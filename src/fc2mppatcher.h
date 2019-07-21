@@ -14,6 +14,9 @@ signals:
 
 public slots:
 
+private:
+    const QString fc2_install_dir = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
+
 };
 
 #endif // FC2MPPATCHER_H

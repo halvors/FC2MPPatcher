@@ -1,6 +1,6 @@
 QT -= gui
 
-CONFIG += c++11 console
+CONFIG += c++14 console
 CONFIG -= app_bundle
 
 # The following define makes your compiler emit warnings if you use
@@ -14,8 +14,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-        main.cpp \
+SOURCES += main.cpp \
     fc2mppatcher.cpp
 
 # Default rules for deployment.
@@ -26,4 +25,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     fc2mppatcher.h
 
-LIBS += -L[path to lib] -l[name of lib]
+# Including 3rd party PeLib library.
+INCLUDEPATH += $$PWD/../lib/pelib/include
+LIBS += -L$$PWD/../lib/pelib/build/src/pelib -lpelib # libpelib or libpelib.dll
+
+#INCLUDEPATH += /home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/lib/pelib/include
+#LIBS += -L/home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/lib/pelib/build/src/pelib -lpelib
