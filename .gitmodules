@@ -1,0 +1,3 @@
+[submodule "lib/pelib"]
+	path = lib/pelib
+	url = https://github.com/avast/pelib
