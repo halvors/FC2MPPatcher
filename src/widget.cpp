@@ -122,8 +122,9 @@ void Widget::pushButton_patch_clicked()
     patcher->open(fileName);
 
     patcher->addImportFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
-    patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
-    //patcher->dumpImportDirectory();
+    //patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
+
+    patcher->dumpImportDirectory();
 
     //peFile->peHeader().writeSections((filename).toStdString());
     //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
