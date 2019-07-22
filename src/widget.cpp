@@ -123,6 +123,7 @@ void Widget::pushButton_patch_clicked()
     ui->pushButton_patch->setEnabled(false);
     ui->pushButton_patch->setText("Patching your broken yet awesome game...");
 
+
     patcher->patch(install_directory);
 
     //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
