@@ -6,6 +6,9 @@
 #include <QSettings>
 #include <QDebug>
 
+#include <QNetworkInterface>
+#include <QHostAddress>
+
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
@@ -14,27 +17,12 @@ Widget::Widget(QWidget *parent) :
 
     loadSettings();
 
-    setWindowTitle("FC2MPPatcher");
+    setWindowTitle(Constants::app_name + " " + Constants::app_version);
 
     ui->lineEdit->setText(install_dir);
+    populateComboboxWithNetworkInterfaces();
 
     patcher = new FC2MPPatcher(this);
-
-    /*
-    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-
-    foreach (QHostAddress interface, list) {
-        if (interface.protocol() == QAbstractSocket::NetworkLayerProtocol::IPv4Protocol) {
-            ui->comboBox->addItem(interface.toString());
-        }
-    }
-
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-
-    foreach (QNetworkInterface interface, list) {
-        ui->comboBox->addItem(interface.name());
-    }
-    */
 
     connect(ui->pushButton_dir, &QPushButton::clicked, this, &Widget::pushButton_dir_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
@@ -48,13 +36,38 @@ Widget::~Widget()
 void Widget::loadSettings()
 {
     QSettings settings;
-    install_dir = settings.value("install_dir", "C:/Program Files/Steam/steamapps/common/Far Cry 2").toString();
+    install_dir = settings.value("install_dir", Constants::defualt_install_dir).toString();
 }
 
 void Widget::saveSettings()
 {
     QSettings settings;
     settings.setValue("install_dir", install_dir);
+}
+
+void Widget::populateComboboxWithNetworkInterfaces()
+{
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+
+    for (QNetworkInterface interface : list) {
+        // Only show active network interfaces.
+        if (interface.flags().testFlag(QNetworkInterface::IsUp)) {
+            QString address;
+
+            // Scan thru addresses for this interface.
+            for (QNetworkAddressEntry addressEntry : interface.addressEntries()) {
+                QHostAddress hostAddress = addressEntry.ip();
+
+                // Only select IPv4 addresses.
+                if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
+                    address = hostAddress.toString();
+                    break;
+                }
+            }
+
+            ui->comboBox->addItem(interface.name() + " (" + address + ")");
+        }
+    }
 }
 
 void Widget::pushButton_dir_clicked()
@@ -87,8 +100,8 @@ void Widget::pushButton_patch_clicked()
     // Load the file into this program.
     patcher->open(fileName);
 
-    patcher->addImportFunction("fix.dll", "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8");
-    patcher->addImportFunction("fix.dll", "_Z14getHostbyname2Pc@4");
+    patcher->addImportFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
+    patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
     patcher->dumpImportDirectory();
 
     //peFile->peHeader().writeSections((filename).toStdString());

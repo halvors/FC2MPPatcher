@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QString>
 
+#include "constants.h"
 #include "fc2mppatcher.h"
 
 namespace Ui {
@@ -30,6 +31,7 @@ private:
 
     void loadSettings();
     void saveSettings();
+    void populateComboboxWithNetworkInterfaces();
 
 };
 

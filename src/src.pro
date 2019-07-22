@@ -23,7 +23,8 @@ SOURCES += main.cpp \
         fc2mppatcher.cpp
 
 HEADERS += widget.h \
-        fc2mppatcher.h
+        fc2mppatcher.h \
+        constants.h
 
 FORMS += widget.ui
 
