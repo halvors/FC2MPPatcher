@@ -17,7 +17,7 @@ public:
     bool open(const QString &filename);
     bool save();
 
-    void addImportFunction(const QString &libraryName, const QString &functionName);
+    bool addImportFunction(const QString &libraryName, const QString &functionName);
     void dumpImportDirectory();
 
 signals:

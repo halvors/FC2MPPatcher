@@ -15,16 +15,15 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    loadSettings();
-
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
-
-    ui->lineEdit->setText(install_dir);
     populateComboboxWithNetworkInterfaces();
+
+    settings = new QSettings();
+    loadSettings();
 
     patcher = new FC2MPPatcher(this);
 
-    connect(ui->pushButton_dir, &QPushButton::clicked, this, &Widget::pushButton_dir_clicked);
+    connect(ui->pushButton_install_dir, &QPushButton::clicked, this, &Widget::pushButton_install_dir_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
 
@@ -35,14 +34,17 @@ Widget::~Widget()
 
 void Widget::loadSettings()
 {
-    QSettings settings;
-    install_dir = settings.value("install_dir", Constants::defualt_install_dir).toString();
+    install_dir = settings->value("install_dir", Constants::defualt_install_dir).toString();
+    ui->lineEdit_install_dir->setText(install_dir);
+
+    interfaceIndex = settings->value("interface_index", ui->comboBox_network_interface->currentIndex()).toInt();
+    ui->comboBox_network_interface->setCurrentIndex(interfaceIndex);
 }
 
 void Widget::saveSettings()
 {
-    QSettings settings;
-    settings.setValue("install_dir", install_dir);
+    settings->setValue("install_dir", install_dir);
+    settings->setValue("interface_index", ui->comboBox_network_interface->currentIndex());
 }
 
 void Widget::populateComboboxWithNetworkInterfaces()
@@ -65,20 +67,39 @@ void Widget::populateComboboxWithNetworkInterfaces()
                 }
             }
 
-            ui->comboBox->addItem(interface.name() + " (" + address + ")");
+            ui->comboBox_network_interface->addItem(interface.name() + " (" + address + ")", address);
         }
     }
 }
 
-void Widget::pushButton_dir_clicked()
+bool Widget::generateNetworkConfigFile(const QString &address)
+{
+    QString filename = install_dir + "/bin/" + Constants::network_configuration_file;
+    QFile file(filename);
+
+    // TODO: Handle if new input is smaller than existing file contents.
+
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << address << endl;
+
+        return true;
+    }
+
+    return false;
+}
+
+void Widget::pushButton_install_dir_clicked()
 {
     QString fileName = QFileDialog::getExistingDirectory(this);
 
-    install_dir = fileName;
-    ui->lineEdit->setText(fileName);
+    if (!fileName.isEmpty()) {
+        install_dir = fileName;
+        ui->lineEdit_install_dir->setText(fileName);
 
-    // TODO: Do this somewhere else.
-    saveSettings();
+        // TODO: Do this somewhere else.
+        saveSettings();
+    }
 }
 
 void Widget::pushButton_patch_clicked()
@@ -102,8 +123,13 @@ void Widget::pushButton_patch_clicked()
 
     patcher->addImportFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
     patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
-    patcher->dumpImportDirectory();
+    //patcher->dumpImportDirectory();
 
     //peFile->peHeader().writeSections((filename).toStdString());
     //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
+
+    generateNetworkConfigFile(ui->comboBox_network_interface->currentData().toString());
+
+    // TODO: Do this somewhere else.
+    saveSettings();
 }
