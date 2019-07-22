@@ -41,10 +41,10 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lineEdit_install_dir"/>
+      <widget class="QLineEdit" name="lineEdit_install_directory"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_install_dir">
+      <widget class="QPushButton" name="pushButton_install_directory">
        <property name="text">
         <string>...</string>
        </property>

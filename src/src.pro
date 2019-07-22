@@ -28,8 +28,6 @@ HEADERS += widget.h \
 
 FORMS += widget.ui
 
-OTHER_FILES += ../TODO
-
 # Including 3rd party PeLib library.
 INCLUDEPATH += $$PWD/../lib/pelib/include
 DEPENDPATH += $$PWD/../lib/pelib/include

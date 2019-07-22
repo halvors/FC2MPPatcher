@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QString>
 #include <QSettings>
+#include <QAction>
+#include <QCloseEvent>
 
 #include "constants.h"
 #include "fc2mppatcher.h"
@@ -21,22 +23,23 @@ public:
     ~Widget();
 
 private slots:
-    void pushButton_install_dir_clicked();
-    void comboBox_network_interface_currentIndexChanged(int index);
+    void pushButton_install_directory_clicked();
     void pushButton_patch_clicked();
 
 private:
+    void closeEvent(QCloseEvent *event);
+
     Ui::Widget *ui;
     QSettings *settings;
     FC2MPPatcher *patcher;
 
     QString install_directory;
-    int interfaceIndex;
 
     void loadSettings();
     void saveSettings();
+    bool generateNetworkConfigFile(const QString &installDir, const QString &address);
+
     void populateComboboxWithNetworkInterfaces();
-    bool generateNetworkConfigFile(const QString &address);
 
 };
 

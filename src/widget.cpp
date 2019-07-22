@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+#include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QSettings>
@@ -22,8 +23,7 @@ Widget::Widget(QWidget *parent) :
 
     patcher = new FC2MPPatcher(this);
 
-    connect(ui->pushButton_install_dir, &QPushButton::clicked, this, &Widget::pushButton_install_dir_clicked);
-    connect(ui->comboBox_network_interface, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &Widget::comboBox_network_interface_currentIndexChanged);
+    connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
 
@@ -34,11 +34,14 @@ Widget::~Widget()
 
 void Widget::loadSettings()
 {
-    install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory_list.first()).toString();
-    ui->lineEdit_install_dir->setText(install_directory);
+    QString install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory_list.first()).toString();
+    ui->lineEdit_install_directory->setText(install_directory);
 
-    interfaceIndex = settings->value(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex()).toInt();
-    ui->comboBox_network_interface->setCurrentIndex(interfaceIndex);
+    int index = settings->value(Constants::settings_interface_index).toInt();
+
+    if (index < ui->comboBox_network_interface->count()) {
+        ui->comboBox_network_interface->setCurrentIndex(index);
+    }
 
     settings->beginGroup("Window");
         resize(settings->value("size", size()).toSize());
@@ -52,7 +55,7 @@ void Widget::loadSettings()
 
 void Widget::saveSettings()
 {
-    settings->setValue(Constants::settings_install_directory, install_directory);
+    settings->setValue(Constants::settings_install_directory, ui->lineEdit_install_directory->text());
     settings->setValue(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex());
 
     settings->beginGroup("Window");
@@ -67,8 +70,10 @@ void Widget::populateComboboxWithNetworkInterfaces()
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
 
     for (QNetworkInterface interface : list) {
+        QNetworkInterface::InterfaceFlags flags = interface.flags();
+
         // Only show active network interfaces.
-        if (interface.flags().testFlag(QNetworkInterface::IsUp)) {
+        if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
             QString address;
 
             // Scan thru addresses for this interface.
@@ -87,9 +92,9 @@ void Widget::populateComboboxWithNetworkInterfaces()
     }
 }
 
-bool Widget::generateNetworkConfigFile(const QString &address)
+bool Widget::generateNetworkConfigFile(const QString &installDir, const QString &address)
 {
-    QString filename = install_directory + "/bin/" + Constants::network_configuration_file;
+    QString filename = installDir + "/bin/" + Constants::network_configuration_file;
     QFile file(filename);
 
     // TODO: Handle if new input is smaller than existing file contents.
@@ -104,22 +109,16 @@ bool Widget::generateNetworkConfigFile(const QString &address)
     return false;
 }
 
-void Widget::pushButton_install_dir_clicked()
+void Widget::pushButton_install_directory_clicked()
 {
-    QString fileName = QFileDialog::getExistingDirectory(this);
+    QString installDir = QFileDialog::getExistingDirectory(this);
 
-    if (!fileName.isEmpty()) {
-        install_directory = fileName;
-        ui->lineEdit_install_dir->setText(fileName);
+    if (QDir(installDir).exists()) {
+        ui->lineEdit_install_directory->setText(installDir);
 
         // TODO: Do this somewhere else.
         saveSettings();
     }
-}
-
-void Widget::comboBox_network_interface_currentIndexChanged(int index)
-{
-    interfaceIndex = index;
 }
 
 void Widget::pushButton_patch_clicked()
@@ -127,13 +126,19 @@ void Widget::pushButton_patch_clicked()
     ui->pushButton_patch->setEnabled(false);
     ui->pushButton_patch->setText("Patching your broken yet awesome game...");
 
-
     patcher->patch(install_directory);
 
     //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
 
-    generateNetworkConfigFile(ui->comboBox_network_interface->currentData().toString());
+    generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
 
     // TODO: Do this somewhere else.
+    saveSettings();
+}
+
+void Widget::closeEvent(QCloseEvent *event)
+{
+    QWidget::closeEvent(event);
+
     saveSettings();
 }
