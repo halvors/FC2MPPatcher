@@ -1,0 +1,2 @@
+- Patch FC2ServerLauncher.exe or/and Dunia.dll with PE imports for fix.dll.y
+- Added support to select network interface to use in pathcer GUI? (QNetworkInterface for this).
