@@ -30,7 +30,7 @@ private:
     QSettings *settings;
     FC2MPPatcher *patcher;
 
-    QString install_dir;
+    QString install_directory;
     int interfaceIndex;
 
     void loadSettings();
