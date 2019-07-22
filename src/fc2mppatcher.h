@@ -17,18 +17,15 @@ public:
     bool open(const QString &filename);
     bool save();
 
+    void addImportFunction(const QString &libraryName, const QString &functionName);
+    void dumpImportDirectory();
+
 signals:
 
 public slots:
 
 private:
     PeLib::PeFile32 *peFile;
-
-    const QString filename = "/home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/FarCry2.exe";
-    const QString fc2_install_dir = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
-
-    void addImportFunction(const QString &libraryName, const QString &functionName);
-    void dumpImportDirectory();
 
 };
 

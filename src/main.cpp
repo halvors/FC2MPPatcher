@@ -1,12 +1,14 @@
-#include <QCoreApplication>
+#include <QApplication>
 
-#include "fc2mppatcher.h"
+#include "widget.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
+    a.setApplicationName("FC2MPPatcher");
 
-    new FC2MPPatcher();
+    Widget w;
+    w.show();
 
     return a.exec();
 }

@@ -4,15 +4,7 @@
 
 FC2MPPatcher::FC2MPPatcher(QObject *parent) : QObject(parent)
 {
-    // Open the file and load PE header.
-    open(filename);
 
-    // Add new entries to import directory.
-    addImportFunction("fix.dll", "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8");
-    addImportFunction("fix.dll", "_Z14getHostbyname2Pc@4");
-
-    // Dump import directory information to console.
-    dumpImportDirectory();
 }
 
 FC2MPPatcher::~FC2MPPatcher()
@@ -25,7 +17,7 @@ bool FC2MPPatcher::open(const QString &filename)
     peFile = new PeLib::PeFile32(filename.toStdString());
 
     if (!peFile) {
-        qDebug("Invalid PE File");
+        qDebug("Invalid PE file.");
 
         return false;
     }
@@ -63,7 +55,7 @@ void FC2MPPatcher::dumpImportDirectory()
     qDebug("Import Directory");
 
     if (peFile->readImportDirectory()) {
-        qDebug("Not available");
+        qDebug("Not available.");
 
         return;
     }
