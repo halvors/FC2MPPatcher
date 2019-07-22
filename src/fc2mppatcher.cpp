@@ -1,3 +1,4 @@
+#include <QFile>
 #include <QDebug>
 
 #include "fc2mppatcher.h"
@@ -103,4 +104,27 @@ void FC2MPPatcher::dumpImportDirectory()
         }
 
     }
+}
+
+void FC2MPPatcher::patch(const QString &installDir)
+{
+    // Create path to binary folder.
+    QString path = installDir + "/bin/";
+    QString fileName = path + "FarCry2_patched.exe";
+
+    // Copy original file to other workfile.
+    if (QFile::exists(fileName)) {
+        QFile::remove(fileName);
+    }
+
+    QFile::copy(path + "FarCry2.exe", fileName);
+
+    // Load the file into this program.
+    open(fileName);
+
+    addImportFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
+    //patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
+    dumpImportDirectory();
+
+    //peFile->peHeader().writeSections((filename).toStdString());
 }

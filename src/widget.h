@@ -22,6 +22,7 @@ public:
 
 private slots:
     void pushButton_install_dir_clicked();
+    void comboBox_network_interface_currentIndexChanged(int index);
     void pushButton_patch_clicked();
 
 private:
