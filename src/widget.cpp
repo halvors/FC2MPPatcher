@@ -34,6 +34,13 @@ Widget::~Widget()
 
 void Widget::loadSettings()
 {
+    resize(settings->value("size", size()).toSize());
+    move(settings->value("position", pos()).toPoint());
+
+    if (settings->value("isMaximized", false).toBool()) {
+        showMaximized();
+    }
+
     install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory_list.first()).toString();
     ui->lineEdit_install_dir->setText(install_directory);
 
@@ -43,6 +50,10 @@ void Widget::loadSettings()
 
 void Widget::saveSettings()
 {
+    settings->setValue("size", size());
+    settings->setValue("position", pos());
+    settings->setValue("isMaximized", isMaximized());
+
     settings->setValue(Constants::settings_install_directory, install_directory);
     settings->setValue(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex());
 }
