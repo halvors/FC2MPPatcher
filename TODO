@@ -1,3 +1,4 @@
 - Patch FC2ServerLauncher.exe or/and Dunia.dll with PE imports for fix.dll
 - Automatically search for install directory, and backup files before altering them.
 - Added support to select network interface to use in pathcer GUI? (QNetworkInterface for this).
+- Fix network file generator not handling different old file sizes.

@@ -9,7 +9,9 @@ FC2MPPatcher::FC2MPPatcher(QObject *parent) : QObject(parent)
 
 FC2MPPatcher::~FC2MPPatcher()
 {
-    delete peFile;
+    if (peFile) {
+        delete peFile;
+    }
 }
 
 bool FC2MPPatcher::open(const QString &filename)

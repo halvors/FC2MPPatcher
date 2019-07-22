@@ -18,7 +18,7 @@ Widget::Widget(QWidget *parent) :
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
     populateComboboxWithNetworkInterfaces();
 
-    settings = new QSettings();
+    settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, Constants::app_name, Constants::app_name, this);
     loadSettings();
 
     patcher = new FC2MPPatcher(this);
