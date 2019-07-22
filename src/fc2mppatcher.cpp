@@ -7,10 +7,11 @@ FC2MPPatcher::FC2MPPatcher(QObject *parent) : QObject(parent)
     // Open the file and load PE header.
     open(filename);
 
+    // Add new entries to import directory.
     addImportFunction("fix.dll", "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8");
     addImportFunction("fix.dll", "_Z14getHostbyname2Pc@4");
 
-    // Actually do stuff.
+    // Dump import directory information to console.
     dumpImportDirectory();
 }
 
@@ -31,7 +32,6 @@ bool FC2MPPatcher::open(const QString &filename)
 
     // These is needed in order to actually read the file from disk.
     peFile->readMzHeader();
-    mzHeaderSize = peFile->mzHeader().size();
     peFile->readPeHeader();
 
     return true;
@@ -42,8 +42,6 @@ bool FC2MPPatcher::save()
     if (!peFile) {
         return false;
     }
-
-    peFile->peHeader().write(peFile->getFileName(), mzHeaderSize);
 
     return true;
 }
@@ -56,23 +54,19 @@ void FC2MPPatcher::addImportFunction(const QString &libraryName, const QString &
     unsigned uiImpDir = peFile->peHeader().getVirtualAddress(0) + 0x100; // TODO: What number is this???
     peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
 
-    // TODO: Problem is here, does not write to file.
+    // TODO: Problem is here, does not write to file. Only applied in memory.
     peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
 }
-
-void
 
 void FC2MPPatcher::dumpImportDirectory()
 {
     qDebug("Import Directory");
 
-    /*
     if (peFile->readImportDirectory()) {
         qDebug("Not available");
 
         return;
     }
-    */
 
     const PeLib::ImportDirectory32 &imp = peFile->impDir();
 

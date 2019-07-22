@@ -23,7 +23,6 @@ public slots:
 
 private:
     PeLib::PeFile32 *peFile;
-    unsigned int mzHeaderSize;
 
     const QString filename = "/home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/FarCry2.exe";
     const QString fc2_install_dir = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
