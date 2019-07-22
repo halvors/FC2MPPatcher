@@ -41,19 +41,29 @@ bool FC2MPPatcher::save()
 bool FC2MPPatcher::addImportFunction(const QString &libraryName, const QString &functionName)
 {
     if (!peFile) {
-        // Reads the import directory from file.
-        peFile->readImportDirectory();
-
-        unsigned uiImpDir = peFile->peHeader().getIddImportRva(); // TODO: What number is this???
-        peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
-
-        // TODO: Problem is here, does not write to file. Only applied in memory.
-        peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
-
-        return true;
+        return false;
     }
 
-    return false;
+    // Reads the import directory from file.
+    //peFile->readImportDirectory();
+
+    //unsigned uiImpDir = peFile->peHeader().getIddImportRva(); // TODO: What number is this???
+    //peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
+
+    // TODO: Problem is here, does not write to file. Only applied in memory.
+    //peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
+
+    // Reads the import directory from file.
+    peFile->readImportDirectory();
+    unsigned uiImpDir = peFile->peHeader().getIddImportRva();
+    //peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
+    //peFile->peHeader().setIddImportSize(peFile->impDir().size());
+    //peFile->peHeader().makeValid(peFile->mzHeader().size());
+    // TODO: Problem is here, does not write to file. Only applied in memory.
+    peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
+    peFile->peHeader().write(peFile->getFileName(), peFile->mzHeader().size());
+
+    return true;
 }
 
 void FC2MPPatcher::dumpImportDirectory()
@@ -84,10 +94,10 @@ void FC2MPPatcher::dumpImportDirectory()
             //qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
 
             // Available information
-            //qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
-            //qDebug() << "Hint" << imp.getFunctionHint(i, j, PeLib::OLDDIR);
-            //qDebug() << "First Thunk" << imp.getFirstThunk(i, j, PeLib::OLDDIR);
-            //qDebug() << "Original First Thunk" << imp.getOriginalFirstThunk(i, j, PeLib::OLDDIR);
+            qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
+            qDebug() << "Hint" << imp.getFunctionHint(i, j, PeLib::OLDDIR);
+            qDebug() << "First Thunk" << imp.getFirstThunk(i, j, PeLib::OLDDIR);
+            qDebug() << "Original First Thunk" << imp.getOriginalFirstThunk(i, j, PeLib::OLDDIR);
         }
 
     }
