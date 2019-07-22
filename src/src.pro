@@ -22,12 +22,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-HEADERS += \
-    fc2mppatcher.h
+HEADERS += fc2mppatcher.h
 
 # Including 3rd party PeLib library.
 INCLUDEPATH += $$PWD/../lib/pelib/include
 LIBS += -L$$PWD/../lib/pelib/build/src/pelib -lpelib # libpelib or libpelib.dll
-
-#INCLUDEPATH += /home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/lib/pelib/include
-#LIBS += -L/home/halvors/Dokumenter/Prosjekter/FC2MPPatcher/lib/pelib/build/src/pelib -lpelib
