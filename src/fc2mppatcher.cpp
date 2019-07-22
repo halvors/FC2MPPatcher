@@ -43,7 +43,7 @@ void FC2MPPatcher::addImportFunction(const QString &libraryName, const QString &
     // Reads the import directory from file.
     peFile->readImportDirectory();
 
-    unsigned uiImpDir = peFile->peHeader().getVirtualAddress(0) + 0x100; // TODO: What number is this???
+    unsigned uiImpDir = peFile->peHeader().getIddImportRva(); // TODO: What number is this???
     peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
 
     // TODO: Problem is here, does not write to file. Only applied in memory.

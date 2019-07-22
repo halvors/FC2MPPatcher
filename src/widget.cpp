@@ -70,5 +70,6 @@ void Widget::pushButton_patch_clicked()
     patcher->addImportFunction("fix.dll", "_Z14getHostbyname2Pc@4");
     patcher->dumpImportDirectory();
 
+    //peFile->peHeader().writeSections((filename).toStdString());
     //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
 }
