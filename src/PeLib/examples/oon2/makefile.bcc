@@ -1,8 +1,0 @@
-COMPILER = bcc32
-CFLAGS =
-
-all: 
-	$(COMPILER) $(CFLAGS) oon2.cpp ../../lib/*.obj
-
-clean:
-	rm oon2.exe

@@ -1,8 +1,0 @@
-COMPILER = g++
-CFLAGS = -I../../source ../../lib/*.o
-
-all:
-	${COMPILER} ${CFLAGS} isnatch.cpp -o isnatch.exe
-
-clean:
-	del isnatch.exe

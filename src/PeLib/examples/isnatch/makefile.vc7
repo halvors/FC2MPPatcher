@@ -1,9 +1,0 @@
-COMPILER = cl
-CFLAGS = /EHsc
-FILENAME=isnatch
-
-all:
-	$(COMPILER) $(CFLAGS) $(FILENAME).cpp ../../lib/*.obj
-
-Clean:
-	del $(FILENAME).exe *.obj

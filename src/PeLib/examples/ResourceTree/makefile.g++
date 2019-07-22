@@ -1,8 +1,0 @@
-COMPILER = g++
-CFLAGS = -I../../source ../../lib/*.o
-
-all:
-	${COMPILER} ${CFLAGS} ResourceTree.cpp -o ResourceTree.exe
-
-clean:
-	del ResourceTree.exe

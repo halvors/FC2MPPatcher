@@ -1,8 +1,0 @@
-COMPILER = dmc
-CFLAGS = -Ae -o+space -w-
-
-all: 
-	$(COMPILER) $(CFLAGS) Filedump.cpp ..\..\lib\*.obj
-
-clean:
-	rm Filedump.exe

@@ -1,8 +1,0 @@
-COMPILER = dmc
-CFLAGS = -Ae -o+space -w-
-
-all: 
-	$(COMPILER) $(CFLAGS) ResourceTree.cpp ..\..\lib\*.obj
-
-clean:
-	rm ResourceTree.exe
