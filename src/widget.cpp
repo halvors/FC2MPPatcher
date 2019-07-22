@@ -20,6 +20,22 @@ Widget::Widget(QWidget *parent) :
 
     patcher = new FC2MPPatcher(this);
 
+    /*
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+
+    foreach (QHostAddress interface, list) {
+        if (interface.protocol() == QAbstractSocket::NetworkLayerProtocol::IPv4Protocol) {
+            ui->comboBox->addItem(interface.toString());
+        }
+    }
+
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+
+    foreach (QNetworkInterface interface, list) {
+        ui->comboBox->addItem(interface.name());
+    }
+    */
+
     connect(ui->pushButton_dir, &QPushButton::clicked, this, &Widget::pushButton_dir_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
@@ -32,7 +48,7 @@ Widget::~Widget()
 void Widget::loadSettings()
 {
     QSettings settings;
-    install_dir = settings.value("install_dir").toString(); //"C:/Program Files/Steam/steamapps/common/Far Cry 2"
+    install_dir = settings.value("install_dir", "C:/Program Files/Steam/steamapps/common/Far Cry 2").toString();
 }
 
 void Widget::saveSettings()
@@ -59,12 +75,17 @@ void Widget::pushButton_patch_clicked()
 
     // Create path to binary folder.
     QString path = install_dir + "/bin/";
+    QString fileName = path + "FarCry2_patched.exe";
 
     // Copy original file to other workfile.
-    QFile::copy(path + "FarCry2.exe", path + "FarCry2_patched.exe");
+    if (QFile::exists(fileName)) {
+        QFile::remove(fileName);
+    }
+
+    QFile::copy(path + "FarCry2.exe", fileName);
 
     // Load the file into this program.
-    patcher->open(path + "FarCry2_patched.exe");
+    patcher->open(fileName);
 
     patcher->addImportFunction("fix.dll", "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8");
     patcher->addImportFunction("fix.dll", "_Z14getHostbyname2Pc@4");
