@@ -22,6 +22,7 @@ public:
 
 private slots:
     void pushButton_install_dir_clicked();
+    void comboBox_network_interface_currentIndexChanged(int index);
     void pushButton_patch_clicked();
 
 private:
@@ -29,7 +30,7 @@ private:
     QSettings *settings;
     FC2MPPatcher *patcher;
 
-    QString install_dir;
+    QString install_directory;
     int interfaceIndex;
 
     void loadSettings();

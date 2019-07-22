@@ -2,12 +2,19 @@
 #define CONSTANTS_H
 
 #include <QString>
+#include <QStringList>
 
 namespace Constants {
     const QString app_name = "FC2MPPatcher";
     const QString app_version = "0.0.1";
+    const QString app_configuration_file = app_name.toLower() + ".ini";
 
-    const QString defualt_install_dir = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
+    const QString settings_install_directory = "install_directory";
+    const QString settings_interface_index = "interface_index";
+
+    const QStringList install_directory_list = { "C:/Program Files/Steam/steamapps/common/Far Cry 2",
+                                                 "C:/Program Files (x86)/Ubisoft/Far Cry 2" };
+
     const QString target_executable_client = "Dunia.dll";
     const QString target_executable_server = "FC2ServerLauncher.exe";
 

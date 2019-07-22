@@ -6,6 +6,8 @@
 
 #include <pelib/PeLib.h>
 
+#include "constants.h"
+
 class FC2MPPatcher : public QObject
 {
     Q_OBJECT
@@ -16,6 +18,8 @@ public:
 
     bool open(const QString &filename);
     bool save();
+
+    void patch(const QString &installDir);
 
     bool addImportFunction(const QString &libraryName, const QString &functionName);
     void dumpImportDirectory();
