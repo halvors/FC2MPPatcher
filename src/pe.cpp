@@ -56,7 +56,9 @@ bool Pe::save()
     }
 
     const string fileName = file->getFileName();
+
     unsigned int uiImpDir = peHeader->getIddImportRva();
+    unsigned int uiIatDir = peHeader->getIddIatRva();
 
     //peHeader->setIddImportSize(peFile->impDir().size());
     //peHeader->makeValid(peFile->mzHeader().size());
@@ -64,6 +66,17 @@ bool Pe::save()
     mzHeader->write(fileName, 0);
     peHeader->write(fileName, mzHeader->getAddressOfPeHeader());
     importDirectory->write(fileName, peHeader->rvaToOffset(uiImpDir), uiImpDir);
+
+    file->iatDir().write(file->getFileName(), peHeader->rvaToOffset(uiIatDir));
+    file->impDir().write(file->getFileName(), peHeader->rvaToOffset(uiImpDir), uiImpDir);
+
+    peHeader->setIddImportSize(file->impDir().size());
+    peHeader->setIddIatSize(file->impDir().size());
+
+    peHeader->makeValid(file->mzHeader().getAddressOfPeHeader());
+    peHeader->write(file->getFileName(),0);
+    peHeader->write(file->getFileName(), mzHeader->getAddressOfPeHeader());
+
 
     return true;
 }
