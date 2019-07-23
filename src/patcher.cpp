@@ -21,8 +21,9 @@ void Patcher::applyPatch(const QString &installDirectory)
     pe->open(fileName);
 
     pe->addLibraryFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
-    pe->addLibraryFunction(Constants::library_name, Constants::library_function_getHostbyname);
-    pe->dumpImportDirectory();
+    //pe->addLibraryFunction(Constants::library_name, Constants::library_function_getHostbyname);
 
     pe->save();
+
+    pe->dumpImportDirectory();
 }

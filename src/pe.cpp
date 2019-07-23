@@ -56,17 +56,13 @@ bool Pe::save()
     }
 
     const string fileName = file->getFileName();
+    unsigned int uiImpDir = peHeader->getIddImportRva();
 
-    //unsigned uiImpDir = peHeader->getIddImportRva(); // TODO: What number is this???
-    // TODO: Problem is here, does not write to file. Only applied in memory.
-    //importDirectory->write(peFile->getFileName(), peHeader->rvaToOffset(uiImpDir), uiImpDir);
-
-    unsigned uiImpDir = peHeader->getIddImportRva();
     //peHeader->setIddImportSize(peFile->impDir().size());
     //peHeader->makeValid(peFile->mzHeader().size());
 
     mzHeader->write(fileName, 0);
-    peHeader->write(fileName, 0xE8);
+    peHeader->write(fileName, mzHeader->getAddressOfPeHeader());
     importDirectory->write(fileName, peHeader->rvaToOffset(uiImpDir), uiImpDir);
 
     return true;
