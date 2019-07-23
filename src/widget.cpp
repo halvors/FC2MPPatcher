@@ -126,6 +126,17 @@ void Widget::pushButton_install_directory_clicked()
 
 void Widget::pushButton_patch_clicked()
 {
+    // Create path to binary folder.
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory;
+    QString fileName = path + "/FarCry2_patched.exe";
+
+    // Copy original file to other workfile.
+    if (!QFile::exists(fileName)) {
+        QFile::copy(path + "/FarCry2.exe", fileName);
+    }
+
+    pushButton_reset_clicked();
+
     patcher->applyPatch(ui->lineEdit_install_directory->text());
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
 
