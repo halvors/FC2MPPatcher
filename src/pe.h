@@ -30,6 +30,7 @@ private:
     MzHeader *mzHeader;
     PeHeader32 *peHeader;
     ImportDirectory32 *importDirectory;
+    IatDirectory *iatDirectory;
 };
 
 #endif // PE_H
