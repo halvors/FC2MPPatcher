@@ -25,9 +25,12 @@ bool FC2MPPatcher::open(const QString &filename)
         return false;
     }
 
-    // These is needed in order to actually read the file from disk.
+    // Read the headers from disk.
     peFile->readMzHeader();
     peFile->readPeHeader();
+
+    // Reads the import directory from file.
+    peFile->readImportDirectory();
 
     return true;
 }
@@ -38,34 +41,27 @@ bool FC2MPPatcher::save()
         return false;
     }
 
+    //unsigned uiImpDir = peFile->peHeader().getIddImportRva(); // TODO: What number is this???
+    // TODO: Problem is here, does not write to file. Only applied in memory.
+    //peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
+
+    unsigned uiImpDir = peFile->peHeader().getIddImportRva();
+    //peFile->peHeader().setIddImportSize(peFile->impDir().size());
+    //peFile->peHeader().makeValid(peFile->mzHeader().size());
+    peFile->mzHeader().write(peFile->getFileName(), 0);
+    peFile->peHeader().write(peFile->getFileName(), 0xE8);
+    peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
+
     return true;
 }
 
-bool FC2MPPatcher::addImportFunction(const QString &libraryName, const QString &functionName)
+bool FC2MPPatcher::addFunction(const QString &libraryName, const QString &functionName)
 {
     if (!peFile) {
         return false;
     }
 
-    // Reads the import directory from file.
-    peFile->readImportDirectory();
-    //unsigned uiImpDir = peFile->peHeader().getIddImportRva(); // TODO: What number is this???
-    //peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
-
-    // TODO: Problem is here, does not write to file. Only applied in memory.
-    //peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
-
-    // Reads the import directory from file.
-    unsigned uiImpDir = peFile->peHeader().getIddImportRva();
-    peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString());
-    //peFile->peHeader().setIddImportSize(peFile->impDir().size());
-    //peFile->peHeader().makeValid(peFile->mzHeader().size());
-    // TODO: Problem is here, does not write to file. Only applied in memory.
-    peFile->impDir().write(peFile->getFileName(), peFile->peHeader().rvaToOffset(uiImpDir), uiImpDir);
-    peFile->mzHeader().write(peFile->getFileName(),0);
-    peFile->peHeader().write(peFile->getFileName(), 0xE8);
-
-    return true;
+    return peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString()) == PeLib::ERROR_NONE;
 }
 
 void FC2MPPatcher::dumpImportDirectory()
@@ -93,9 +89,6 @@ void FC2MPPatcher::dumpImportDirectory()
         //qDebug() << "FirstThunk" << imp.getFirstThunk(i, PeLib::OLDDIR);
 
         for (unsigned int j = 0; j < imp.getNumberOfFunctions(i, PeLib::OLDDIR); j++) {
-            //qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
-
-            // Available information
             qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
             qDebug() << "Hint" << imp.getFunctionHint(i, j, PeLib::OLDDIR);
             qDebug() << "First Thunk" << imp.getFirstThunk(i, j, PeLib::OLDDIR);
@@ -121,9 +114,9 @@ void FC2MPPatcher::patch(const QString &installDir)
     // Load the file into this program.
     open(fileName);
 
-    addImportFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
-    //patcher->addImportFunction(Constants::library_name, Constants::library_function_getHostbyname);
-    dumpImportDirectory();
+    //addFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
+    //addFunction(Constants::library_name, Constants::library_function_getHostbyname);
+    //dumpImportDirectory();
 
-    //peFile->peHeader().writeSections((filename).toStdString());
+    save();
 }

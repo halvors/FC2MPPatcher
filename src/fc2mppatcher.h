@@ -21,12 +21,8 @@ public:
 
     void patch(const QString &installDir);
 
-    bool addImportFunction(const QString &libraryName, const QString &functionName);
+    bool addFunction(const QString &libraryName, const QString &functionName);
     void dumpImportDirectory();
-
-signals:
-
-public slots:
 
 private:
     PeLib::PeFile32 *peFile;
