@@ -1,3 +1,4 @@
+#include <QFile>
 #include <QDebug>
 
 #include "pe.h"
@@ -14,9 +15,16 @@ Pe::~Pe()
     }
 }
 
-bool Pe::open(const QString &filename)
+bool Pe::open(const QString &fileName)
 {
-    file = new PeFile32(filename.toStdString());
+    // Verify that the file we're trying to open actually exists.
+    if (!QFile::exists(fileName)) {
+        qDebug("Specified file does not exist.");
+
+        return false;
+    }
+
+    file = new PeFile32(fileName.toStdString());
 
     if (!file) {
         qDebug("Invalid PE file.");
