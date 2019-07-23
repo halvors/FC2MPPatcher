@@ -14,6 +14,7 @@ namespace Constants {
 
     const QStringList install_directory_list = { "C:/Program Files/Steam/steamapps/common/Far Cry 2",
                                                  "C:/Program Files (x86)/Ubisoft/Far Cry 2" };
+    const QString executable_directory = "bin";
 
     const QString target_executable_client = "Dunia.dll";
     const QString target_executable_server = "FC2ServerLauncher.exe";

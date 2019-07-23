@@ -94,12 +94,9 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
 bool Widget::generateNetworkConfigFile(const QString &installDir, const QString &address)
 {
-    QString filename = installDir + "/bin/" + Constants::network_configuration_file;
-    QFile file(filename);
+    QFile file(installDir + "/" + Constants::executable_directory + "/" + Constants::network_configuration_file);
 
-    // TODO: Handle if new input is smaller than existing file contents.
-
-    if (file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
         QTextStream stream(&file);
         stream << address << endl;
 
@@ -115,9 +112,6 @@ void Widget::pushButton_install_directory_clicked()
 
     if (QDir(installDir).exists()) {
         ui->lineEdit_install_directory->setText(installDir);
-
-        // TODO: Do this somewhere else.
-        saveSettings();
     }
 }
 
@@ -126,14 +120,11 @@ void Widget::pushButton_patch_clicked()
     ui->pushButton_patch->setEnabled(false);
     ui->pushButton_patch->setText("Patching your broken yet awesome game...");
 
-    patcher->patch(install_directory);
+    //patcher->patch(install_directory);
 
-    //ui->pushButton_2->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
+    //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
 
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
-
-    // TODO: Do this somewhere else.
-    saveSettings();
 }
 
 void Widget::closeEvent(QCloseEvent *event)
