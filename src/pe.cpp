@@ -93,13 +93,11 @@ void Pe::dumpImportDirectory()
 {
     qDebug("Import Directory");
 
-    /*
     if (file->readImportDirectory()) { // Should we read this again here or just use what's in memory?
         qDebug("Not available.");
 
         return;
     }
-    */
 
     for (unsigned int i = 0; i < importDirectory->getNumberOfFiles(OLDDIR); i++) {
         qDebug() << "Library Name: " << QString::fromStdString(importDirectory->getFileName(i, OLDDIR));
