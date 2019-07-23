@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QString>
 #include <QSettings>
-#include <QAction>
 #include <QCloseEvent>
 
 #include "constants.h"
@@ -27,18 +26,15 @@ private slots:
     void pushButton_patch_clicked();
 
 private:
-    void closeEvent(QCloseEvent *event);
-
     Ui::Widget *ui;
     QSettings *settings;
     FC2MPPatcher *patcher;
 
-    QString install_directory;
-
     void loadSettings();
     void saveSettings();
-    bool generateNetworkConfigFile(const QString &installDir, const QString &address);
+    void closeEvent(QCloseEvent *event);
 
+    bool generateNetworkConfigFile(const QString &installDir, const QString &address);
     void populateComboboxWithNetworkInterfaces();
 
 };

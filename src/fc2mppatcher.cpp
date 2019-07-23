@@ -17,7 +17,7 @@ FC2MPPatcher::~FC2MPPatcher()
 
 bool FC2MPPatcher::open(const QString &filename)
 {
-    peFile = new PeLib::PeFile32(filename.toStdString());
+    peFile = new PeFile32(filename.toStdString());
 
     if (!peFile) {
         qDebug("Invalid PE file.");
@@ -61,7 +61,7 @@ bool FC2MPPatcher::addFunction(const QString &libraryName, const QString &functi
         return false;
     }
 
-    return peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString()) == PeLib::ERROR_NONE;
+    return peFile->impDir().addFunction(libraryName.toStdString(), functionName.toStdString()) == ERROR_NONE;
 }
 
 void FC2MPPatcher::dumpImportDirectory()
@@ -74,25 +74,25 @@ void FC2MPPatcher::dumpImportDirectory()
         return;
     }
 
-    const PeLib::ImportDirectory32 &imp = peFile->impDir();
+    const ImportDirectory<32> &imp = peFile->impDir();
 
-    for (unsigned int i = 0; i < imp.getNumberOfFiles(PeLib::OLDDIR); i++) {
-        qDebug() << "Library Name: " << QString::fromStdString(imp.getFileName(i, PeLib::OLDDIR));
+    for (unsigned int i = 0; i < imp.getNumberOfFiles(OLDDIR); i++) {
+        qDebug() << "Library Name: " << QString::fromStdString(imp.getFileName(i, OLDDIR));
         //qDebug("Functions");
 
         // Available information
-        //qDebug() << "DLL Name" << QString::fromStdString(imp.getFileName(i, PeLib::OLDDIR));
-        //qDebug() << "OriginalFirstThunk" << imp.getOriginalFirstThunk(i, PeLib::OLDDIR);
-        //qDebug() << "TimeDateStamp" << imp.getTimeDateStamp(i, PeLib::OLDDIR);
-        //qDebug() << "ForwarderChain" << imp.getForwarderChain(i, PeLib::OLDDIR);
-        //qDebug() << "Name" << imp.getRvaOfName(i, PeLib::OLDDIR);
-        //qDebug() << "FirstThunk" << imp.getFirstThunk(i, PeLib::OLDDIR);
+        //qDebug() << "DLL Name" << QString::fromStdString(imp.getFileName(i, OLDDIR));
+        //qDebug() << "OriginalFirstThunk" << imp.getOriginalFirstThunk(i, OLDDIR);
+        //qDebug() << "TimeDateStamp" << imp.getTimeDateStamp(i, OLDDIR);
+        //qDebug() << "ForwarderChain" << imp.getForwarderChain(i, OLDDIR);
+        //qDebug() << "Name" << imp.getRvaOfName(i, OLDDIR);
+        //qDebug() << "FirstThunk" << imp.getFirstThunk(i, OLDDIR);
 
-        for (unsigned int j = 0; j < imp.getNumberOfFunctions(i, PeLib::OLDDIR); j++) {
-            qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, PeLib::OLDDIR));
-            qDebug() << "Hint" << imp.getFunctionHint(i, j, PeLib::OLDDIR);
-            qDebug() << "First Thunk" << imp.getFirstThunk(i, j, PeLib::OLDDIR);
-            qDebug() << "Original First Thunk" << imp.getOriginalFirstThunk(i, j, PeLib::OLDDIR);
+        for (unsigned int j = 0; j < imp.getNumberOfFunctions(i, OLDDIR); j++) {
+            qDebug() << "Function Name" << QString::fromStdString(imp.getFunctionName(i, j, OLDDIR));
+            qDebug() << "Hint" << imp.getFunctionHint(i, j, OLDDIR);
+            qDebug() << "First Thunk" << imp.getFirstThunk(i, j, OLDDIR);
+            qDebug() << "Original First Thunk" << imp.getOriginalFirstThunk(i, j, OLDDIR);
         }
 
     }

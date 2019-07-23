@@ -65,6 +65,13 @@ void Widget::saveSettings()
     settings->endGroup();
 }
 
+void Widget::closeEvent(QCloseEvent *event)
+{
+    QWidget::closeEvent(event);
+
+    saveSettings();
+}
+
 void Widget::populateComboboxWithNetworkInterfaces()
 {
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
@@ -125,11 +132,4 @@ void Widget::pushButton_patch_clicked()
     //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
 
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
-}
-
-void Widget::closeEvent(QCloseEvent *event)
-{
-    QWidget::closeEvent(event);
-
-    saveSettings();
 }

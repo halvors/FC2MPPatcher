@@ -4,9 +4,11 @@
 #include <QObject>
 #include <QString>
 
-#include <pelib/PeLib.h>
+#include <pelib/PeFile.h>
 
 #include "constants.h"
+
+using namespace PeLib;
 
 class FC2MPPatcher : public QObject
 {
@@ -25,7 +27,7 @@ public:
     void dumpImportDirectory();
 
 private:
-    PeLib::PeFile32 *peFile;
+    PeFile32 *peFile;
 
 };
 

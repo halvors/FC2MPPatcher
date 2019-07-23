@@ -32,7 +32,7 @@ FORMS += widget.ui
 INCLUDEPATH += $$PWD/../lib/pelib/include
 DEPENDPATH += $$PWD/../lib/pelib/include
 
-LIBS += -L$$PWD/../lib/pelib/build/src/pelib -lpelib # libpelib or libpelib.dll
+LIBS += -L$$PWD/../lib/pelib/build/src/pelib -lpelib
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
