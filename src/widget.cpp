@@ -8,9 +8,12 @@
 #include <QNetworkInterface>
 #include <QDebug>
 
+#include <QTimer>
+
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget),
+    patcher(new Patcher(this))
 {
     ui->setupUi(this);
 
@@ -21,10 +24,9 @@ Widget::Widget(QWidget *parent) :
     settings = new QSettings(Constants::app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
-    patcher = new FC2MPPatcher(this);
-
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
+    connect(ui->pushButton_reset, &QPushButton::clicked, this, &Widget::pushButton_reset_clicked);
 }
 
 Widget::~Widget()
@@ -124,12 +126,29 @@ void Widget::pushButton_install_directory_clicked()
 
 void Widget::pushButton_patch_clicked()
 {
-    ui->pushButton_patch->setEnabled(false);
-    ui->pushButton_patch->setText("Patching your broken yet awesome game...");
-
-    //patcher->patch(install_directory);
-
-    //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
-
+    patcher->applyPatch(ui->lineEdit_install_directory->text());
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
+
+    // Used to indicate how many times this button was pressed since application start.
+    ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");
+
+    //ui->pushButton_patch->setEnabled(false);
+    //ui->pushButton_patch->setText("Patching your broken yet awesome game...");
+    //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
+}
+
+void Widget::pushButton_reset_clicked()
+{
+    // Create path to binary folder.
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory;
+    QString fileName = path + "/FarCry2_patched.exe";
+
+    // Copy original file to other workfile.
+    if (QFile::exists(fileName)) {
+        QFile::remove(fileName);
+    }
+
+    QFile::copy(path + "/FarCry2.exe", fileName);
+
+    qDebug() << "FarCry2_patched.exe was reset.";
 }

@@ -7,7 +7,7 @@
 #include <QCloseEvent>
 
 #include "constants.h"
-#include "fc2mppatcher.h"
+#include "patcher.h"
 
 namespace Ui {
     class Widget;
@@ -24,11 +24,12 @@ public:
 private slots:
     void pushButton_install_directory_clicked();
     void pushButton_patch_clicked();
+    void pushButton_reset_clicked();
 
 private:
     Ui::Widget *ui;
     QSettings *settings;
-    FC2MPPatcher *patcher;
+    Patcher *patcher;
 
     void loadSettings();
     void saveSettings();
@@ -36,7 +37,6 @@ private:
 
     bool generateNetworkConfigFile(const QString &installDir, const QString &address);
     void populateComboboxWithNetworkInterfaces();
-
 };
 
 #endif // WIDGET_H

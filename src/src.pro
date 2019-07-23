@@ -20,11 +20,13 @@ CONFIG += c++17
 
 SOURCES += main.cpp \
         widget.cpp \
-        fc2mppatcher.cpp
+    pe.cpp \
+    patcher.cpp
 
 HEADERS += widget.h \
-        fc2mppatcher.h \
-        constants.h
+        constants.h \
+    pe.h \
+    patcher.h
 
 FORMS += widget.ui
 
