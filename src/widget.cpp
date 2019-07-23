@@ -99,9 +99,9 @@ void Widget::populateComboboxWithNetworkInterfaces()
     }
 }
 
-bool Widget::generateNetworkConfigFile(const QString &installDir, const QString &address)
+bool Widget::generateNetworkConfigFile(const QString &installDirectory, const QString &address)
 {
-    QFile file(installDir + "/" + Constants::executable_directory + "/" + Constants::network_configuration_file);
+    QFile file(installDirectory + "/" + Constants::executable_directory + "/" + Constants::network_configuration_file);
 
     if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
         QTextStream stream(&file);
@@ -115,10 +115,10 @@ bool Widget::generateNetworkConfigFile(const QString &installDir, const QString 
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString installDir = QFileDialog::getExistingDirectory(this);
+    QString installDirectory = QFileDialog::getExistingDirectory(this, nullptr, ui->lineEdit_install_directory->text());
 
-    if (QDir(installDir).exists()) {
-        ui->lineEdit_install_directory->setText(installDir);
+    if (QDir(installDirectory).exists()) {
+        ui->lineEdit_install_directory->setText(installDirectory);
     }
 }
 

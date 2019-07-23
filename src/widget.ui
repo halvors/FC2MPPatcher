@@ -17,7 +17,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QLabel" name="label_install_dir">
+      <widget class="QLabel" name="label_install_directory">
        <property name="text">
         <string>Select install directory:</string>
        </property>

@@ -98,18 +98,18 @@ void FC2MPPatcher::dumpImportDirectory()
     }
 }
 
-void FC2MPPatcher::patch(const QString &installDir)
+void FC2MPPatcher::patch(const QString &installDirectory)
 {
     // Create path to binary folder.
-    QString path = installDir + "/bin/";
-    QString fileName = path + "FarCry2_patched.exe";
+    QString path = installDirectory + "/" + Constants::executable_directory;
+    QString fileName = path + "/FarCry2_patched.exe";
 
     // Copy original file to other workfile.
     if (QFile::exists(fileName)) {
         QFile::remove(fileName);
     }
 
-    QFile::copy(path + "FarCry2.exe", fileName);
+    QFile::copy(path + "/FarCry2.exe", fileName);
 
     // Load the file into this program.
     open(fileName);
