@@ -64,13 +64,14 @@ bool Pe::save()
     unsigned int importDirectoryRva = peHeader->getIddImportRva();
     unsigned int iatDirectoryRva = peHeader->getIddIatRva();
 
+    // Write to directories calls rebuild().
     iatDirectory->write(fileName, peHeader->rvaToOffset(iatDirectoryRva));
     importDirectory->write(fileName, peHeader->rvaToOffset(importDirectoryRva), importDirectoryRva);
 
     peHeader->setIddImportSize(importDirectory->size());
     peHeader->setIddIatSize(iatDirectory->size());
-
     peHeader->makeValid(mzHeader->getAddressOfPeHeader());
+
     mzHeader->write(fileName, 0);
     peHeader->write(fileName, mzHeader->getAddressOfPeHeader());
 
