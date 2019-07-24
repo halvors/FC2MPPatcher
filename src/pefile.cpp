@@ -14,7 +14,7 @@ PeFile::~PeFile()
 
 }
 
-void PeFile::addLibraryFunction(const QString &libraryName, const QString &functionName)
+void PeFile::addFunction(const QString &libraryName, const QString &functionName)
 {
     // Add a new import function.
     imported_function function;
@@ -40,7 +40,7 @@ void PeFile::addLibraryFunction(const QString &libraryName, const QString &funct
     importLibrary->add_import(function);
 }
 
-void PeFile::fetchLibraryFunctions(imported_functions_list &imports)
+void PeFile::applyFunctions(imported_functions_list &imports)
 {
     // Add all functions from map to imports list.
     for (import_library *importLibrary : functionMap.values()) {
@@ -51,7 +51,18 @@ void PeFile::fetchLibraryFunctions(imported_functions_list &imports)
     functionMap.clear();
 }
 
-void PeFile::printLibraryFunctions(const pe_base &image)
+void PeFile::buildFunctionToAddressMap(const pe_base &image) {
+    for (import_library library : get_imported_functions(image)) {
+        unsigned int address = library.get_rva_to_iat();
+
+        for (imported_function function : library.get_imported_functions()) {
+            functionToAddressMap.insert(QString::fromStdString(function.get_name()), address);
+            address += 4;
+        }
+    }
+}
+
+void PeFile::printFunctions(const pe_base &image)
 {
     // Print all libraries.
     for (import_library importLibrary : get_imported_functions(image)) {
@@ -85,7 +96,7 @@ bool PeFile::apply(const QString &fileName)
         imported_functions_list imports = get_imported_functions(image);
 
         // Fetch new imports.
-        fetchLibraryFunctions(imports);
+        applyFunctions(imports);
 
         // But we'll just rebuild the import table
         // It will be larger than before our editing
@@ -103,20 +114,11 @@ bool PeFile::apply(const QString &fileName)
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
 
-        for (import_library importLibrary : get_imported_functions(image)) {
-            qDebug() << "Library: " << hex << importLibrary.get_rva_to_iat();
+        // Build function to address table.
+        buildFunctionToAddressMap(image);
 
-            unsigned int address = importLibrary.get_rva_to_iat();
-
-            for (imported_function function : importLibrary.get_imported_functions()) {
-                functionToAddressMap.insert(QString::fromStdString(function.get_name()), address);
-
-                qDebug() << "Function: " << QString::fromStdString(function.get_name());
-                qDebug() << "Address: " << hex << address;
-
-                address += 4;
-            }
-        }
+        // Debugging print.
+        printFunctions(image);
 
         // Create a new PE file.
         std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);

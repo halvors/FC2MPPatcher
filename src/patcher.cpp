@@ -16,7 +16,7 @@ void Patcher::applyPatch(const QString &installDirectory)
     QString fileName = installDirectory + "/" + Constants::executable_directory + "/FarCry2_patched.exe";
 
     // Load the file into this program.
-    pe->addLibraryFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
-    pe->addLibraryFunction(Constants::library_name, Constants::library_function_getHostbyname);
+    pe->addFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
+    pe->addFunction(Constants::library_name, Constants::library_function_getHostbyname);
     pe->apply(fileName);
 }
