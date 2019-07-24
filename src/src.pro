@@ -22,13 +22,13 @@ CONFIG += c++17
 
 SOURCES += main.cpp \
     widget.cpp \
-    pe.cpp \
-    patcher.cpp
+    patcher.cpp \
+    pefile.cpp
 
 HEADERS += constants.h \
     widget.h \
-    pe.h \
-    patcher.h
+    patcher.h \
+    pefile.h
 
 FORMS += widget.ui
 

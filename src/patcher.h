@@ -5,7 +5,7 @@
 #include <QString>
 
 #include "constants.h"
-#include "pe.h"
+#include "pefile.h"
 
 class Patcher : public QObject
 {
@@ -18,7 +18,7 @@ public:
     void applyPatch(const QString &installDirectory);
 
 private:
-    Pe *pe;
+    PeFile *pe;
 
 };
 

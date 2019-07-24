@@ -11,12 +11,12 @@
 
 using namespace pe_bliss;
 
-class Pe : public QObject
+class PeFile : public QObject
 {
     Q_OBJECT
 public:
-    explicit Pe(QObject *parent = nullptr);
-    ~Pe();
+    explicit PeFile(QObject *parent = nullptr);
+    ~PeFile();
 
     void addLibraryFunction(const QString &libraryName, const QString &functionName);
     void fetchLibraryFunctions(imported_functions_list &imports);

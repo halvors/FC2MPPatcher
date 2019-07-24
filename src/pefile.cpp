@@ -2,19 +2,19 @@
 
 #include <fstream>
 
-#include "pe.h"
+#include "pefile.h"
 
-Pe::Pe(QObject *parent) : QObject(parent)
+PeFile::PeFile(QObject *parent) : QObject(parent)
 {
 
 }
 
-Pe::~Pe()
+PeFile::~PeFile()
 {
 
 }
 
-void Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
+void PeFile::addLibraryFunction(const QString &libraryName, const QString &functionName)
 {
     // Add a new import function.
     imported_function function;
@@ -40,7 +40,7 @@ void Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
     importLibrary->add_import(function);
 }
 
-void Pe::fetchLibraryFunctions(imported_functions_list &imports)
+void PeFile::fetchLibraryFunctions(imported_functions_list &imports)
 {
     // Add all functions from map to imports list.
     for (import_library *importLibrary : functionMap.values()) {
@@ -51,7 +51,7 @@ void Pe::fetchLibraryFunctions(imported_functions_list &imports)
     functionMap.clear();
 }
 
-void Pe::printLibraryFunctions(const pe_base &image)
+void PeFile::printLibraryFunctions(const pe_base &image)
 {
     // Print all libraries.
     for (import_library importLibrary : get_imported_functions(image)) {
@@ -66,7 +66,7 @@ void Pe::printLibraryFunctions(const pe_base &image)
     }
 }
 
-bool Pe::apply(const QString &fileName)
+bool PeFile::apply(const QString &fileName)
 {
     // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
@@ -95,7 +95,9 @@ bool Pe::apply(const QString &fileName)
         importSection.get_raw_data().resize(1);						 // We cannot add empty sections, so let it be the initial data size 1
         importSection.set_name(Constants::patch_name.toStdString());							// Section Name
         importSection.readable(true).writeable(true);			     // Available for read and write
-        section &attachedSection = image.add_section(importSection); // Add a section and get a link to the added section with calculated dimensions
+
+        // Add a section and get a link to the added section with calculated dimensions
+        section &attachedSection = image.add_section(importSection);
 
         // Structure responsible for import reassembler settings
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
@@ -117,9 +119,9 @@ bool Pe::apply(const QString &fileName)
         rebuild_pe(image, outputStream);
 
         qDebug() << "PE was rebuilt and saved to" << fileName;
-    } catch (const pe_exception &e) {
+    } catch (const pe_exception &exception) {
         // If an error occurred.
-        qDebug() << "Error:" << e.what();
+        qDebug() << "Error:" << exception.what();
 
         return false;
     }
