@@ -9,7 +9,6 @@
 
 #include "constants.h"
 
-using namespace std;
 using namespace pe_bliss;
 
 class Pe : public QObject

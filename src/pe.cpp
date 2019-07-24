@@ -1,4 +1,3 @@
-#include <QFile>
 #include <QDebug>
 
 #include <fstream>
@@ -46,9 +45,9 @@ bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
 bool Pe::apply(const QString &fileName)
 {
     // Open the file
-    ifstream pe_file(fileName.toStdString(), std::ios::in | std::ios::binary);
+    std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
 
-    if (!pe_file) {
+    if (!inputStream) {
         qDebug() << "Cannot open " << fileName;
 
         return false;
@@ -56,7 +55,7 @@ bool Pe::apply(const QString &fileName)
 
     try {
         // Create an instance of a PE or PE + class using a factory
-        pe_base image(pe_factory::create_pe(pe_file));
+        pe_base image(pe_factory::create_pe(inputStream));
 
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
@@ -71,26 +70,26 @@ bool Pe::apply(const QString &fileName)
         // so we write it in a new section so that everything fits
         // (we cannot expand existing sections, unless the section is right at the end of the file)
         section importSection;
-        importSection.get_raw_data().resize(1);						// We cannot add empty sections, so let it be the initial data size 1
+        importSection.get_raw_data().resize(1);						 // We cannot add empty sections, so let it be the initial data size 1
         importSection.set_name(Constants::patch_name.toStdString());							// Section Name
-        importSection.readable(true).writeable(true);					// Available for read and write
-        section &attached_section = image.add_section(importSection); // Add a section and get a link to the added section with calculated dimensions
+        importSection.readable(true).writeable(true);			     // Available for read and write
+        section &attachedSection = image.add_section(importSection); // Add a section and get a link to the added section with calculated dimensions
 
         // Structure responsible for import reassembler settings
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
-        rebuild_imports(image, imports, attached_section, settings); // Rebuild Imports
+        rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
 
         // Create a new PE file
-        std::ofstream new_pe_file(fileName.toStdString().c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream outputStream(fileName.toStdString().c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
 
-        if (!new_pe_file) {
+        if (!outputStream) {
             qDebug() << "Cannot create " << fileName;
 
             return false;
         }
 
         // Rebuild PE file
-        rebuild_pe(image, new_pe_file);
+        rebuild_pe(image, outputStream);
 
         qDebug() << "PE was rebuilt and saved to " << fileName;
     } catch (const pe_exception &e) {
