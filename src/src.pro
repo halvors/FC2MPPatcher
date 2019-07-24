@@ -32,7 +32,7 @@ HEADERS += widget.h \
 
 FORMS += widget.ui
 
-# Including 3rd party PeLib library.
+# Including 3rd party PeBliss library.
 INCLUDEPATH += $$PWD/../lib/libpebliss/pe_lib
 DEPENDPATH += $$PWD/../lib/libpebliss/pe_lib
 

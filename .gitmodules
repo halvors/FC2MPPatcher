@@ -1,6 +1,0 @@
-[submodule "lib/pelib"]
-	path = lib/pelib
-	url = https://github.com/avast/pelib
-[submodule "lib/libpebliss"]
-	path = lib/libpebliss
-	url = https://github.com/asinbow/libpebliss.git
