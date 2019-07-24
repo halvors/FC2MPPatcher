@@ -36,17 +36,15 @@ bool Pe::open(const QString &fileName)
     file->readMzHeader();
     file->readPeHeader();
 
-    // Read import directory .
+    // Read directories.
     file->readImportDirectory();
-
-    // Read import address table directory.
-    file->readIatDirectory();
+    //file->readIatDirectory();
 
     // Create pointers.
     mzHeader = &file->mzHeader();
     peHeader = &file->peHeader();
     importDirectory = &file->impDir();
-    iatDirectory = &file->iatDir();
+    //iatDirectory = &file->iatDir();
 
     return true;
 }
@@ -62,16 +60,18 @@ bool Pe::save()
     const string fileName = file->getFileName();
 
     unsigned int importDirectoryRva = peHeader->getIddImportRva();
-    unsigned int iatDirectoryRva = peHeader->getIddIatRva();
+    //unsigned int iatDirectoryRva = peHeader->getIddIatRva();
 
-    // Write to directories calls rebuild().
-    iatDirectory->write(fileName, peHeader->rvaToOffset(iatDirectoryRva));
-    importDirectory->write(fileName, peHeader->rvaToOffset(importDirectoryRva), importDirectoryRva);
+    // Write directories.
+    importDirectory->write(fileName, peHeader->rvaToOffset(importDirectoryRva) + 1103, importDirectoryRva);
+    //iatDirectory->write(fileName, peHeader->rvaToOffset(iatDirectoryRva));
 
+    // Modify PE header.
     peHeader->setIddImportSize(importDirectory->size());
-    peHeader->setIddIatSize(iatDirectory->size());
+    //peHeader->setIddIatSize(iatDirectory->size());
     peHeader->makeValid(mzHeader->getAddressOfPeHeader());
 
+    // Write headers.
     mzHeader->write(fileName, 0);
     peHeader->write(fileName, mzHeader->getAddressOfPeHeader());
 
