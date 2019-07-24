@@ -1,6 +1,8 @@
 #include <QDebug>
+#include <QByteArray>
 
 #include <fstream>
+#include <iomanip>
 
 #include "pe.h"
 
@@ -29,11 +31,11 @@ bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
     // Create a new library from which we will import functions.
     import_library *importLibrary = new import_library();
 
-    if (!map.contains(libraryName)) {
+    if (!libraryMap.contains(libraryName)) {
         importLibrary->set_name(libraryName.toStdString());
-        map.insert(libraryName, importLibrary);
+        libraryMap.insert(libraryName, importLibrary);
     } else {
-        importLibrary = map.value(libraryName);
+        importLibrary = libraryMap.value(libraryName);
     }
 
     // Add imported functions to library.
@@ -60,13 +62,13 @@ bool Pe::apply(const QString &fileName)
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
 
-        // Add Imports
-        for (import_library *importLibrary : map.values()) {
+        // Add imports.
+        for (import_library *importLibrary : libraryMap.values()) {
             imports.push_back(*importLibrary); // Add imported library to imports
         }
 
-        // Clear written imports.
-        map.clear();
+        // Clear written imports from libraryMap.
+        libraryMap.clear();
 
         // But we'll just rebuild the import table
         // It will be larger than before our editing
@@ -81,6 +83,13 @@ bool Pe::apply(const QString &fileName)
         // Structure responsible for import reassembler settings
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
+
+        for (import_library importLibrary : imports) {
+            for (imported_function function : importLibrary.get_imported_functions()) {
+                qDebug() << "Function: " << QString::fromStdString(function.get_name());
+                qDebug() << "VA: " << hex << function.get_iat_va();
+            }
+        }
 
         // Create a new PE file
         std::ofstream outputStream(fileName.toStdString().c_str(), std::ios::out | std::ios::binary | std::ios::trunc);

@@ -22,7 +22,7 @@ public:
     bool apply(const QString &fileName);
 
 private:
-    QHash<QString, import_library*> map;
+    QHash<QString, import_library*> libraryMap;
 
 };
 
