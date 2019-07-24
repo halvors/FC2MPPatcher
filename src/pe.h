@@ -18,7 +18,7 @@ public:
     explicit Pe(QObject *parent = nullptr);
     ~Pe();
 
-    bool addLibraryFunction(const QString &libraryName, const QString &functionName);
+    void addLibraryFunction(const QString &libraryName, const QString &functionName);
     bool apply(const QString &fileName);
 
 private:

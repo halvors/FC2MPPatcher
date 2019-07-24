@@ -1,5 +1,5 @@
 #include <QDebug>
-#include <QByteArray>
+#include <QDataStream>
 
 #include <fstream>
 #include <iomanip>
@@ -16,7 +16,7 @@ Pe::~Pe()
 
 }
 
-bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
+void Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
 {
     // Add a couple of import functions to it.
     imported_function function;
@@ -40,17 +40,15 @@ bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
 
     // Add imported functions to library.
     importLibrary->add_import(function);
-
-    return true;
 }
 
 bool Pe::apply(const QString &fileName)
 {
-    // Open the file
+    // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
 
     if (!inputStream) {
-        qDebug() << "Cannot open " << fileName;
+        qDebug() << "Cannot open" << fileName;
 
         return false;
     }
@@ -62,9 +60,9 @@ bool Pe::apply(const QString &fileName)
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
 
-        // Add imports.
+        // Add new imports.
         for (import_library *importLibrary : libraryMap.values()) {
-            imports.push_back(*importLibrary); // Add imported library to imports
+            imports.push_back(*importLibrary);
         }
 
         // Clear written imports from libraryMap.
@@ -84,29 +82,31 @@ bool Pe::apply(const QString &fileName)
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
 
-        for (import_library importLibrary : imports) {
+        // Print out all libraries and functions.
+        for (import_library importLibrary : get_imported_functions(image)) {
+            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
+
             for (imported_function function : importLibrary.get_imported_functions()) {
-                qDebug() << "Function: " << QString::fromStdString(function.get_name());
-                qDebug() << "VA: " << hex << function.get_iat_va();
+                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
             }
         }
 
-        // Create a new PE file
-        std::ofstream outputStream(fileName.toStdString().c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        // Create a new PE file.
+        std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!outputStream) {
-            qDebug() << "Cannot create " << fileName;
+            qDebug() << "Cannot create" << fileName;
 
             return false;
         }
 
-        // Rebuild PE file
+        // Rebuild PE file.
         rebuild_pe(image, outputStream);
 
-        qDebug() << "PE was rebuilt and saved to " << fileName;
+        qDebug() << "PE was rebuilt and saved to" << fileName;
     } catch (const pe_exception &e) {
-        // If an error occurred
-        qDebug() << "Error: " << e.what();
+        // If an error occurred.
+        qDebug() << "Error:" << e.what();
 
         return false;
     }
