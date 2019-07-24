@@ -26,7 +26,6 @@ Widget::Widget(QWidget *parent) :
 
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
-    connect(ui->pushButton_reset, &QPushButton::clicked, this, &Widget::pushButton_reset_clicked);
 }
 
 Widget::~Widget()
@@ -131,11 +130,13 @@ void Widget::pushButton_patch_clicked()
     QString fileName = path + "/FarCry2_patched.exe";
 
     // Copy original file to other workfile.
-    if (!QFile::exists(fileName)) {
-        QFile::copy(path + "/FarCry2.exe", fileName);
+    if (QFile::exists(fileName)) {
+        QFile::remove(fileName);
     }
 
-    pushButton_reset_clicked();
+    QFile::copy(path + "/FarCry2.exe", fileName);
+
+    qDebug() << "FarCry2_patched.exe was reset.";
 
     patcher->applyPatch(ui->lineEdit_install_directory->text());
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
@@ -146,20 +147,4 @@ void Widget::pushButton_patch_clicked()
     //ui->pushButton_patch->setEnabled(false);
     //ui->pushButton_patch->setText("Patching your broken yet awesome game...");
     //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
-}
-
-void Widget::pushButton_reset_clicked()
-{
-    // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory;
-    QString fileName = path + "/FarCry2_patched.exe";
-
-    // Copy original file to other workfile.
-    if (QFile::exists(fileName)) {
-        QFile::remove(fileName);
-    }
-
-    QFile::copy(path + "/FarCry2.exe", fileName);
-
-    qDebug() << "FarCry2_patched.exe was reset.";
 }

@@ -24,7 +24,6 @@ public:
 private slots:
     void pushButton_install_directory_clicked();
     void pushButton_patch_clicked();
-    void pushButton_reset_clicked();
 
 private:
     Ui::Widget *ui;

@@ -1,8 +1,6 @@
 #include <QDebug>
-#include <QByteArray>
 
 #include <fstream>
-#include <iomanip>
 
 #include "pe.h"
 
@@ -16,9 +14,9 @@ Pe::~Pe()
 
 }
 
-bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
+void Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
 {
-    // Add a couple of import functions to it.
+    // Add a new import function.
     imported_function function;
     function.set_name(functionName.toStdString());
 
@@ -31,26 +29,50 @@ bool Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
     // Create a new library from which we will import functions.
     import_library *importLibrary = new import_library();
 
-    if (!libraryMap.contains(libraryName)) {
+    if (!functionMap.contains(libraryName)) {
         importLibrary->set_name(libraryName.toStdString());
-        libraryMap.insert(libraryName, importLibrary);
+        functionMap.insert(libraryName, importLibrary);
     } else {
-        importLibrary = libraryMap.value(libraryName);
+        importLibrary = functionMap.value(libraryName);
     }
 
     // Add imported functions to library.
     importLibrary->add_import(function);
+}
 
-    return true;
+void Pe::fetchLibraryFunctions(imported_functions_list &imports)
+{
+    // Add all functions from map to imports list.
+    for (import_library *importLibrary : functionMap.values()) {
+        imports.push_back(*importLibrary);
+    }
+
+    // Clear read imports from map.
+    functionMap.clear();
+}
+
+void Pe::printLibraryFunctions(const pe_base &image)
+{
+    // Print all libraries.
+    for (import_library importLibrary : get_imported_functions(image)) {
+        if (importLibrary.get_name() == Constants::library_name.toStdString()) {
+            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
+
+            // Print all functions.
+            for (imported_function function : importLibrary.get_imported_functions()) {
+                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
+            }
+        }
+    }
 }
 
 bool Pe::apply(const QString &fileName)
 {
-    // Open the file
+    // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
 
     if (!inputStream) {
-        qDebug() << "Cannot open " << fileName;
+        qDebug() << "Cannot open" << fileName;
 
         return false;
     }
@@ -62,13 +84,8 @@ bool Pe::apply(const QString &fileName)
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
 
-        // Add imports.
-        for (import_library *importLibrary : libraryMap.values()) {
-            imports.push_back(*importLibrary); // Add imported library to imports
-        }
-
-        // Clear written imports from libraryMap.
-        libraryMap.clear();
+        // Fetch new imports.
+        fetchLibraryFunctions(imports);
 
         // But we'll just rebuild the import table
         // It will be larger than before our editing
@@ -99,22 +116,22 @@ bool Pe::apply(const QString &fileName)
             }
         }
 
-        // Create a new PE file
-        std::ofstream outputStream(fileName.toStdString().c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        // Create a new PE file.
+        std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!outputStream) {
-            qDebug() << "Cannot create " << fileName;
+            qDebug() << "Cannot create" << fileName;
 
             return false;
         }
 
-        // Rebuild PE file
+        // Rebuild PE file.
         rebuild_pe(image, outputStream);
 
-        qDebug() << "PE was rebuilt and saved to " << fileName;
+        qDebug() << "PE was rebuilt and saved to" << fileName;
     } catch (const pe_exception &e) {
-        // If an error occurred
-        qDebug() << "Error: " << e.what();
+        // If an error occurred.
+        qDebug() << "Error:" << e.what();
 
         return false;
     }

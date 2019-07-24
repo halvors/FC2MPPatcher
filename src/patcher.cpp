@@ -1,6 +1,3 @@
-#include <QFile>
-#include <QDebug>
-
 #include "patcher.h"
 
 Patcher::Patcher(QObject *parent) : QObject(parent), pe(new Pe(this))
