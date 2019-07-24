@@ -19,10 +19,13 @@ public:
     ~Pe();
 
     void addLibraryFunction(const QString &libraryName, const QString &functionName);
+    void fetchLibraryFunctions(imported_functions_list &imports);
+    void printLibraryFunctions(const pe_base &imports);
     bool apply(const QString &fileName);
 
+
 private:
-    QHash<QString, import_library*> libraryMap;
+    QHash<QString, import_library*> functionMap;
 
 };
 

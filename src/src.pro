@@ -25,8 +25,8 @@ SOURCES += main.cpp \
     pe.cpp \
     patcher.cpp
 
-HEADERS += widget.h \
-    constants.h \
+HEADERS += constants.h \
+    widget.h \
     pe.h \
     patcher.h
 

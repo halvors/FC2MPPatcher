@@ -1,8 +1,6 @@
 #include <QDebug>
-#include <QDataStream>
 
 #include <fstream>
-#include <iomanip>
 
 #include "pe.h"
 
@@ -18,7 +16,7 @@ Pe::~Pe()
 
 void Pe::addLibraryFunction(const QString &libraryName, const QString &functionName)
 {
-    // Add a couple of import functions to it.
+    // Add a new import function.
     imported_function function;
     function.set_name(functionName.toStdString());
 
@@ -31,15 +29,41 @@ void Pe::addLibraryFunction(const QString &libraryName, const QString &functionN
     // Create a new library from which we will import functions.
     import_library *importLibrary = new import_library();
 
-    if (!libraryMap.contains(libraryName)) {
+    if (!functionMap.contains(libraryName)) {
         importLibrary->set_name(libraryName.toStdString());
-        libraryMap.insert(libraryName, importLibrary);
+        functionMap.insert(libraryName, importLibrary);
     } else {
-        importLibrary = libraryMap.value(libraryName);
+        importLibrary = functionMap.value(libraryName);
     }
 
     // Add imported functions to library.
     importLibrary->add_import(function);
+}
+
+void Pe::fetchLibraryFunctions(imported_functions_list &imports)
+{
+    // Add all functions from map to imports list.
+    for (import_library *importLibrary : functionMap.values()) {
+        imports.push_back(*importLibrary);
+    }
+
+    // Clear read imports from map.
+    functionMap.clear();
+}
+
+void Pe::printLibraryFunctions(const pe_base &image)
+{
+    // Print all libraries.
+    for (import_library importLibrary : get_imported_functions(image)) {
+        if (importLibrary.get_name() == Constants::library_name.toStdString()) {
+            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
+
+            // Print all functions.
+            for (imported_function function : importLibrary.get_imported_functions()) {
+                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
+            }
+        }
+    }
 }
 
 bool Pe::apply(const QString &fileName)
@@ -60,13 +84,8 @@ bool Pe::apply(const QString &fileName)
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
 
-        // Add new imports.
-        for (import_library *importLibrary : libraryMap.values()) {
-            imports.push_back(*importLibrary);
-        }
-
-        // Clear written imports from libraryMap.
-        libraryMap.clear();
+        // Fetch new imports.
+        fetchLibraryFunctions(imports);
 
         // But we'll just rebuild the import table
         // It will be larger than before our editing
@@ -82,14 +101,8 @@ bool Pe::apply(const QString &fileName)
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
 
-        // Print out all libraries and functions.
-        for (import_library importLibrary : get_imported_functions(image)) {
-            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
-
-            for (imported_function function : importLibrary.get_imported_functions()) {
-                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
-            }
-        }
+        // Print all functions (DEBUG).
+        printLibraryFunctions(image);
 
         // Create a new PE file.
         std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
