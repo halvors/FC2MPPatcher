@@ -66,7 +66,7 @@ bool Pe::apply(const QString &fileName)
         }
 
         // Clear written imports.
-        imports.clear();
+        map.clear();
 
         // But we'll just rebuild the import table
         // It will be larger than before our editing
