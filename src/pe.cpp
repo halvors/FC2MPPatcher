@@ -65,6 +65,9 @@ bool Pe::apply(const QString &fileName)
             imports.push_back(*importLibrary); // Add imported library to imports
         }
 
+        // Clear written imports.
+        imports.clear();
+
         // But we'll just rebuild the import table
         // It will be larger than before our editing
         // so we write it in a new section so that everything fits
