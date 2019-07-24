@@ -19,7 +19,8 @@ namespace Constants {
     const QString target_executable_client = "Dunia.dll";
     const QString target_executable_server = "FC2ServerLauncher.exe";
 
-    const QString library_name = "fix.dll"; // TODO: Should we call this "MPPatch.dll"?
+    const QString patch_name = "MPPatch";
+    const QString library_name = patch_name + ".dll";
     const QString library_function_getAdaptersInfo = "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8";
     const QString library_function_getHostbyname = "_Z14getHostbyname2Pc@4";
 

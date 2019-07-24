@@ -3,13 +3,14 @@
 
 #include <QObject>
 #include <QString>
+#include <QHash>
 
-#include <pelib/PeFile.h>
+#include <pe_bliss.h>
 
 #include "constants.h"
 
 using namespace std;
-using namespace PeLib;
+using namespace pe_bliss;
 
 class Pe : public QObject
 {
@@ -18,19 +19,12 @@ public:
     explicit Pe(QObject *parent = nullptr);
     ~Pe();
 
-    bool open(const QString &fileName);
-    bool save();
-
     bool addLibraryFunction(const QString &libraryName, const QString &functionName);
-    void dumpImportDirectory();
+    bool apply(const QString &fileName);
 
 private:
-    PeFile32 *file;
+    QHash<QString, import_library*> map;
 
-    MzHeader *mzHeader;
-    PeHeader32 *peHeader;
-    ImportDirectory32 *importDirectory;
-    IatDirectory *iatDirectory;
 };
 
 #endif // PE_H

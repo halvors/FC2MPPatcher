@@ -33,49 +33,10 @@ HEADERS += widget.h \
 FORMS += widget.ui
 
 # Including 3rd party PeLib library.
-INCLUDEPATH += $$PWD/../lib/pelib/include
-DEPENDPATH += $$PWD/../lib/pelib/include
+INCLUDEPATH += $$PWD/../lib/libpebliss/pe_lib
+DEPENDPATH += $$PWD/../lib/libpebliss/pe_lib
 
-#LIBS += -L$$PWD/../lib/pelib/build/src/pelib -lpelib
-
-SOURCES += $$PWD/../lib/pelib/src/pelib/BoundImportDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/CoffSymbolTable.cpp \
-    $$PWD/../lib/pelib/src/pelib/ComHeaderDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/DebugDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/ExportDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/IatDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/InputBuffer.cpp \
-    $$PWD/../lib/pelib/src/pelib/MzHeader.cpp \
-    $$PWD/../lib/pelib/src/pelib/OutputBuffer.cpp \
-    $$PWD/../lib/pelib/src/pelib/PeFile.cpp \
-    $$PWD/../lib/pelib/src/pelib/PeHeader.cpp \
-    $$PWD/../lib/pelib/src/pelib/PeLibAux.cpp \
-    $$PWD/../lib/pelib/src/pelib/RelocationsDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/ResourceDirectory.cpp \
-    $$PWD/../lib/pelib/src/pelib/RichHeader.cpp \
-    $$PWD/../lib/pelib/src/pelib/SecurityDirectory.cpp
-
-HEADERS += $$PWD/../lib/pelib/include/pelib/BoundImportDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/CoffSymbolTable.h \
-    $$PWD/../lib/pelib/include/pelib/ComHeaderDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/DebugDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/DelayImportDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/ExportDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/IatDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/ImportDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/InputBuffer.h \
-    $$PWD/../lib/pelib/include/pelib/MzHeader.h \
-    $$PWD/../lib/pelib/include/pelib/OutputBuffer.h \
-    $$PWD/../lib/pelib/include/pelib/PeFile.h \
-    $$PWD/../lib/pelib/include/pelib/PeHeader.h \
-    $$PWD/../lib/pelib/include/pelib/PeLib.h \
-    $$PWD/../lib/pelib/include/pelib/PeLibAux.h \
-    $$PWD/../lib/pelib/include/pelib/PeLibInc.h \
-    $$PWD/../lib/pelib/include/pelib/RelocationsDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/ResourceDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/RichHeader.h \
-    $$PWD/../lib/pelib/include/pelib/SecurityDirectory.h \
-    $$PWD/../lib/pelib/include/pelib/TlsDirectory.h
+LIBS += -L$$PWD/../lib/libpebliss/lib -lpebliss
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
