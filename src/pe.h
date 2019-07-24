@@ -23,6 +23,7 @@ public:
 
 private:
     QHash<QString, import_library*> libraryMap;
+    QHash<QString, unsigned int> functionToAddressMap;
 
 };
 

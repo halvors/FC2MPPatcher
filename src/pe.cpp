@@ -84,10 +84,18 @@ bool Pe::apply(const QString &fileName)
         import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
 
-        for (import_library importLibrary : imports) {
+        for (import_library importLibrary : get_imported_functions(image)) {
+            qDebug() << "Library: " << hex << importLibrary.get_rva_to_iat();
+
+            unsigned int address = importLibrary.get_rva_to_iat();
+
             for (imported_function function : importLibrary.get_imported_functions()) {
+                functionToAddressMap.insert(QString::fromStdString(function.get_name()), address);
+
                 qDebug() << "Function: " << QString::fromStdString(function.get_name());
-                qDebug() << "VA: " << hex << function.get_iat_va();
+                qDebug() << "Address: " << hex << address;
+
+                address += 4;
             }
         }
 
