@@ -15,7 +15,7 @@ class PeFile : public QObject
 {
     Q_OBJECT
 public:
-    explicit PeFile(QObject *parent = nullptr);
+    explicit PeFile(QObject* parent = nullptr);
     ~PeFile();
 
     void addFunction(const QString &libraryName, const QString &functionName);
@@ -30,7 +30,7 @@ public:
 
 private:
     QString path, target;
-    pe_base *image;
+    pe_base* image;
 
     QHash<QString, import_library*> functions;
     FunctionMap addressOfFunctions;

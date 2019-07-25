@@ -47,12 +47,12 @@ void PeFile::applyFunctions(imported_functions_list &imports)
 
 void PeFile::patchCode()
 {
-    unsigned int baseImageAddress = image->get_image_base_32() + image->get_base_of_code();  // 0x10000000 + 1000 = image.get_image_base_32() + (image.get_base_of_code() or section.get_virtual_address())?
+    unsigned int baseImageAddress = image->get_image_base_32() + image->get_base_of_code();
 
     for (section &section : section_list(image->get_image_sections())) {
         if (section.get_name() == ".text") {
             // Read raw data of section as byte array.
-            unsigned int *data = reinterpret_cast<unsigned int*>(const_cast<char*>(section.get_raw_data().c_str()));
+            char* data = const_cast<char*>(section.get_raw_data().c_str());
             //unsigned char *data = (unsigned char*) section.get_raw_data().c_str();
 
             qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
@@ -63,11 +63,14 @@ void PeFile::patchCode()
                 unsigned int oldAddress = functionMap.value(functionName);
                 unsigned int newAddress = addressOfFunctions.value(functionName);
 
-                // TODO: Fix integer vs. char precision lost?...
-                // TODO: Halvor skal spørre markus hvorfor offset med 2 fra originale addresser fra hex editor...
+                // Creating a pointer to data to be updated.
+                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + (oldAddress - baseImageAddress));
+                qDebug() << showbase << hex << "loc" << reinterpret_cast<void*>(dataPtr);
+                qDebug() << showbase << hex << "data" << reinterpret_cast<void*>(data);
+                qDebug() << showbase << hex << "offset" << reinterpret_cast<void*>(oldAddress - baseImageAddress);
 
                 // Change old address to point to new function instead.
-                data[oldAddress - baseImageAddress] = newAddress; //data[addressOfGetHostByName - addressOfBaseImage];
+                *dataPtr = newAddress;
 
                 qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
             }
@@ -75,10 +78,12 @@ void PeFile::patchCode()
             // Write altered raw data of section.
             section.set_raw_data(std::string(reinterpret_cast<char*>(data)));
 
+            /*
             // Print out for debugging.
             for (unsigned int i = 0; i < 8; i++) {
                 qDebug() << showbase << hex << data[i];
             }
+            */
         }
     }
 }
