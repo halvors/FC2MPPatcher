@@ -7,7 +7,6 @@
 #include <QCloseEvent>
 
 #include "constants.h"
-#include "patcher.h"
 
 namespace Ui {
     class Widget;
@@ -28,7 +27,6 @@ private slots:
 private:
     Ui::Widget* ui;
     QSettings* settings;
-    Patcher* patcher;
 
     void loadSettings();
     void saveSettings();

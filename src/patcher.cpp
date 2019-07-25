@@ -3,14 +3,9 @@
 
 #include "patcher.h"
 
-Patcher::Patcher(QObject* parent) : QObject(parent), peFile(new PeFile(this))
+Patcher::Patcher(QObject* parent) : QObject(parent)
 {
 
-}
-
-Patcher::~Patcher()
-{
-    delete peFile;
 }
 
 void Patcher::applyPatch(const QString &path, const QString &target)
@@ -32,6 +27,8 @@ void Patcher::applyPatch(const QString &path, const QString &target)
     }
 
     QFile::copy(fileNameBackup, fileNamePatched);
+
+    PeFile* peFile = new PeFile();
 
     // Add all functions for target.
     for (QString &functionName : Constants::targets.value(target).keys()) {

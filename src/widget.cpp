@@ -1,15 +1,15 @@
-#include "widget.h"
-#include "ui_widget.h"
-
 #include <QDir>
 #include <QFileDialog>
 #include <QSettings>
 #include <QNetworkInterface>
 
+#include "widget.h"
+#include "ui_widget.h"
+#include "patcher.h"
+
 Widget::Widget(QWidget* parent) :
     QWidget(parent),
-    ui(new Ui::Widget),
-    patcher(new Patcher(this))
+    ui(new Ui::Widget)
 {
     ui->setupUi(this);
 
@@ -119,8 +119,8 @@ void Widget::pushButton_patch_clicked()
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
     QString target = ui->comboBox_select_target->currentData().toString();
 
-    patcher->applyPatch(path, target);
-    patcher->generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().toString());
+    Patcher::applyPatch(path, target);
+    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().toString());
 
     // Used to indicate how many times this button was pressed since application start.
     ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");

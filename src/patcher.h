@@ -13,13 +13,9 @@ class Patcher : public QObject
 
 public:
     explicit Patcher(QObject *parent = nullptr);
-    ~Patcher();
 
-    void applyPatch(const QString &path, const QString &fileName);
-    bool generateNetworkConfigFile(const QString &installDirectory, const QString &address);
-
-private:
-    PeFile* peFile;
+    static void applyPatch(const QString &path, const QString &fileName);
+    static bool generateNetworkConfigFile(const QString &installDirectory, const QString &address);
 
 };
 
