@@ -135,7 +135,7 @@ void Widget::pushButton_patch_clicked()
         QFile::remove(fileName);
     }
 
-    QFile::copy(path + "/" + Constants::targets.keys().first(), fileName);
+    QFile::copy(path + "/" + target, fileName);
 
     patcher->applyPatch(path, target);
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());

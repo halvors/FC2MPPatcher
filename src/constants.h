@@ -26,18 +26,20 @@ namespace Constants {
     const QString network_configuration_file = "network.cfg";
 
     const TargetMap targets = {
-        { "FC2ServerLauncher.exe",
-            {
-                { library_function_getAdaptersInfo, 0 },
-                { library_function_getHostbyname, 0 }
-            }
-        },
         { "Dunia.dll",
             {
                 { library_function_getAdaptersInfo, 0x10C6A692 },
                 { library_function_getHostbyname, 0x100141FC }
             }
         }
+        /*
+        { "FC2ServerLauncher.exe",
+            {
+                { library_function_getAdaptersInfo, 0 },
+                { library_function_getHostbyname, 0 }
+            }
+        }
+        */
     };
 }
 

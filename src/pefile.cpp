@@ -45,14 +45,14 @@ void PeFile::applyFunctions(imported_functions_list &imports)
     functions.clear();
 }
 
-void PeFile::patchCode(const QString &target, const pe_base &image)
+void PeFile::patchCode()
 {
-    unsigned int baseImageAddress = image.get_image_base_32() + image.get_base_of_code();  // 0x10000000 + 1000 = image.get_image_base_32() + (image.get_base_of_code() or section.get_virtual_address())?
+    unsigned int baseImageAddress = image->get_image_base_32() + image->get_base_of_code();  // 0x10000000 + 1000 = image.get_image_base_32() + (image.get_base_of_code() or section.get_virtual_address())?
 
-    for (section &section : section_list(image.get_image_sections())) {
+    for (section &section : section_list(image->get_image_sections())) {
         if (section.get_name() == ".text") {
             // Read raw data of section as byte array.
-            unsigned char *data = reinterpret_cast<unsigned char*>(const_cast<char*>(section.get_raw_data().c_str()));
+            unsigned int *data = reinterpret_cast<unsigned int*>(const_cast<char*>(section.get_raw_data().c_str()));
             //unsigned char *data = (unsigned char*) section.get_raw_data().c_str();
 
             qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
@@ -64,11 +64,12 @@ void PeFile::patchCode(const QString &target, const pe_base &image)
                 unsigned int newAddress = addressOfFunctions.value(functionName);
 
                 // TODO: Fix integer vs. char precision lost?...
+                // TODO: Halvor skal spørre markus hvorfor offset med 2 fra originale addresser fra hex editor...
 
                 // Change old address to point to new function instead.
                 data[oldAddress - baseImageAddress] = newAddress; //data[addressOfGetHostByName - addressOfBaseImage];
 
-                qDebug() << showbase << hex << "Patching" << functionName << "changed address" << oldAddress << "to" << newAddress;
+                qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
             }
 
             // Write altered raw data of section.
@@ -76,17 +77,17 @@ void PeFile::patchCode(const QString &target, const pe_base &image)
 
             // Print out for debugging.
             for (unsigned int i = 0; i < 8; i++) {
-                qDebug() << hex << data[i];
+                qDebug() << showbase << hex << data[i];
             }
         }
     }
 }
 
-FunctionMap PeFile::buildAddressOfFunctions(const pe_base &image) {
+FunctionMap PeFile::buildAddressOfFunctions() {
     const unsigned int entryOffset = 4; // Offset is 4 between entries.
     FunctionMap map;
 
-    for (import_library library : get_imported_functions(image)) {
+    for (import_library library : get_imported_functions(*image)) {
         unsigned int address = library.get_rva_to_iat();
 
         for (imported_function function : library.get_imported_functions()) {
@@ -135,7 +136,6 @@ bool PeFile::load(const QString &path, const QString &target)
         // Create an instance of a PE or PE + class using a factory
         image = new pe_base(pe_factory::create_pe(inputStream));
     } catch (const pe_exception &exception) {
-        // If an error occurred.
         qDebug() << "Error:" << exception.what();
 
         return false;
@@ -155,27 +155,27 @@ void PeFile::apply()
     imported_functions_list imports = get_imported_functions(*image);
     applyFunctions(imports);
 
-    // But we'll just rebuild the import table
-    // It will be larger than before our editing
-    // so we write it in a new section so that everything fits
-    // (we cannot expand existing sections, unless the section is right at the end of the file)
+    // But we'll just rebuild the import table.
+    // It will be larger than before our editing.
+    // so we write it in a new section so that everything fits.
+    // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
-    importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1
-    importSection.set_name(Constants::patch_name.toStdString()); // Section Name
-    importSection.readable(true).writeable(true); // Available for read and write
+    importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
+    importSection.set_name(Constants::patch_name.toStdString()); // Section Name.
+    importSection.readable(true).writeable(true); // Available for read and write.
 
-    // Add a section and get a link to the added section with calculated dimensions
+    // Add a section and get a link to the added section with calculated dimensions.
     section &attachedSection = image->add_section(importSection);
 
     // Structure responsible for import reassembler settings
-    import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
-    rebuild_imports(*image, imports, attachedSection, settings); // Rebuild Imports
+    import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
+    rebuild_imports(*image, imports, attachedSection, settings); // Rebuild Imports.
 
     // Build address to function table.
-    addressOfFunctions = buildAddressOfFunctions(*image);
+    addressOfFunctions = buildAddressOfFunctions();
 
     // Patch code.
-    patchCode(target, *image);
+    patchCode();
 }
 
 bool PeFile::save()
@@ -202,7 +202,6 @@ bool PeFile::save()
 
         qDebug() << "PE was rebuilt and saved to" << fileName;
     } catch (const pe_exception &exception) {
-        // If an error occurred.
         qDebug() << "Error:" << exception.what();
 
         return false;
