@@ -49,11 +49,10 @@ void PeFile::patchCode()
 {
     unsigned int baseImageAddress = image->get_image_base_32() + image->get_base_of_code();
 
-    for (section &section : section_list(image->get_image_sections())) {
+    for (section &section : image->get_image_sections()) {
         if (section.get_name() == ".text") {
             // Read raw data of section as byte array.
-            char* data = const_cast<char*>(section.get_raw_data().c_str());
-            //unsigned char *data = (unsigned char*) section.get_raw_data().c_str();
+            unsigned char* data = (unsigned char*)(&section.get_raw_data()[0]);
 
             qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
 
@@ -64,19 +63,23 @@ void PeFile::patchCode()
                 unsigned int newAddress = addressOfFunctions.value(functionName);
 
                 // Creating a pointer to data to be updated.
+
                 unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + (oldAddress - baseImageAddress));
                 qDebug() << showbase << hex << "loc" << reinterpret_cast<void*>(dataPtr);
                 qDebug() << showbase << hex << "data" << reinterpret_cast<void*>(data);
                 qDebug() << showbase << hex << "offset" << reinterpret_cast<void*>(oldAddress - baseImageAddress);
 
+                qDebug() << showbase << hex << "newAddress" << newAddress;
+
                 // Change old address to point to new function instead.
                 *dataPtr = newAddress;
 
                 qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
+
             }
 
             // Write altered raw data of section.
-            section.set_raw_data(std::string(reinterpret_cast<char*>(data)));
+            //section.set_raw_data(section.get_raw_data());
 
             /*
             // Print out for debugging.
@@ -157,7 +160,7 @@ void PeFile::apply()
     }
 
     // Get the list of imported libraries and functions.
-    imported_functions_list imports = get_imported_functions(*image);
+    imported_functions_list imports = imported_functions_list(get_imported_functions(*image));
     applyFunctions(imports);
 
     // But we'll just rebuild the import table.
@@ -173,7 +176,7 @@ void PeFile::apply()
     section &attachedSection = image->add_section(importSection);
 
     // Structure responsible for import reassembler settings
-    import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
+    import_rebuilder_settings settings(true, true); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
     rebuild_imports(*image, imports, attachedSection, settings); // Rebuild Imports.
 
     // Build address to function table.
