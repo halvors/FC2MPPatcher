@@ -16,6 +16,7 @@ public:
     ~Patcher();
 
     void applyPatch(const QString &path, const QString &fileName);
+    bool generateNetworkConfigFile(const QString &installDirectory, const QString &address);
 
 private:
     PeFile* peFile;

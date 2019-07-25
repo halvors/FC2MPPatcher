@@ -51,7 +51,7 @@ FunctionMap PeFile::buildAddressOfFunctions() {
     // Loop thru all imported libraries.
     for (import_library library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() == Constants::library_name.toStdString()) {
+        if (library.get_name() == Constants::patch_library_name.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
             for (imported_function function : library.get_imported_functions()) {
@@ -64,12 +64,12 @@ FunctionMap PeFile::buildAddressOfFunctions() {
     return map;
 }
 
-void PeFile::patchCode()
+bool PeFile::patchCode()
 {
     // TODO: Alter file version field here?
 
     for (section &section : image->get_image_sections()) {
-        if (section.get_name() == ".text") {
+        if (section.get_name() == Constants::patch_pe_section.toStdString()) {
             unsigned int baseImageAddress = image->get_image_base_32() + section.get_virtual_address();
             qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
 
@@ -83,25 +83,24 @@ void PeFile::patchCode()
                 unsigned int newAddress = buildAddressOfFunctions().value(functionName); // Build address of function table on the fly.
 
                 // Verify to some degree addresses to be patched.
-                if (oldAddress != 0 && newAddress != 0) {
-                    // Creating a pointer to data to be updated.
-                    unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + (oldAddress - baseImageAddress));
-                    qDebug() << showbase << hex << "dataPtr =" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(oldAddress - baseImageAddress);
+                if (oldAddress == 0 || newAddress == 0) {
+                    qDebug() << "Error: Addresses in patch should not be zero! Patch was not applied.";
 
-                    // Change old address to point to new function instead.
-                    *dataPtr = newAddress;
-                    qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
+                    return false;
                 }
-            }
 
-            /*
-            // Print out for debugging.
-            for (unsigned int i = 0; i < 8; i++) {
-                qDebug() << showbase << hex << data[i];
+                // Creating a pointer to data to be updated.
+                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + (oldAddress - baseImageAddress));
+                qDebug() << showbase << hex << "dataPtr =" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(oldAddress - baseImageAddress);
+
+                // Change old address to point to new function instead.
+                *dataPtr = newAddress;
+                qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
             }
-            */
         }
     }
+
+    return true;
 }
 
 void PeFile::clear()
@@ -165,7 +164,7 @@ void PeFile::apply()
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(Constants::patch_name.toStdString()); // Section Name.
+    importSection.set_name(Constants::patch_library_name.toStdString()); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
     // Add a section and get a link to the added section with calculated dimensions.

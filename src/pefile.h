@@ -21,7 +21,7 @@ public:
     void addFunction(const QString &libraryName, const QString &functionName);
     void applyFunctions(imported_functions_list &imports);
     FunctionMap buildAddressOfFunctions();
-    void patchCode();
+    bool patchCode();
 
     void clear();
     bool load(const QString &path, const QString &target);

@@ -37,8 +37,6 @@ private:
     void populateComboboxWithNetworkInterfaces();
     void populateComboboxWithTargets();
 
-    bool generateNetworkConfigFile(const QString &installDir, const QString &address);
-
 };
 
 #endif // WIDGET_H

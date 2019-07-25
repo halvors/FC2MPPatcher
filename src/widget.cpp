@@ -2,13 +2,9 @@
 #include "ui_widget.h"
 
 #include <QDir>
-#include <QFile>
 #include <QFileDialog>
 #include <QSettings>
 #include <QNetworkInterface>
-#include <QDebug>
-
-#include <QTimer>
 
 Widget::Widget(QWidget* parent) :
     QWidget(parent),
@@ -45,11 +41,11 @@ void Widget::loadSettings()
         ui->comboBox_network_interface->setCurrentIndex(index);
     }
 
-    settings->beginGroup("Window");
-        resize(settings->value("size", size()).toSize());
-        move(settings->value("position", pos()).toPoint());
+    settings->beginGroup(Constants::settings_group_window);
+        resize(settings->value(Constants::settings_group_window_size, size()).toSize());
+        move(settings->value(Constants::settings_group_window_position, pos()).toPoint());
 
-        if (settings->value("isMaximized", false).toBool()) {
+        if (settings->value(Constants::settings_group_window_isMaximized, false).toBool()) {
             showMaximized();
         }
     settings->endGroup();
@@ -60,10 +56,10 @@ void Widget::saveSettings()
     settings->setValue(Constants::settings_install_directory, ui->lineEdit_install_directory->text());
     settings->setValue(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex());
 
-    settings->beginGroup("Window");
-        settings->setValue("size", size());
-        settings->setValue("position", pos());
-        settings->setValue("isMaximized", isMaximized());
+    settings->beginGroup(Constants::settings_group_window);
+        settings->setValue(Constants::settings_group_window_size, size());
+        settings->setValue(Constants::settings_group_window_position, pos());
+        settings->setValue(Constants::settings_group_window_isMaximized, isMaximized());
     settings->endGroup();
 }
 
@@ -108,20 +104,6 @@ void Widget::populateComboboxWithTargets()
     }
 }
 
-bool Widget::generateNetworkConfigFile(const QString &installDirectory, const QString &address)
-{
-    QFile file(installDirectory + "/" + Constants::executable_directory + "/" + Constants::network_configuration_file);
-
-    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-        QTextStream stream(&file);
-        stream << address << endl;
-
-        return true;
-    }
-
-    return false;
-}
-
 void Widget::pushButton_install_directory_clicked()
 {
     QString installDirectory = QFileDialog::getExistingDirectory(this, nullptr, ui->lineEdit_install_directory->text());
@@ -136,17 +118,9 @@ void Widget::pushButton_patch_clicked()
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
     QString target = ui->comboBox_select_target->currentData().toString();
-    QString fileName = path + target + "_patched";
-
-    // Copy original file to other workfile.
-    if (QFile::exists(fileName)) {
-        QFile::remove(fileName);
-    }
-
-    QFile::copy(path + "/" + target, fileName);
 
     patcher->applyPatch(path, target);
-    generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
+    patcher->generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().toString());
 
     // Used to indicate how many times this button was pressed since application start.
     ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");
