@@ -18,7 +18,7 @@ public:
     void applyPatch(const QString &path, const QString &fileName);
 
 private:
-    PeFile *peFile;
+    PeFile* peFile;
 
 };
 

@@ -18,7 +18,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = nullptr);
+    explicit Widget(QWidget* parent = nullptr);
     ~Widget();
 
 private slots:
@@ -26,16 +26,19 @@ private slots:
     void pushButton_patch_clicked();
 
 private:
-    Ui::Widget *ui;
-    QSettings *settings;
-    Patcher *patcher;
+    Ui::Widget* ui;
+    QSettings* settings;
+    Patcher* patcher;
 
     void loadSettings();
     void saveSettings();
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent* event);
+
+    void populateComboboxWithNetworkInterfaces();
+    void populateComboboxWithTargets();
 
     bool generateNetworkConfigFile(const QString &installDir, const QString &address);
-    void populateComboboxWithNetworkInterfaces();
+
 };
 
 #endif // WIDGET_H

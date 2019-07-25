@@ -31,15 +31,15 @@ namespace Constants {
                 { library_function_getAdaptersInfo, 0x10C6A692 },
                 { library_function_getHostbyname, 0x100141FC }
             }
-        }
-        /*
+        },
         { "FC2ServerLauncher.exe",
             {
+                { library_function_getAdaptersInfo, 0 },
+                { library_function_getHostbyname, 0 },
                 { library_function_getAdaptersInfo, 0 },
                 { library_function_getHostbyname, 0 }
             }
         }
-        */
     };
 }
 

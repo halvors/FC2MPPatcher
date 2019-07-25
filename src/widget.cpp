@@ -10,7 +10,7 @@
 
 #include <QTimer>
 
-Widget::Widget(QWidget *parent) :
+Widget::Widget(QWidget* parent) :
     QWidget(parent),
     ui(new Ui::Widget),
     patcher(new Patcher(this))
@@ -19,6 +19,7 @@ Widget::Widget(QWidget *parent) :
 
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
     populateComboboxWithNetworkInterfaces();
+    populateComboboxWithTargets();
 
     // Load settings from configuration file.
     settings = new QSettings(Constants::app_configuration_file, QSettings::IniFormat, this);
@@ -100,6 +101,13 @@ void Widget::populateComboboxWithNetworkInterfaces()
     }
 }
 
+void Widget::populateComboboxWithTargets()
+{
+    for (QString &target : Constants::targets.keys()) {
+        ui->comboBox_select_target->addItem(target, target);
+    }
+}
+
 bool Widget::generateNetworkConfigFile(const QString &installDirectory, const QString &address)
 {
     QFile file(installDirectory + "/" + Constants::executable_directory + "/" + Constants::network_configuration_file);
@@ -127,7 +135,7 @@ void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
-    QString target = Constants::targets.keys().first();
+    QString target = ui->comboBox_select_target->currentData().toString();
     QString fileName = path + target + "_patched";
 
     // Copy original file to other workfile.
@@ -142,8 +150,4 @@ void Widget::pushButton_patch_clicked()
 
     // Used to indicate how many times this button was pressed since application start.
     ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");
-
-    //ui->pushButton_patch->setEnabled(false);
-    //ui->pushButton_patch->setText("Patching your broken yet awesome game...");
-    //ui->pushButton_patch->setText("Your game is now fixed! Enjoy the nostalgia of playing...");
 }

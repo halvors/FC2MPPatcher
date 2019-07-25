@@ -82,17 +82,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QLabel" name="label_select_target">
+       <property name="text">
+        <string>Select target:</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_select_target"/>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_patch">

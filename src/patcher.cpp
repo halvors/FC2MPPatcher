@@ -1,6 +1,6 @@
 #include "patcher.h"
 
-Patcher::Patcher(QObject *parent) : QObject(parent), peFile(new PeFile(this))
+Patcher::Patcher(QObject* parent) : QObject(parent), peFile(new PeFile(this))
 {
 
 }
