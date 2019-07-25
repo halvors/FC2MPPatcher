@@ -1,7 +1,6 @@
 #include <QDebug>
 
 #include <fstream>
-#include <iostream>
 
 #include "pefile.h"
 
@@ -21,20 +20,14 @@ void PeFile::addFunction(const QString &libraryName, const QString &functionName
     imported_function function;
     function.set_name(functionName.toStdString());
 
-    //func.set_iat_va(0x1);	 // Write a non-zero absolute address in the import address table
-
-    // We have specified incorrect contents (0x1 and 0x2) for the cells where the addresses of the imported functions will be written
-    // It doesn't matter in the general case, because these values ​​are always overwritten by the loader.
-    // These addresses are important only if the exe file has import bound
-
     // Create a new library from which we will import functions.
     import_library *importLibrary = new import_library();
 
-    if (!functionMap.contains(libraryName)) {
+    if (!functions.contains(libraryName)) {
         importLibrary->set_name(libraryName.toStdString());
-        functionMap.insert(libraryName, importLibrary);
+        functions.insert(libraryName, importLibrary);
     } else {
-        importLibrary = functionMap.value(libraryName);
+        importLibrary = functions.value(libraryName);
     }
 
     // Add imported functions to library.
@@ -44,16 +37,53 @@ void PeFile::addFunction(const QString &libraryName, const QString &functionName
 void PeFile::applyFunctions(imported_functions_list &imports)
 {
     // Add all functions from map to imports list.
-    for (import_library *importLibrary : functionMap.values()) {
+    for (import_library *importLibrary : functions.values()) {
         imports.push_back(*importLibrary);
     }
 
     // Clear read imports from map.
-    functionMap.clear();
+    functions.clear();
 }
 
-QHash<QString, unsigned int> PeFile::buildAddressOfFunctionMap(const pe_base &image) {
-    QHash<QString, unsigned int> map;
+void PeFile::patchCode(const QString &target, const pe_base &image)
+{
+    unsigned int baseImageAddress = image.get_image_base_32() + image.get_base_of_code();  // 0x10000000 + 1000 = image.get_image_base_32() + (image.get_base_of_code() or section.get_virtual_address())?
+
+    for (section &section : section_list(image.get_image_sections())) {
+        if (section.get_name() == ".text") {
+            // Read raw data of section as byte array.
+            unsigned char *data = reinterpret_cast<unsigned char*>(const_cast<char*>(section.get_raw_data().c_str()));
+            //unsigned char *data = (unsigned char*) section.get_raw_data().c_str();
+
+            qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
+
+            FunctionMap functionMap = Constants::targets.value(target);
+
+            for (QString &functionName : functionMap.keys()) {
+                unsigned int oldAddress = functionMap.value(functionName);
+                unsigned int newAddress = addressOfFunctions.value(functionName);
+
+                // TODO: Fix integer vs. char precision lost?...
+
+                // Change old address to point to new function instead.
+                data[oldAddress - baseImageAddress] = newAddress; //data[addressOfGetHostByName - addressOfBaseImage];
+
+                qDebug() << showbase << hex << "Patching" << functionName << "changed address" << oldAddress << "to" << newAddress;
+            }
+
+            // Write altered raw data of section.
+            section.set_raw_data(std::string(reinterpret_cast<char*>(data)));
+
+            // Print out for debugging.
+            for (unsigned int i = 0; i < 8; i++) {
+                qDebug() << hex << data[i];
+            }
+        }
+    }
+}
+
+FunctionMap PeFile::buildAddressOfFunctions(const pe_base &image) {
+    FunctionMap map;
 
     for (import_library library : get_imported_functions(image)) {
         unsigned int address = library.get_rva_to_iat();
@@ -67,8 +97,10 @@ QHash<QString, unsigned int> PeFile::buildAddressOfFunctionMap(const pe_base &im
     return map;
 }
 
-bool PeFile::apply(const QString &fileName)
+bool PeFile::apply(const QString &path, const QString &target)
 {
+    QString fileName = path + target + "_patched";
+
     // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
 
@@ -84,8 +116,6 @@ bool PeFile::apply(const QString &fileName)
 
         // Get the list of imported libraries and functions.
         imported_functions_list imports = get_imported_functions(image);
-
-        // Fetch new imports.
         applyFunctions(imports);
 
         // But we'll just rebuild the import table
@@ -104,37 +134,11 @@ bool PeFile::apply(const QString &fileName)
         import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
         rebuild_imports(image, imports, attachedSection, settings); // Rebuild Imports
 
-        // Build function to address table.
-        addressOfFunctionMap = buildAddressOfFunctionMap(image);
+        // Build address to function table.
+        addressOfFunctions = buildAddressOfFunctions(image);
 
-        //##################################################
-
-        unsigned int addressOfBaseImage = image.get_image_base_32() + image.get_base_of_code();  // 0x10000000 + (image.get_base_of_code() or section.get_virtual_address())?
-        section_list sections(image.get_image_sections());
-
-
-
-        for (section &section : sections) {
-            if (section.get_name() == ".text") {
-                qDebug() << "Address of base image: " << hex << addressOfBaseImage;
-
-                // Dunia.dll
-                unsigned int addressOfGetHostByName = 0x100141FC; // getHostbyname
-                unsigned int addressOfGetAdaptersInfo = 0x10C6A692; //getAdaptersInfo
-
-                unsigned char* data = (unsigned char*)section.get_raw_data().c_str();
-
-                //data[addressOfGetHostByName - addressOfBaseImage];
-
-                //const char* data = section.get_raw_data().c_str();
-
-                for (unsigned int i = 0; i < 8; i++) {
-                    qDebug() << hex << data[i];
-                }
-            }
-        }
-
-        //##################################################
+        // Patch code.
+        patchCode(target, image);
 
         // Create a new PE file.
         std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
@@ -158,20 +162,3 @@ bool PeFile::apply(const QString &fileName)
 
     return true;
 }
-
-/*
-void PeFile::printFunctions(const pe_base &image)
-{
-    // Print all libraries.
-    for (import_library importLibrary : get_imported_functions(image)) {
-        if (importLibrary.get_name() == Constants::library_name.toStdString()) {
-            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
-
-            // Print all functions.
-            for (imported_function function : importLibrary.get_imported_functions()) {
-                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
-            }
-        }
-    }
-}
-*/

@@ -15,10 +15,10 @@ public:
     explicit Patcher(QObject *parent = nullptr);
     ~Patcher();
 
-    void applyPatch(const QString &fileName);
+    void applyPatch(const QString &path, const QString &fileName);
 
 private:
-    PeFile *pe;
+    PeFile *peFile;
 
 };
 

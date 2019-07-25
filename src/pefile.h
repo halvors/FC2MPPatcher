@@ -20,14 +20,15 @@ public:
 
     void addFunction(const QString &libraryName, const QString &functionName);
     void applyFunctions(imported_functions_list &imports);
-    QHash<QString, unsigned int> buildAddressOfFunctionMap(const pe_base &image);
-    bool apply(const QString &fileName);
+    void patchCode(const QString &target, const pe_base &image);
+    FunctionMap buildAddressOfFunctions(const pe_base &image);
+    bool apply(const QString &path, const QString &target);
 
     //void printFunctions(const pe_base &imports);
 
 private:
-    QHash<QString, import_library*> functionMap;
-    QHash<QString, unsigned int> addressOfFunctionMap;
+    QHash<QString, import_library*> functions;
+    FunctionMap addressOfFunctions;
 
 };
 

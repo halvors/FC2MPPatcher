@@ -2,8 +2,10 @@
 #define CONSTANTS_H
 
 #include <QString>
-#include <QStringList>
 #include <QHash>
+
+typedef QHash<QString, unsigned int> FunctionMap;
+typedef QHash<QString, FunctionMap> TargetMap;
 
 namespace Constants {
     const QString app_name = "FC2MPPatcher";
@@ -13,8 +15,7 @@ namespace Constants {
     const QString settings_install_directory = "install_directory";
     const QString settings_interface_index = "interface_index";
 
-    const QStringList install_directory_list = { "C:/Program Files/Steam/steamapps/common/Far Cry 2",
-                                                 "C:/Program Files (x86)/Ubisoft/Far Cry 2" };
+    const QString install_directory = { "C:/Program Files/Steam/steamapps/common/Far Cry 2" };
     const QString executable_directory = "bin";
 
     const QString patch_name = "MPPatch";
@@ -24,13 +25,19 @@ namespace Constants {
 
     const QString network_configuration_file = "network.cfg";
 
-    const QString target_executable_client = "Dunia.dll";
-    const QString target_executable_server = "FC2ServerLauncher.exe";
-
-    // Dunia.dll information.
-    const QHash<QString, unsigned int> replaceAddressOfFunction = {
-        { library_function_getAdaptersInfo, 0x10C6A692 },
-        { library_function_getHostbyname, 0x100141FC }
+    const TargetMap targets = {
+        { "FC2ServerLauncher.exe",
+            {
+                { library_function_getAdaptersInfo, 0 },
+                { library_function_getHostbyname, 0 }
+            }
+        },
+        { "Dunia.dll",
+            {
+                { library_function_getAdaptersInfo, 0x10C6A692 },
+                { library_function_getHostbyname, 0x100141FC }
+            }
+        }
     };
 }
 

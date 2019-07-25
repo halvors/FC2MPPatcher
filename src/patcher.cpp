@@ -1,19 +1,20 @@
 #include "patcher.h"
 
-Patcher::Patcher(QObject *parent) : QObject(parent), pe(new PeFile(this))
+Patcher::Patcher(QObject *parent) : QObject(parent), peFile(new PeFile(this))
 {
 
 }
 
 Patcher::~Patcher()
 {
-    delete pe;
+    delete peFile;
 }
 
-void Patcher::applyPatch(const QString &fileName)
+void Patcher::applyPatch(const QString &path, const QString &target)
 {
-    // Load the file into this program.
-    pe->addFunction(Constants::library_name, Constants::library_function_getAdaptersInfo);
-    pe->addFunction(Constants::library_name, Constants::library_function_getHostbyname);
-    pe->apply(fileName);
+    for (QString &functionName : Constants::targets.value(target).keys()) {
+        peFile->addFunction(target, functionName);
+    }
+
+    peFile->apply(path, target);
 }

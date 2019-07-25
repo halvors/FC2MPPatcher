@@ -35,7 +35,7 @@ Widget::~Widget()
 
 void Widget::loadSettings()
 {
-    QString install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory_list.first()).toString();
+    QString install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory).toString();
     ui->lineEdit_install_directory->setText(install_directory);
 
     int index = settings->value(Constants::settings_interface_index).toInt();
@@ -126,17 +126,18 @@ void Widget::pushButton_install_directory_clicked()
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory;
-    QString fileName = path + "/" + Constants::target_executable_client + "_patched";
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
+    QString target = Constants::targets.keys().first();
+    QString fileName = path + target + "_patched";
 
     // Copy original file to other workfile.
     if (QFile::exists(fileName)) {
         QFile::remove(fileName);
     }
 
-    QFile::copy(path + "/" + Constants::target_executable_client, fileName);
+    QFile::copy(path + "/" + Constants::targets.keys().first(), fileName);
 
-    patcher->applyPatch(fileName);
+    patcher->applyPatch(path, target);
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
 
     // Used to indicate how many times this button was pressed since application start.
