@@ -16,5 +16,7 @@ void Patcher::applyPatch(const QString &path, const QString &target)
         peFile->addFunction(target, functionName);
     }
 
-    peFile->apply(path, target);
+    peFile->load(path, target);
+    peFile->apply();
+    peFile->save();
 }

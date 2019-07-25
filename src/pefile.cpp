@@ -11,7 +11,7 @@ PeFile::PeFile(QObject *parent) : QObject(parent)
 
 PeFile::~PeFile()
 {
-
+    clear();
 }
 
 void PeFile::addFunction(const QString &libraryName, const QString &functionName)
@@ -83,6 +83,7 @@ void PeFile::patchCode(const QString &target, const pe_base &image)
 }
 
 FunctionMap PeFile::buildAddressOfFunctions(const pe_base &image) {
+    const unsigned int entryOffset = 4; // Offset is 4 between entries.
     FunctionMap map;
 
     for (import_library library : get_imported_functions(image)) {
@@ -90,15 +91,35 @@ FunctionMap PeFile::buildAddressOfFunctions(const pe_base &image) {
 
         for (imported_function function : library.get_imported_functions()) {
             map.insert(QString::fromStdString(function.get_name()), address);
-            address += 4; // Offset is 4 between entries.
+            address += entryOffset;
         }
     }
 
     return map;
 }
 
-bool PeFile::apply(const QString &path, const QString &target)
+void PeFile::clear()
 {
+    path.clear();
+    target.clear();
+
+    // TODO: clear this?
+    /*
+    if (image) {
+        delete *image;
+    }
+    */
+
+    functions.clear();
+    addressOfFunctions.clear();
+}
+
+bool PeFile::load(const QString &path, const QString &target)
+{
+    // Store paramters for later use.
+    this->path = path;
+    this->target = target;
+
     QString fileName = path + target + "_patched";
 
     // Open the file.
@@ -112,34 +133,61 @@ bool PeFile::apply(const QString &path, const QString &target)
 
     try {
         // Create an instance of a PE or PE + class using a factory
-        pe_base image(pe_factory::create_pe(inputStream));
+        image = new pe_base(pe_factory::create_pe(inputStream));
+    } catch (const pe_exception &exception) {
+        // If an error occurred.
+        qDebug() << "Error:" << exception.what();
 
-        // Get the list of imported libraries and functions.
-        imported_functions_list imports = get_imported_functions(image);
-        applyFunctions(imports);
+        return false;
+    }
 
-        // But we'll just rebuild the import table
-        // It will be larger than before our editing
-        // so we write it in a new section so that everything fits
-        // (we cannot expand existing sections, unless the section is right at the end of the file)
-        section importSection;
-        importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1
-        importSection.set_name(Constants::patch_name.toStdString()); // Section Name
-        importSection.readable(true).writeable(true); // Available for read and write
+    return true;
+}
 
-        // Add a section and get a link to the added section with calculated dimensions
-        section &attachedSection = image.add_section(importSection);
+void PeFile::apply()
+{
+    // Check that image is loaded.
+    if (!image) {
+        return;
+    }
 
-        // Structure responsible for import reassembler settings
-        import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
-        rebuild_imports(image, imports, attachedSection, settings); // Rebuild Imports
+    // Get the list of imported libraries and functions.
+    imported_functions_list imports = get_imported_functions(*image);
+    applyFunctions(imports);
 
-        // Build address to function table.
-        addressOfFunctions = buildAddressOfFunctions(image);
+    // But we'll just rebuild the import table
+    // It will be larger than before our editing
+    // so we write it in a new section so that everything fits
+    // (we cannot expand existing sections, unless the section is right at the end of the file)
+    section importSection;
+    importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1
+    importSection.set_name(Constants::patch_name.toStdString()); // Section Name
+    importSection.readable(true).writeable(true); // Available for read and write
 
-        // Patch code.
-        patchCode(target, image);
+    // Add a section and get a link to the added section with calculated dimensions
+    section &attachedSection = image->add_section(importSection);
 
+    // Structure responsible for import reassembler settings
+    import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
+    rebuild_imports(*image, imports, attachedSection, settings); // Rebuild Imports
+
+    // Build address to function table.
+    addressOfFunctions = buildAddressOfFunctions(*image);
+
+    // Patch code.
+    patchCode(target, *image);
+}
+
+bool PeFile::save()
+{
+    // Check that image is loaded.
+    if (!image) {
+        return false;
+    }
+
+    QString fileName = path + target + "_patched";
+
+    try {
         // Create a new PE file.
         std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
@@ -150,7 +198,7 @@ bool PeFile::apply(const QString &path, const QString &target)
         }
 
         // Rebuild PE file.
-        rebuild_pe(image, outputStream);
+        rebuild_pe(*image, outputStream);
 
         qDebug() << "PE was rebuilt and saved to" << fileName;
     } catch (const pe_exception &exception) {
@@ -159,6 +207,8 @@ bool PeFile::apply(const QString &path, const QString &target)
 
         return false;
     }
+
+    clear();
 
     return true;
 }
