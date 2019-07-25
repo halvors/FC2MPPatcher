@@ -1,6 +1,7 @@
 #include <QDebug>
 
 #include <fstream>
+#include <iostream>
 
 #include "pefile.h"
 
@@ -51,30 +52,19 @@ void PeFile::applyFunctions(imported_functions_list &imports)
     functionMap.clear();
 }
 
-void PeFile::buildFunctionToAddressMap(const pe_base &image) {
+QHash<QString, unsigned int> PeFile::buildAddressOfFunctionMap(const pe_base &image) {
+    QHash<QString, unsigned int> map;
+
     for (import_library library : get_imported_functions(image)) {
         unsigned int address = library.get_rva_to_iat();
 
         for (imported_function function : library.get_imported_functions()) {
-            functionToAddressMap.insert(QString::fromStdString(function.get_name()), address);
-            address += 4;
+            map.insert(QString::fromStdString(function.get_name()), address);
+            address += 4; // Offset is 4 between entries.
         }
     }
-}
 
-void PeFile::printFunctions(const pe_base &image)
-{
-    // Print all libraries.
-    for (import_library importLibrary : get_imported_functions(image)) {
-        if (importLibrary.get_name() == Constants::library_name.toStdString()) {
-            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
-
-            // Print all functions.
-            for (imported_function function : importLibrary.get_imported_functions()) {
-                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
-            }
-        }
-    }
+    return map;
 }
 
 bool PeFile::apply(const QString &fileName)
@@ -103,22 +93,48 @@ bool PeFile::apply(const QString &fileName)
         // so we write it in a new section so that everything fits
         // (we cannot expand existing sections, unless the section is right at the end of the file)
         section importSection;
-        importSection.get_raw_data().resize(1);						 // We cannot add empty sections, so let it be the initial data size 1
-        importSection.set_name(Constants::patch_name.toStdString());							// Section Name
-        importSection.readable(true).writeable(true);			     // Available for read and write
+        importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1
+        importSection.set_name(Constants::patch_name.toStdString()); // Section Name
+        importSection.readable(true).writeable(true); // Available for read and write
 
         // Add a section and get a link to the added section with calculated dimensions
         section &attachedSection = image.add_section(importSection);
 
         // Structure responsible for import reassembler settings
-        import_rebuilder_settings settings(true, false);			 // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
-        rebuild_imports(image, imports, attachedSection, settings);  // Rebuild Imports
+        import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field
+        rebuild_imports(image, imports, attachedSection, settings); // Rebuild Imports
 
         // Build function to address table.
-        buildFunctionToAddressMap(image);
+        addressOfFunctionMap = buildAddressOfFunctionMap(image);
 
-        // Debugging print.
-        printFunctions(image);
+        //##################################################
+
+        unsigned int addressOfBaseImage = image.get_image_base_32() + image.get_base_of_code();  // 0x10000000 + (image.get_base_of_code() or section.get_virtual_address())?
+        section_list sections(image.get_image_sections());
+
+
+
+        for (section &section : sections) {
+            if (section.get_name() == ".text") {
+                qDebug() << "Address of base image: " << hex << addressOfBaseImage;
+
+                // Dunia.dll
+                unsigned int addressOfGetHostByName = 0x100141FC; // getHostbyname
+                unsigned int addressOfGetAdaptersInfo = 0x10C6A692; //getAdaptersInfo
+
+                unsigned char* data = (unsigned char*)section.get_raw_data().c_str();
+
+                //data[addressOfGetHostByName - addressOfBaseImage];
+
+                //const char* data = section.get_raw_data().c_str();
+
+                for (unsigned int i = 0; i < 8; i++) {
+                    qDebug() << hex << data[i];
+                }
+            }
+        }
+
+        //##################################################
 
         // Create a new PE file.
         std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
@@ -142,3 +158,20 @@ bool PeFile::apply(const QString &fileName)
 
     return true;
 }
+
+/*
+void PeFile::printFunctions(const pe_base &image)
+{
+    // Print all libraries.
+    for (import_library importLibrary : get_imported_functions(image)) {
+        if (importLibrary.get_name() == Constants::library_name.toStdString()) {
+            qDebug() << "Library:" << QString::fromStdString(importLibrary.get_name());
+
+            // Print all functions.
+            for (imported_function function : importLibrary.get_imported_functions()) {
+                qDebug() << "Function:" << QString::fromStdString(function.get_name()) << "(VA:" << hex << function.get_iat_va() << ")";
+            }
+        }
+    }
+}
+*/

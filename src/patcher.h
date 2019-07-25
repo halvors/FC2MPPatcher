@@ -15,7 +15,7 @@ public:
     explicit Patcher(QObject *parent = nullptr);
     ~Patcher();
 
-    void applyPatch(const QString &installDirectory);
+    void applyPatch(const QString &fileName);
 
 private:
     PeFile *pe;

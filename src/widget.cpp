@@ -127,18 +127,16 @@ void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory;
-    QString fileName = path + "/FarCry2_patched.exe";
+    QString fileName = path + "/" + Constants::target_executable_client + "_patched";
 
     // Copy original file to other workfile.
     if (QFile::exists(fileName)) {
         QFile::remove(fileName);
     }
 
-    QFile::copy(path + "/FarCry2.exe", fileName);
+    QFile::copy(path + "/" + Constants::target_executable_client, fileName);
 
-    qDebug() << "FarCry2_patched.exe was reset.";
-
-    patcher->applyPatch(ui->lineEdit_install_directory->text());
+    patcher->applyPatch(fileName);
     generateNetworkConfigFile(ui->lineEdit_install_directory->text(), ui->comboBox_network_interface->currentData().toString());
 
     // Used to indicate how many times this button was pressed since application start.
