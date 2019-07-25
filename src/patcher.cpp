@@ -13,7 +13,7 @@ Patcher::~Patcher()
 void Patcher::applyPatch(const QString &path, const QString &target)
 {
     for (QString &functionName : Constants::targets.value(target).keys()) {
-        peFile->addFunction(target, functionName);
+        peFile->addFunction(Constants::library_name, functionName);
     }
 
     peFile->load(path, target);
