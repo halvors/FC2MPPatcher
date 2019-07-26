@@ -30,10 +30,9 @@ public:
 
 private:
     QString path, target;
-    pe_base* image;
+    pe_base* image = nullptr;
 
     QHash<QString, import_library*> functions;
-    FunctionMap addressOfFunctions;
 
 };
 

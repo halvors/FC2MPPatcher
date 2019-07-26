@@ -43,6 +43,8 @@ void Patcher::applyPatch(const QString &path, const QString &target)
 
     // Save PE from memory to file.
     peFile->save();
+
+    delete peFile;
 }
 
 bool Patcher::generateNetworkConfigFile(const QString &path, const QString &address)

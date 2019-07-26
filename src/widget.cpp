@@ -1,6 +1,5 @@
 #include <QDir>
 #include <QFileDialog>
-#include <QSettings>
 #include <QNetworkInterface>
 
 #include "widget.h"
@@ -72,9 +71,7 @@ void Widget::closeEvent(QCloseEvent *event)
 
 void Widget::populateComboboxWithNetworkInterfaces()
 {
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-
-    for (QNetworkInterface interface : list) {
+    for (QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
         QNetworkInterface::InterfaceFlags flags = interface.flags();
 
         // Only show active network interfaces.
@@ -82,7 +79,7 @@ void Widget::populateComboboxWithNetworkInterfaces()
             QString address;
 
             // Scan thru addresses for this interface.
-            for (QNetworkAddressEntry addressEntry : interface.addressEntries()) {
+            for (QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
                 QHostAddress hostAddress = addressEntry.ip();
 
                 // Only select IPv4 addresses.
