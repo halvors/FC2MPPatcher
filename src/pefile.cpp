@@ -66,6 +66,8 @@ bool PeFile::patchCode()
                 *dataPtr = newAddress;
                 qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
             }
+
+            break;
         }
     }
 
