@@ -33,13 +33,9 @@ void Patcher::applyPatch(const QString &path, const QString &target)
     // Load PE from file.
     peFile->load(path, target);
 
-    // Add all functions for target.
-    for (QString &functionName : Constants::targets.value(target).keys()) {
-        peFile->addFunction(Constants::patch_library_name, functionName);
-    }
-
     // Apply PE and binary patches.
-    peFile->apply();
+    // TODO: Verify this, correct to get these from hashmap and not patch specific thingy?
+    peFile->apply(Constants::patch_library_name, Constants::targets.value(target).keys());
 
     // Save PE from memory to file.
     peFile->save();

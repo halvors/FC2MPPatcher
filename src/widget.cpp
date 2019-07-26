@@ -117,7 +117,7 @@ void Widget::pushButton_patch_clicked()
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
     QString target = ui->comboBox_select_target->currentData().toString();
 
-    //Patcher::applyPatch(path, target);
+    Patcher::applyPatch(path, target);
     Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
     // Used to indicate how many times this button was pressed since application start.

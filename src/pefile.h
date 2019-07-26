@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QHash>
 
 #include <pe_bliss.h>
@@ -18,21 +19,17 @@ public:
     explicit PeFile(QObject* parent = nullptr);
     ~PeFile();
 
-    void addFunction(const QString &libraryName, const QString &functionName);
-    void applyFunctions(imported_functions_list &imports);
     FunctionMap buildAddressOfFunctions();
     bool patchCode();
 
     void clear();
     bool load(const QString &path, const QString &target);
-    void apply();
+    void apply(const QString &libraryName, QStringList functions);
     bool save();
 
 private:
     QString path, target;
     pe_base* image = nullptr;
-
-    QHash<QString, import_library*> functions;
 
 };
 

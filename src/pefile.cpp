@@ -14,37 +14,6 @@ PeFile::~PeFile()
     clear();
 }
 
-void PeFile::addFunction(const QString &libraryName, const QString &functionName)
-{
-    // Add a new import function.
-    imported_function function;
-    function.set_name(functionName.toStdString());
-
-    // Create a new library from which we will import functions.
-    import_library* importLibrary = new import_library();
-
-    if (!functions.contains(libraryName)) {
-        importLibrary->set_name(libraryName.toStdString());
-        functions.insert(libraryName, importLibrary);
-    } else {
-        importLibrary = functions.value(libraryName);
-    }
-
-    // Add imported functions to library.
-    importLibrary->add_import(function);
-}
-
-void PeFile::applyFunctions(imported_functions_list &imports)
-{
-    // Add all functions from map to imports list.
-    for (import_library* importLibrary : functions.values()) {
-        imports.push_back(*importLibrary);
-    }
-
-    // Clear read imports from map.
-    functions.clear();
-}
-
 FunctionMap PeFile::buildAddressOfFunctions() {
     FunctionMap map;
 
@@ -114,8 +83,6 @@ void PeFile::clear()
         delete *image;
     }
     */
-
-    functions.clear();
 }
 
 bool PeFile::load(const QString &path, const QString &target)
@@ -147,7 +114,7 @@ bool PeFile::load(const QString &path, const QString &target)
     return true;
 }
 
-void PeFile::apply()
+void PeFile::apply(const QString &libraryName, QStringList functions)
 {
     // Check that image is loaded.
     if (!image) {
@@ -156,7 +123,20 @@ void PeFile::apply()
 
     // Get the list of imported libraries and functions.
     imported_functions_list imports = imported_functions_list(get_imported_functions(*image));
-    applyFunctions(imports);
+
+    // Create a new library from which we will import functions.
+    import_library importLibrary;
+    importLibrary.set_name(libraryName.toStdString());
+
+    // Add a new import functions.
+    for (QString &functionName : functions) {
+        imported_function function;
+        function.set_name(functionName.toStdString());
+
+        importLibrary.add_import(function);
+    }
+
+    imports.push_back(importLibrary);
 
     // But we'll just rebuild the import table.
     // It will be larger than before our editing.
