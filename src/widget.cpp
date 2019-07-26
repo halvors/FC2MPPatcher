@@ -1,6 +1,8 @@
+#include <QVariant>
+#include <QNetworkInterface>
 #include <QDir>
 #include <QFileDialog>
-#include <QNetworkInterface>
+#include <QMessageBox>
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -69,8 +71,6 @@ void Widget::closeEvent(QCloseEvent* event)
     saveSettings();
 }
 
-#include <QVariant>
-
 void Widget::populateComboboxWithNetworkInterfaces()
 {
     for (QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
@@ -97,8 +97,8 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
 void Widget::populateComboboxWithTargets()
 {
-    for (QString &target : Constants::targets.keys()) {
-        ui->comboBox_select_target->addItem(target, target);
+    for (TargetEntry target : Constants::targets) {
+        ui->comboBox_select_target->addItem(target.fileName, QVariant::fromValue<TargetEntry>(target));
     }
 }
 
@@ -115,11 +115,15 @@ void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
-    QString target = ui->comboBox_select_target->currentData().toString();
+    TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
 
-    Patcher::applyPatch(path, target);
+    // Validate target file against stored checksum.
+    if (!Patcher::isValid(path, target)) {
+        QMessageBox::critical(this, "Error", "Invalid file checksum for " + target.fileName + ", patching was aborted!");
+
+        return;
+    }
+
+    Patcher::applyPatch(path, ui->comboBox_select_target->currentData().value<TargetEntry>());
     Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
-
-    // Used to indicate how many times this button was pressed since application start.
-    ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");
 }

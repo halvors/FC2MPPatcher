@@ -1,4 +1,6 @@
 #include <QFile>
+#include <QCryptographicHash>
+#include <QSettings>
 #include <QTextStream>
 
 #include "patcher.h"
@@ -8,19 +10,39 @@ Patcher::Patcher(QObject* parent) : QObject(parent)
 
 }
 
-void Patcher::applyPatch(const QString &path, const QString &target)
+bool Patcher::isValid(const QString &path, const TargetEntry &target)
 {
-    QString fileName = path + target;
+    return target.checkSum == checksum(path + target.fileName);
+}
+
+QString Patcher::checksum(const QString &filePath)
+{
+    QFile file(filePath);
+
+    if (file.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(QCryptographicHash::Sha1);
+
+        if (hash.addData(&file)) {
+            return hash.result().toHex();
+        }
+    }
+
+    return QString();
+}
+
+void Patcher::applyPatch(const QString &path, const TargetEntry &target)
+{
+    QString filePath = path + target.fileName;
 
     // Backup original file.
-    QString fileNameBackup = fileName + "_backup";
+    QString fileNameBackup = filePath + "_backup";
 
     if (!QFile::exists(fileNameBackup)) {
-        QFile::copy(fileName, fileNameBackup);
+        QFile::copy(filePath, fileNameBackup);
     }
 
     // Temporarily workaround.
-    QString fileNamePatched = fileName + "_patched.dll";
+    QString fileNamePatched = filePath + "_patched.dll";
 
     if (QFile::exists(fileNamePatched)) {
         QFile::remove(fileNamePatched);
@@ -31,11 +53,11 @@ void Patcher::applyPatch(const QString &path, const QString &target)
     PeFile* peFile = new PeFile();
 
     // Load PE from file.
-    peFile->load(path, target);
+    peFile->load(path, target.fileName);
 
     // Apply PE and binary patches.
     // TODO: Verify this, correct to get these from hashmap and not patch specific thingy?
-    peFile->apply(Constants::patch_library_name, Constants::targets.value(target).keys());
+    peFile->apply(Constants::patch_library_name, target.functions);
 
     // Save PE from memory to file.
     peFile->save();
@@ -43,16 +65,20 @@ void Patcher::applyPatch(const QString &path, const QString &target)
     delete peFile;
 }
 
-bool Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
+void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
 {
+    QSettings settings(path + Constants::patch_network_configuration_file + ".ini", QSettings::IniFormat);
+
+    settings.beginGroup(Constants::patch_library_name);
+        settings.setValue("Address", address.ip().toString());
+        settings.setValue("Netmask", address.netmask().toString());
+        settings.setValue("Broadcast", address.broadcast().toString());
+    settings.endGroup();
+
     QFile file(path + Constants::patch_network_configuration_file);
 
     if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
         QTextStream stream(&file);
         stream << address.ip().toString() << endl;
-
-        return true;
     }
-
-    return false;
 }

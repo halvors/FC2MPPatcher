@@ -3,9 +3,23 @@
 
 #include <QString>
 #include <QHash>
+#include <QMetaType>
 
 typedef QHash<QString, unsigned int> FunctionMap;
-typedef QHash<QString, FunctionMap> TargetMap;
+
+enum TargetType {
+    STEAM,
+    RETAIL
+};
+
+struct TargetEntry {
+    TargetType type;
+    const QString fileName;
+    const QString checkSum;
+    const FunctionMap functions;
+};
+
+Q_DECLARE_METATYPE(TargetEntry)
 
 namespace Constants {
     const QString app_name = "FC2MPPatcher";
@@ -29,20 +43,22 @@ namespace Constants {
     const QString patch_pe_section = ".text";
     const QString patch_network_configuration_file = "network.cfg";
 
-    const TargetMap targets = {
-        { "Dunia.dll",
-            {
-                { patch_library_function_getAdaptersInfo, 0x10C6A692 },
-                { patch_library_function_getHostbyname, 0x100141FC }
-            }
+    const TargetEntry targets[] = {
+        { TargetType::STEAM,
+          "Dunia.dll",
+          "b99ea707e1bba5ae964effd2cec94eed6b865739", // Does Steam version differ from retail version?
+          {
+              { patch_library_function_getAdaptersInfo, 0x10C6A692 },
+              { patch_library_function_getHostbyname, 0x100141FC }
+          }
         },
-        { "FC2ServerLauncher.exe",
-            {
-                { patch_library_function_getAdaptersInfo, 0 },
-                { patch_library_function_getHostbyname, 0 },
-                { patch_library_function_getAdaptersInfo, 0 },
-                { patch_library_function_getHostbyname, 0 }
-            }
+        { TargetType::STEAM,
+          "FC2ServerLauncher.exe",
+          "a9ba7b50f1c541254a27299dd471fa0ebc1db02b", // Does Steam version differ from retail version?
+          {
+              { patch_library_function_getAdaptersInfo, 0 },
+              { patch_library_function_getHostbyname, 0 }
+          }
         }
     };
 }

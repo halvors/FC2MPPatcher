@@ -33,7 +33,7 @@ FunctionMap PeFile::buildAddressOfFunctions() {
     return map;
 }
 
-bool PeFile::patchCode()
+bool PeFile::patchCode(const FunctionMap &functions)
 {
     // TODO: Alter file version field here?
 
@@ -45,11 +45,10 @@ bool PeFile::patchCode()
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
-            FunctionMap functionToAddresses = Constants::targets.value(target);
             FunctionMap addressOfFunctions = buildAddressOfFunctions(); // Build address of function table on the fly.
 
-            for (QString &functionName : functionToAddresses.keys()) {
-                unsigned int oldAddress = functionToAddresses.value(functionName);
+            for (QString &functionName : functions.keys()) {
+                unsigned int oldAddress = functions.value(functionName);
                 unsigned int newAddress = addressOfFunctions.value(functionName);
 
                 // Verify to some degree addresses to be patched.
@@ -94,7 +93,7 @@ bool PeFile::load(const QString &path, const QString &target)
     this->path = path;
     this->target = target;
 
-    QString fileName = path + target + "_patched";
+    QString fileName = path + target + "_patched.dll";
 
     // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
@@ -117,7 +116,7 @@ bool PeFile::load(const QString &path, const QString &target)
     return true;
 }
 
-void PeFile::apply(const QString &libraryName, QStringList functions)
+void PeFile::apply(const QString &libraryName, const FunctionMap &functions)
 {
     // Check that image is loaded.
     if (!image) {
@@ -132,7 +131,7 @@ void PeFile::apply(const QString &libraryName, QStringList functions)
     importLibrary.set_name(libraryName.toStdString());
 
     // Add a new import functions.
-    for (QString &functionName : functions) {
+    for (QString &functionName : functions.keys()) {
         imported_function function;
         function.set_name(functionName.toStdString());
 
@@ -161,7 +160,7 @@ void PeFile::apply(const QString &libraryName, QStringList functions)
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Patch code.
-    patchCode();
+    patchCode(functions);
 }
 
 bool PeFile::save()
@@ -171,7 +170,7 @@ bool PeFile::save()
         return false;
     }
 
-    QString fileName = path + target + "_patched";
+    QString fileName = path + target + "_patched.dll";
 
     try {
         // Create a new PE file.

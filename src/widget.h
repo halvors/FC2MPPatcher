@@ -34,7 +34,6 @@ private:
 
     void populateComboboxWithNetworkInterfaces();
     void populateComboboxWithTargets();
-
 };
 
 #endif // WIDGET_H
