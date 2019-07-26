@@ -62,12 +62,14 @@ void Widget::saveSettings()
     settings->endGroup();
 }
 
-void Widget::closeEvent(QCloseEvent *event)
+void Widget::closeEvent(QCloseEvent* event)
 {
     QWidget::closeEvent(event);
 
     saveSettings();
 }
+
+#include <QVariant>
 
 void Widget::populateComboboxWithNetworkInterfaces()
 {
@@ -76,20 +78,19 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
         // Only show active network interfaces.
         if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
-            QString address;
+            QNetworkAddressEntry selectedAddressEntry;
 
             // Scan thru addresses for this interface.
             for (QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
                 QHostAddress hostAddress = addressEntry.ip();
-
                 // Only select IPv4 addresses.
                 if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
-                    address = hostAddress.toString();
+                    selectedAddressEntry = addressEntry;
                     break;
                 }
             }
 
-            ui->comboBox_network_interface->addItem(interface.name() + " (" + address + ")", address);
+            ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
         }
     }
 }
@@ -116,8 +117,8 @@ void Widget::pushButton_patch_clicked()
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
     QString target = ui->comboBox_select_target->currentData().toString();
 
-    Patcher::applyPatch(path, target);
-    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().toString());
+    //Patcher::applyPatch(path, target);
+    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
     // Used to indicate how many times this button was pressed since application start.
     ui->pushButton_patch->setText(ui->pushButton_patch->text() + ".");

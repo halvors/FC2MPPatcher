@@ -30,13 +30,13 @@ void Patcher::applyPatch(const QString &path, const QString &target)
 
     PeFile* peFile = new PeFile();
 
+    // Load PE from file.
+    peFile->load(path, target);
+
     // Add all functions for target.
     for (QString &functionName : Constants::targets.value(target).keys()) {
         peFile->addFunction(Constants::patch_library_name, functionName);
     }
-
-    // Load PE from file.
-    peFile->load(path, target);
 
     // Apply PE and binary patches.
     peFile->apply();
@@ -47,13 +47,13 @@ void Patcher::applyPatch(const QString &path, const QString &target)
     delete peFile;
 }
 
-bool Patcher::generateNetworkConfigFile(const QString &path, const QString &address)
+bool Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
 {
     QFile file(path + Constants::patch_network_configuration_file);
 
     if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
         QTextStream stream(&file);
-        stream << address << endl;
+        stream << address.ip().toString() << endl;
 
         return true;
     }
