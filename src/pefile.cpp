@@ -45,11 +45,13 @@ bool PeFile::patchCode()
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
+            // TODO: Rename this?
             FunctionMap functionMap = Constants::targets.value(target);
+            FunctionMap addressOfFunctions = buildAddressOfFunctions(); // Build address of function table on the fly.
 
             for (QString &functionName : functionMap.keys()) {
                 unsigned int oldAddress = functionMap.value(functionName);
-                unsigned int newAddress = buildAddressOfFunctions().value(functionName); // Build address of function table on the fly.
+                unsigned int newAddress = addressOfFunctions.value(functionName);
 
                 // Verify to some degree addresses to be patched.
                 if (oldAddress == 0 || newAddress == 0) {
@@ -59,10 +61,10 @@ bool PeFile::patchCode()
                 }
 
                 // Creating a pointer to data to be updated.
-                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + (oldAddress - baseImageAddress));
+                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + oldAddress - baseImageAddress);
                 qDebug() << showbase << hex << "dataPtr =" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(oldAddress - baseImageAddress);
 
-                // Change old address to point to new function instead.
+                // Change the old address to point to new function instead.
                 *dataPtr = newAddress;
                 qDebug() << showbase << hex << "Patched" << functionName << "changed address" << oldAddress << "to" << newAddress;
             }
