@@ -45,12 +45,11 @@ bool PeFile::patchCode()
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
-            // TODO: Rename this?
-            FunctionMap functionMap = Constants::targets.value(target);
+            FunctionMap functionToAddresses = Constants::targets.value(target);
             FunctionMap addressOfFunctions = buildAddressOfFunctions(); // Build address of function table on the fly.
 
-            for (QString &functionName : functionMap.keys()) {
-                unsigned int oldAddress = functionMap.value(functionName);
+            for (QString &functionName : functionToAddresses.keys()) {
+                unsigned int oldAddress = functionToAddresses.value(functionName);
                 unsigned int newAddress = addressOfFunctions.value(functionName);
 
                 // Verify to some degree addresses to be patched.
