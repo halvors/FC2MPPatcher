@@ -5,7 +5,7 @@
 #include <QString>
 #include <QMetaType>
 
-typedef QHash<QString, unsigned int> FunctionMap;
+typedef QHash<unsigned int, QString> FunctionMap;
 
 enum TargetType {
     STEAM,
@@ -18,6 +18,11 @@ struct TargetEntry {
     const QString fileName;
     const QString checkSum;
     const FunctionMap functions;
+};
+
+struct FunctionEntry {
+    unsigned int address;
+    const QString functionName;
 };
 
 Q_DECLARE_METATYPE(TargetEntry)
@@ -50,19 +55,19 @@ namespace Constants {
           "Dunia.dll",
           "b99ea707e1bba5ae964effd2cec94eed6b865739",
           {
-              { patch_library_function_getAdaptersInfo, 0x10C6A692 },
-              { patch_library_function_getHostbyname, 0x100141FC }
+              { 0x10C6A692, patch_library_function_getAdaptersInfo },
+              { 0x100141FC, patch_library_function_getHostbyname }
           }
         },
         { TargetType::STEAM,
           "FC2ServerLauncher.exe",
           "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
           {
-              { patch_library_function_getAdaptersInfo, 0x00495BCF },
-              { patch_library_function_getAdaptersInfo, 0x00495BF0 },
-              { patch_library_function_getAdaptersInfo, 0x00E63AAE },
-              { patch_library_function_getAdaptersInfo, 0x00E63AD0 },
-              { patch_library_function_getHostbyname, 0x00BA714C }
+              { 0x00495BCF, patch_library_function_getAdaptersInfo },
+              { 0x00495BF0, patch_library_function_getAdaptersInfo },
+              { 0x00E63AAE, patch_library_function_getAdaptersInfo },
+              { 0x00E63AD0, patch_library_function_getAdaptersInfo },
+              { 0x00BA714C, patch_library_function_getHostbyname }
           }
         }
     };

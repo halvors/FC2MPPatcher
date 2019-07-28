@@ -121,7 +121,8 @@ void Widget::pushButton_reset_clicked()
     TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
 
     QString fileName = path + target.fileName;
-    QString fileNameBackup = fileName.split(".")[0] + Constants::target_backup_suffix;
+    QStringList split = fileName.split(".");
+    QString fileNameBackup = split[0] + Constants::target_backup_suffix + split[1];
 
     if (QFile::exists(fileNameBackup)) {
         // Removed old main file.

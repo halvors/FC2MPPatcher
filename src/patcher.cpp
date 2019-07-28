@@ -57,7 +57,7 @@ void Patcher::applyPatch(const QString &path, const TargetEntry &target)
     peFile->load(path, target.fileName);
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_name, target.functions);
+    peFile->apply(Constants::patch_library_file, target.functions);
 
     // Save PE from memory to file.
     peFile->save();
