@@ -58,7 +58,7 @@ namespace Constants {
           "FC2ServerLauncher.exe",
           "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
           {
-              { patch_library_function_getAdaptersInfo, 0x00495BCD },
+              { patch_library_function_getAdaptersInfo, 0x00495BCF },
               { patch_library_function_getAdaptersInfo, 0x00495BF0 },
               { patch_library_function_getAdaptersInfo, 0x00E63AAE },
               { patch_library_function_getAdaptersInfo, 0x00E63AD0 },

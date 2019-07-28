@@ -144,6 +144,8 @@ void Widget::pushButton_patch_clicked()
         return;
     }
 
+    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
+
     // Validate target file against stored checksum.
     if (!Patcher::isFileValid(path, target)) {
         QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.fileName + ", patching was aborted!");
@@ -152,5 +154,4 @@ void Widget::pushButton_patch_clicked()
     }
 
     Patcher::applyPatch(path, ui->comboBox_select_target->currentData().value<TargetEntry>());
-    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 }

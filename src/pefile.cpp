@@ -20,13 +20,15 @@ FunctionMap PeFile::buildAddressOfFunctions() {
     // Loop thru all imported libraries.
     for (import_library library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() == Constants::patch_library_name.toStdString()) {
+        if (library.get_name() == Constants::patch_library_file.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
             for (imported_function function : library.get_imported_functions()) {
                 map.insert(QString::fromStdString(function.get_name()), address);
                 address += 4; // Offset is 4 between entries.
             }
+
+            break;
         }
     }
 
@@ -35,8 +37,6 @@ FunctionMap PeFile::buildAddressOfFunctions() {
 
 bool PeFile::patchCode(const FunctionMap &functions)
 {
-    // TODO: Alter file version field here?
-
     for (section &section : image->get_image_sections()) {
         if (section.get_name() == Constants::patch_pe_section.toStdString()) {
             unsigned int baseImageAddress = image->get_image_base_32() + section.get_virtual_address();
