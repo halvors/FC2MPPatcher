@@ -17,11 +17,16 @@ bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
 
 void Patcher::backupFile(const QString &path, const TargetEntry &target)
 {
-    QString fileName = path + target.fileName;
-    QString fileNameBackup = fileName.split(".")[0] + Constants::target_backup_suffix;
+    QStringList fileName = target.fileName.split(".");
+    QString suffix = fileName.takeLast();
+    QString filePath = path + fileName.first() + "." + suffix;
+    QString fileNameBackup = path + fileName.first() + Constants::target_backup_suffix + "." + suffix;
+
+    qDebug() << filePath;
+    qDebug() << fileNameBackup;
 
     if (!QFile::exists(fileNameBackup)) {
-        QFile::copy(fileName, fileNameBackup);
+        QFile::copy(filePath, fileNameBackup);
     }
 }
 

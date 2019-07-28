@@ -14,6 +14,7 @@ Widget::Widget(QWidget* parent) :
     ui->setupUi(this);
 
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
+
     ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
     populateComboboxWithNetworkInterfaces();
     populateComboboxWithTargets();
@@ -123,7 +124,10 @@ void Widget::pushButton_reset_clicked()
     QString fileNameBackup = fileName.split(".")[0] + Constants::target_backup_suffix;
 
     if (QFile::exists(fileNameBackup)) {
+        // Removed old main file.
         QFile::remove(fileName);
+
+        // Copy backup to main file.
         QFile::copy(fileNameBackup, fileName);
     }
 }
