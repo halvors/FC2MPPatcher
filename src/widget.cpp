@@ -1,7 +1,6 @@
-#include <QVariant>
 #include <QNetworkInterface>
-#include <QDir>
 #include <QFileDialog>
+#include <QDir>
 #include <QMessageBox>
 
 #include "widget.h"
@@ -15,6 +14,7 @@ Widget::Widget(QWidget* parent) :
     ui->setupUi(this);
 
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
+    ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
     populateComboboxWithNetworkInterfaces();
     populateComboboxWithTargets();
 
@@ -23,6 +23,7 @@ Widget::Widget(QWidget* parent) :
     loadSettings();
 
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
+    connect(ui->pushButton_reset, &QPushButton::clicked, this, &Widget::pushButton_reset_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
 
@@ -33,7 +34,7 @@ Widget::~Widget()
 
 void Widget::loadSettings()
 {
-    QString install_directory = settings->value(Constants::settings_install_directory, Constants::install_directory).toString();
+    QString install_directory = settings->value(Constants::settings_install_directory, Constants::game_install_directory).toString();
     ui->lineEdit_install_directory->setText(install_directory);
 
     int index = settings->value(Constants::settings_interface_index).toInt();
@@ -104,22 +105,44 @@ void Widget::populateComboboxWithTargets()
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString installDirectory = QFileDialog::getExistingDirectory(this, nullptr, ui->lineEdit_install_directory->text());
+    QString installDirectory = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
     if (QDir(installDirectory).exists()) {
         ui->lineEdit_install_directory->setText(installDirectory);
+    }
+
+    saveSettings();
+}
+
+void Widget::pushButton_reset_clicked()
+{
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
+    TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
+
+    QString fileName = path + target.fileName;
+    QString fileNameBackup = fileName.split(".")[0] + Constants::target_backup_suffix;
+
+    if (QFile::exists(fileNameBackup)) {
+        QFile::remove(fileName);
+        QFile::copy(fileNameBackup, fileName);
     }
 }
 
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::executable_directory + "/";
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
     TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
 
+    // Verify that binary folder actually exists.
+    if (!QDir(path).exists()) {
+        QMessageBox::warning(this, "Warning", "Game file not found, please select the " + Constants::game_name + " installation directory.");
+        return;
+    }
+
     // Validate target file against stored checksum.
-    if (!Patcher::isValid(path, target)) {
-        QMessageBox::critical(this, "Error", "Invalid file checksum for " + target.fileName + ", patching was aborted!");
+    if (!Patcher::isFileValid(path, target)) {
+        QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.fileName + ", patching was aborted!");
 
         return;
     }

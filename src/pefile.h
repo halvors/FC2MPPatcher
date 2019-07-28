@@ -3,8 +3,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QStringList>
-#include <QHash>
 
 #include <pe_bliss.h>
 

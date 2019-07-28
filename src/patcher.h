@@ -15,12 +15,13 @@ class Patcher : public QObject
 public:
     explicit Patcher(QObject *parent = nullptr);
 
-    static bool isValid(const QString &path, const TargetEntry &target);
+    static bool isFileValid(const QString &path, const TargetEntry &target);
+    static void backupFile(const QString &path, const TargetEntry &target);
     static void applyPatch(const QString &path, const TargetEntry &target);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
 private:
-    static QString checksum(const QString &filePath);
+    static QString checksumFile(const QString &filePath);
 };
 
 #endif // PATCHER_H

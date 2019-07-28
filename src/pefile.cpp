@@ -93,7 +93,7 @@ bool PeFile::load(const QString &path, const QString &target)
     this->path = path;
     this->target = target;
 
-    QString fileName = path + target + "_patched.dll";
+    QString fileName = path + target;
 
     // Open the file.
     std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
@@ -170,7 +170,7 @@ bool PeFile::save()
         return false;
     }
 
-    QString fileName = path + target + "_patched.dll";
+    QString fileName = path + target;
 
     try {
         // Create a new PE file.

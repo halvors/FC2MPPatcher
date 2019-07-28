@@ -10,12 +10,22 @@ Patcher::Patcher(QObject* parent) : QObject(parent)
 
 }
 
-bool Patcher::isValid(const QString &path, const TargetEntry &target)
+bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
 {
-    return target.checkSum == checksum(path + target.fileName);
+    return target.checkSum == checksumFile(path + target.fileName);
 }
 
-QString Patcher::checksum(const QString &filePath)
+void Patcher::backupFile(const QString &path, const TargetEntry &target)
+{
+    QString fileName = path + target.fileName;
+    QString fileNameBackup = fileName.split(".")[0] + Constants::target_backup_suffix;
+
+    if (!QFile::exists(fileNameBackup)) {
+        QFile::copy(fileName, fileNameBackup);
+    }
+}
+
+QString Patcher::checksumFile(const QString &filePath)
 {
     QFile file(filePath);
 
@@ -32,31 +42,16 @@ QString Patcher::checksum(const QString &filePath)
 
 void Patcher::applyPatch(const QString &path, const TargetEntry &target)
 {
-    QString filePath = path + target.fileName;
-
     // Backup original file.
-    QString fileNameBackup = filePath + "_backup";
+    backupFile(path, target);
 
-    if (!QFile::exists(fileNameBackup)) {
-        QFile::copy(filePath, fileNameBackup);
-    }
-
-    // Temporarily workaround.
-    QString fileNamePatched = filePath + "_patched.dll";
-
-    if (QFile::exists(fileNamePatched)) {
-        QFile::remove(fileNamePatched);
-    }
-
-    QFile::copy(fileNameBackup, fileNamePatched);
-
+    // Create PeFile instance for this particular target.
     PeFile* peFile = new PeFile();
 
     // Load PE from file.
     peFile->load(path, target.fileName);
 
     // Apply PE and binary patches.
-    // TODO: Verify this, correct to get these from hashmap and not patch specific thingy?
     peFile->apply(Constants::patch_library_name, target.functions);
 
     // Save PE from memory to file.

@@ -1,8 +1,8 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <QString>
 #include <QHash>
+#include <QString>
 #include <QMetaType>
 
 typedef QHash<QString, unsigned int> FunctionMap;
@@ -12,6 +12,7 @@ enum TargetType {
     RETAIL
 };
 
+// Does Steam version differ from retail version?
 struct TargetEntry {
     TargetType type;
     const QString fileName;
@@ -33,8 +34,9 @@ namespace Constants {
     const QString settings_group_window_position = "position";
     const QString settings_group_window_isMaximized = "isMaximized";
 
-    const QString install_directory = { "C:/Program Files/Steam/steamapps/common/Far Cry 2" };
-    const QString executable_directory = "bin";
+    const QString game_name = "Far Cry 2";
+    const QString game_install_directory = { "C:/Program Files/Steam/steamapps/common/Far Cry 2" };
+    const QString game_executable_directory = "bin";
 
     const QString patch_library_name = "MPPatch";
     const QString patch_library_file = patch_library_name + ".dll";
@@ -46,7 +48,7 @@ namespace Constants {
     const TargetEntry targets[] = {
         { TargetType::STEAM,
           "Dunia.dll",
-          "b99ea707e1bba5ae964effd2cec94eed6b865739", // Does Steam version differ from retail version?
+          "b99ea707e1bba5ae964effd2cec94eed6b865739",
           {
               { patch_library_function_getAdaptersInfo, 0x10C6A692 },
               { patch_library_function_getHostbyname, 0x100141FC }
@@ -54,13 +56,15 @@ namespace Constants {
         },
         { TargetType::STEAM,
           "FC2ServerLauncher.exe",
-          "a9ba7b50f1c541254a27299dd471fa0ebc1db02b", // Does Steam version differ from retail version?
+          "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
           {
               { patch_library_function_getAdaptersInfo, 0 },
               { patch_library_function_getHostbyname, 0 }
           }
         }
     };
+
+    const QString target_backup_suffix = "_Original.dll";
 }
 
 #endif // CONSTANTS_H
