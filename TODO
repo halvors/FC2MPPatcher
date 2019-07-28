@@ -1,3 +1,4 @@
-- Patch FC2ServerLauncher.exe or/and Dunia.dll with PE imports for fix.dll
+- Patch FC2ServerLauncher.exe or/and Dunia.dll with PE imports for MPPatch.dll.
 - Automatically search for install directory, and backup files before altering them.
 - Avoid crashing if specifying an invalid file path to PeLib::PeFile.
+- Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
