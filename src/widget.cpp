@@ -151,3 +151,11 @@ void Widget::pushButton_patch_clicked()
     // Start patching.
     Patcher::applyPatch(path, ui->comboBox_select_target->currentData().value<TargetEntry>());
 }
+
+QString Widget::findPath() {
+#ifdef Q_OS_WIN
+    // Extract Far Cry 2 registry installdir here.
+#endif
+
+    return QString();
+}

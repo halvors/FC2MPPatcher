@@ -34,6 +34,8 @@ private:
 
     void populateComboboxWithNetworkInterfaces();
     void populateComboboxWithTargets();
+
+    QString findPath();
 };
 
 #endif // WIDGET_H
