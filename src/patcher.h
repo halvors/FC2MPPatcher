@@ -20,7 +20,7 @@ public:
 
 private:
     static QString checksumFile(const QString &filePath);
-    static bool copyFile(const QString &path, const TargetEntry &target, bool isBackup = true);
+    static bool copyFile(const QString &path, const TargetEntry &target, bool isBackup);
 };
 
 #endif // PATCHER_H

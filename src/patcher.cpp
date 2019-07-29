@@ -48,7 +48,7 @@ bool Patcher::copyFile(const QString &path, const TargetEntry &target, bool isBa
 
 bool Patcher::backupFile(const QString &path, const TargetEntry &target)
 {
-    return copyFile(path, target);
+    return copyFile(path, target, true);
 }
 
 bool Patcher::restoreFile(const QString &path, const TargetEntry &target)

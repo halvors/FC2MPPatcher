@@ -30,7 +30,6 @@ private:
     QString name;
 };
 
-// Does Steam version differ from retail version?
 class TargetEntry {
 public:
     TargetEntry() {}
@@ -81,11 +80,11 @@ namespace Constants {
     const QString game_install_directory = { "C:/Program Files/Steam/steamapps/common/Far Cry 2" };
     const QString game_executable_directory = "bin";
 
+    const QString patch_pe_section = ".text";
     const QString patch_library_name = "MPPatch";
     const QString patch_library_file = patch_library_name + ".dll";
     const QString patch_library_function_getAdaptersInfo = "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8";
     const QString patch_library_function_getHostbyname = "_Z14getHostbyname2Pc@4";
-    const QString patch_pe_section = ".text";
     const QString patch_network_configuration_file = "network.cfg";
 
     const TargetEntry targets[] = {

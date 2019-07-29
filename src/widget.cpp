@@ -80,22 +80,20 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
         // Only show active network interfaces.
         if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
-            QNetworkAddressEntry* selectedAddressEntry = nullptr;
+            QNetworkAddressEntry selectedAddressEntry;
 
             // Scan thru addresses for this interface.
             for (QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
                 QHostAddress hostAddress = addressEntry.ip();
                 // Only select IPv4 addresses.
                 if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
-                    selectedAddressEntry = &addressEntry;
+                    selectedAddressEntry = addressEntry;
                     break;
                 }
             }
 
-            // Only add option if we found a match.
-            if (selectedAddressEntry) {
-                ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry->ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(*selectedAddressEntry));
-            }
+            // TODO: Handle this if it's empty.
+            ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
         }
     }
 }
@@ -159,9 +157,11 @@ void Widget::pushButton_patch_clicked()
 }
 
 QString Widget::findPath() {
+    QString installDirectory = QString();
+
 #ifdef Q_OS_WIN
     // Extract Far Cry 2 registry installdir here.
 #endif
 
-    return QString();
+    return installDirectory;
 }

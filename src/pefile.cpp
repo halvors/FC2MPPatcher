@@ -38,6 +38,7 @@ QList<FunctionEntry> PeFile::buildAddressOfFunctions() {
 bool PeFile::patchCode(QList<FunctionEntry> &functions)
 {
     for (section &section : image->get_image_sections()) {
+        // Only patch our section specified.
         if (section.get_name() == Constants::patch_pe_section.toStdString()) {
             unsigned int baseImageAddress = image->get_image_base_32() + section.get_virtual_address();
             qDebug() << "Address of base image:" << showbase << hex << baseImageAddress;
@@ -45,12 +46,24 @@ bool PeFile::patchCode(QList<FunctionEntry> &functions)
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
-            QList<FunctionEntry> functionAddresses = buildAddressOfFunctions(); // Build address of function table on the fly.
+            QList<FunctionEntry> importFunctions = buildAddressOfFunctions(); // Build address of function table on the fly.
+
+            qDebug() << "Size:" << importFunctions.size();
 
             for (FunctionEntry &function : functions) {
-                unsigned int newAddress = functionAddresses.takeFirst().getAddress();
+                unsigned int newAddress = 0;
 
-                qDebug() << showbase << hex << newAddress;
+                // Find address matching function.
+                for (FunctionEntry &importFunction : importFunctions) {
+                    if (function.getName() == importFunction.getName()) {
+                        newAddress = importFunction.getAddress();
+
+                        break;
+                    }
+                }
+
+                qDebug() << showbase << hex << "Old address: " << function.getAddress();
+                qDebug() << showbase << hex << "New address: " << newAddress;
 
                 // Verify to some degree addresses to be patched.
                 if (function.getAddress() == 0 || newAddress == 0) {
@@ -65,14 +78,14 @@ bool PeFile::patchCode(QList<FunctionEntry> &functions)
 
                 // Change the old address to point to new function instead.
                 *dataPtr = newAddress;
-                qDebug() << showbase << hex << "Patched" << function.getName() << "changed address" << function.getAddress() << "to" << newAddress;
+                qDebug() << showbase << hex << "Patched" << function.getName() << ", changed address" << function.getAddress() << "to" << newAddress;
             }
 
-            break;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 void PeFile::clear()
@@ -83,7 +96,7 @@ void PeFile::clear()
     // TODO: clear this?
     /*
     if (image) {
-        delete *image;
+        delete image;
     }
     */
 }
