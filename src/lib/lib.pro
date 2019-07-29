@@ -18,14 +18,18 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += c++17
 
-SOURCES += mppatch.cpp
+SOURCES += \
+    mppatch.cpp
 
-HEADERS += mppatch.h \
-        mppatch_global.h 
-
-LIBS += -lws2_32 -lIPHLPAPI
+HEADERS += \
+    mppatch.h \
+    mppatch_global.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+LIBS += -lws2_32 -lIPHLPAPI
+
+include(../common/common.pri)

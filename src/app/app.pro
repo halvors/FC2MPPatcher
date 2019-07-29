@@ -1,4 +1,5 @@
-QT += core \
+QT += \
+    core \
     gui \
     network
 
@@ -21,17 +22,24 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 CONFIG += static \
     c++17
 
-SOURCES += main.cpp \
+SOURCES += \
+    main.cpp \
     widget.cpp \
     patcher.cpp \
     pefile.cpp
 
-HEADERS += constants.h \
+HEADERS += \
     widget.h \
     patcher.h \
     pefile.h
 
 FORMS += widget.ui
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
 
 # Including 3rd party PeBliss library.
 INCLUDEPATH += $$PWD/../../lib/libpebliss/pe_lib
@@ -39,7 +47,4 @@ DEPENDPATH += $$PWD/../../lib/libpebliss/pe_lib
 
 LIBS += -L$$PWD/../../lib/libpebliss/lib -lpebliss
 
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+include(../common/common.pri)

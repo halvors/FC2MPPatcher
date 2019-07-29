@@ -1,14 +1,15 @@
 #include "mppatch.h"
+#include "constants.h"
 
 void MPPatch::readSettings()
 {
     if (!settings) {
-        settings = new QSettings("network.cfg.ini", QSettings::IniFormat);
+        settings = new QSettings(Constants::patch_network_configuration_file, QSettings::IniFormat);
     }
 
     if (!address) {
-        settings->beginGroup("MPPatch");
-            address = settings->value("Address").toString().toStdString().c_str();
+        settings->beginGroup(Constants::patch_library_name);
+            address = settings->value(Constants::patch_network_configuration_address).toString().toStdString().c_str();
         settings->endGroup();
     }
 }

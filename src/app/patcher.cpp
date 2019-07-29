@@ -1,7 +1,6 @@
 #include <QFile>
 #include <QCryptographicHash>
 #include <QSettings>
-#include <QTextStream>
 
 #include "patcher.h"
 #include "pefile.h"
@@ -75,19 +74,11 @@ void Patcher::applyPatch(const QString &path, const TargetEntry &target)
 
 void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
 {
-    QSettings settings(path + Constants::patch_network_configuration_file + ".ini", QSettings::IniFormat);
+    QSettings settings(path + Constants::patch_network_configuration_file, QSettings::IniFormat);
 
     settings.beginGroup(Constants::patch_library_name);
-        settings.setValue("Address", address.ip().toString());
-        settings.setValue("Netmask", address.netmask().toString());
-        settings.setValue("Broadcast", address.broadcast().toString());
+        settings.setValue(Constants::patch_network_configuration_address, address.ip().toString());
+        settings.setValue(Constants::patch_network_configuration_broadcast, address.broadcast().toString());
+        settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
-
-    // Old way for compatibility with old library.
-    QFile file(path + Constants::patch_network_configuration_file);
-
-    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-        QTextStream stream(&file);
-        stream << address.ip().toString() << endl;
-    }
 }

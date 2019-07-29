@@ -7,8 +7,8 @@
 #include <QFlag>
 
 enum TargetType {
-    STEAM,
-    RETAIL
+    RETAIL, // GOG is identical.
+    STEAM
 };
 
 class FunctionEntry {
@@ -86,6 +86,9 @@ namespace Constants {
     const QString patch_library_function_getAdaptersInfo = "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8";
     const QString patch_library_function_getHostbyname = "_Z14getHostbyname2Pc@4";
     const QString patch_network_configuration_file = "network.cfg";
+    const QString patch_network_configuration_address = "Address";
+    const QString patch_network_configuration_broadcast = "Broadcast";
+    const QString patch_network_configuration_netmask = "Netmask";
 
     const QStringList patch_library_functions = {
         "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8",
@@ -105,9 +108,6 @@ namespace Constants {
           "FC2ServerLauncher.exe",
           "0949e9dc6fd2934673005a0baff4b30b843ada02",
           {
-              { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getAdaptersInfo },
               { 0x00000000, patch_library_function_getAdaptersInfo },
               { 0x00000000, patch_library_function_getHostbyname }
           }

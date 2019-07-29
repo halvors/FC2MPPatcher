@@ -7,7 +7,7 @@
 
 #include <pe_bliss.h>
 
-#include "constants.h"
+#include "../common/constants.h"
 
 using namespace pe_bliss;
 
