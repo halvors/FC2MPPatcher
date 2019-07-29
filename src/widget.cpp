@@ -80,19 +80,22 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
         // Only show active network interfaces.
         if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
-            QNetworkAddressEntry selectedAddressEntry;
+            QNetworkAddressEntry* selectedAddressEntry = nullptr;
 
             // Scan thru addresses for this interface.
             for (QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
                 QHostAddress hostAddress = addressEntry.ip();
                 // Only select IPv4 addresses.
                 if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
-                    selectedAddressEntry = addressEntry;
+                    selectedAddressEntry = &addressEntry;
                     break;
                 }
             }
 
-            ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
+            // Only add option if we found a match.
+            if (selectedAddressEntry) {
+                ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry->ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(*selectedAddressEntry));
+            }
         }
     }
 }
