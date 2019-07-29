@@ -62,6 +62,8 @@ bool PeFile::patchCode(QList<FunctionEntry> &functions)
                     }
                 }
 
+                qDebug() << "#####################################################################";
+
                 qDebug() << showbase << hex << "Old address: " << function.getAddress();
                 qDebug() << showbase << hex << "New address: " << newAddress;
 
@@ -147,9 +149,9 @@ void PeFile::apply(const QString &libraryName, QList<FunctionEntry> functions)
     // TODO: Avoid duplicate added functions here?...
 
     // Add a new import functions.
-    for (FunctionEntry &function : functions) {
+    for (const QString &functionName : Constants::patch_library_functions) {
         imported_function importFunction;
-        importFunction.set_name(function.getName().toStdString());
+        importFunction.set_name(functionName.toStdString());
 
         importLibrary.add_import(importFunction);
     }

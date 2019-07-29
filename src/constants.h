@@ -87,6 +87,11 @@ namespace Constants {
     const QString patch_library_function_getHostbyname = "_Z14getHostbyname2Pc@4";
     const QString patch_network_configuration_file = "network.cfg";
 
+    const QStringList patch_library_functions = {
+        "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8",
+        "_Z14getHostbyname2Pc@4"
+    };
+
     const TargetEntry targets[] = {
         { TargetType::RETAIL,
           "Dunia.dll",
@@ -119,10 +124,7 @@ namespace Constants {
           "FC2ServerLauncher.exe",
           "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
           {
-              { 0x00495BCF, patch_library_function_getAdaptersInfo },
-              { 0x00495BF0, patch_library_function_getAdaptersInfo },
-              { 0x00E63AAE, patch_library_function_getAdaptersInfo },
-              { 0x00E63AD0, patch_library_function_getAdaptersInfo },
+              { 0x00C46A66, patch_library_function_getAdaptersInfo },
               { 0x00BA714C, patch_library_function_getHostbyname }
           }
         }
