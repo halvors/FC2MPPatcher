@@ -126,6 +126,8 @@ void Widget::pushButton_reset_clicked()
     TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
 
     Patcher::restoreFile(path, target);
+
+    this->findPath();
 }
 
 void Widget::pushButton_patch_clicked()
@@ -161,6 +163,12 @@ QString Widget::findPath() {
 
 #ifdef Q_OS_WIN
     // Extract Far Cry 2 registry installdir here.
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat, this);
+    registry.beginGroup("7-Zip");
+
+    qDebug() << "Registry:" << registry.value("Path").toString();
+
+    registry.endGroup();
 #endif
 
     return installDirectory;
