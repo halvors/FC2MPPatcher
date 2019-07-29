@@ -89,6 +89,25 @@ namespace Constants {
     const QString patch_network_configuration_file = "network.cfg";
 
     const TargetEntry targets[] = {
+        { TargetType::RETAIL,
+          "Dunia.dll",
+          "3905709d89d75b1e1928c94685e70b22b25843fa",
+          {
+              { 0x00000000, patch_library_function_getAdaptersInfo },
+              { 0x00000000, patch_library_function_getHostbyname }
+          }
+        },
+        { TargetType::RETAIL,
+          "FC2ServerLauncher.exe",
+          "0949e9dc6fd2934673005a0baff4b30b843ada02",
+          {
+              { 0x00000000, patch_library_function_getAdaptersInfo },
+              { 0x00000000, patch_library_function_getAdaptersInfo },
+              { 0x00000000, patch_library_function_getAdaptersInfo },
+              { 0x00000000, patch_library_function_getAdaptersInfo },
+              { 0x00000000, patch_library_function_getHostbyname }
+          }
+        },
         { TargetType::STEAM,
           "Dunia.dll",
           "b99ea707e1bba5ae964effd2cec94eed6b865739",

@@ -100,7 +100,10 @@ void Widget::populateComboboxWithNetworkInterfaces()
 void Widget::populateComboboxWithTargets()
 {
     for (TargetEntry target : Constants::targets) {
-        ui->comboBox_select_target->addItem(target.getFileName(), QVariant::fromValue<TargetEntry>(target));
+        // Temporarily only adding Steam version.
+        if (target.getType() == TargetType::STEAM) {
+            ui->comboBox_select_target->addItem(target.getFileName(), QVariant::fromValue<TargetEntry>(target));
+        }
     }
 }
 
