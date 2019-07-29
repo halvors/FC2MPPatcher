@@ -6,22 +6,21 @@
 #include <QNetworkAddressEntry>
 
 #include "constants.h"
-#include "pefile.h"
 
-class Patcher : public QObject
+class Patcher
 {
-    Q_OBJECT
-
 public:
-    explicit Patcher(QObject *parent = nullptr);
-
     static bool isFileValid(const QString &path, const TargetEntry &target);
-    static void backupFile(const QString &path, const TargetEntry &target);
+
+    static bool backupFile(const QString &path, const TargetEntry &target);
+    static bool restoreFile(const QString &path, const TargetEntry &target);
+
     static void applyPatch(const QString &path, const TargetEntry &target);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
 private:
     static QString checksumFile(const QString &filePath);
+    static bool copyFile(const QString &path, const TargetEntry &target, bool isBackup = true);
 };
 
 #endif // PATCHER_H

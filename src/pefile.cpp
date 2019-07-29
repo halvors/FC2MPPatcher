@@ -14,8 +14,8 @@ PeFile::~PeFile()
     clear();
 }
 
-FunctionMap PeFile::buildAddressOfFunctions() {
-    FunctionMap map;
+QList<FunctionEntry> PeFile::buildAddressOfFunctions() {
+    QList<FunctionEntry> list;
 
     // Loop thru all imported libraries.
     for (import_library library : get_imported_functions(*image)) {
@@ -24,7 +24,7 @@ FunctionMap PeFile::buildAddressOfFunctions() {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
             for (imported_function function : library.get_imported_functions()) {
-                map.insert(address, QString::fromStdString(function.get_name()));
+                list.append({ address, QString::fromStdString(function.get_name()) });
                 address += 4; // Offset is 4 between entries.
             }
 
@@ -32,10 +32,10 @@ FunctionMap PeFile::buildAddressOfFunctions() {
         }
     }
 
-    return map;
+    return list;
 }
 
-bool PeFile::patchCode(const FunctionMap &functions)
+bool PeFile::patchCode(QList<FunctionEntry> &functions)
 {
     for (section &section : image->get_image_sections()) {
         if (section.get_name() == Constants::patch_pe_section.toStdString()) {
@@ -45,25 +45,27 @@ bool PeFile::patchCode(const FunctionMap &functions)
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
-            FunctionMap addressOfFunctions = buildAddressOfFunctions(); // Build address of function table on the fly.
+            QList<FunctionEntry> functionAddresses = buildAddressOfFunctions(); // Build address of function table on the fly.
 
-            for (unsigned int address : functions.keys()) {
-                unsigned int newAddress = addressOfFunctions.key(functions.value(address));
+            for (FunctionEntry &function : functions) {
+                unsigned int newAddress = functionAddresses.takeFirst().getAddress();
+
+                qDebug() << showbase << hex << newAddress;
 
                 // Verify to some degree addresses to be patched.
-                if (address == 0 || newAddress == 0) {
+                if (function.getAddress() == 0 || newAddress == 0) {
                     qDebug() << "Error: Addresses in patch should not be zero! Patch was not applied.";
 
                     return false;
                 }
 
                 // Creating a pointer to data to be updated.
-                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + address - baseImageAddress);
-                qDebug() << showbase << hex << "dataPtr =" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(address - baseImageAddress);
+                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + function.getAddress() - baseImageAddress);
+                qDebug() << showbase << hex << "dataPtr =" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(function.getAddress() - baseImageAddress);
 
                 // Change the old address to point to new function instead.
                 *dataPtr = newAddress;
-                //qDebug() << showbase << hex << "Patched" << functionName << "changed address" << address << "to" << newAddress;
+                qDebug() << showbase << hex << "Patched" << function.getName() << "changed address" << function.getAddress() << "to" << newAddress;
             }
 
             break;
@@ -115,7 +117,7 @@ bool PeFile::load(const QString &path, const QString &target)
     return true;
 }
 
-void PeFile::apply(const QString &libraryName, const FunctionMap &functions)
+void PeFile::apply(const QString &libraryName, QList<FunctionEntry> functions)
 {
     // Check that image is loaded.
     if (!image) {
@@ -129,12 +131,14 @@ void PeFile::apply(const QString &libraryName, const FunctionMap &functions)
     import_library importLibrary;
     importLibrary.set_name(libraryName.toStdString());
 
-    // Add a new import functions.
-    for (const QString &functionName : functions.values().toSet()) {
-        imported_function function;
-        function.set_name(functionName.toStdString());
+    // TODO: Avoid duplicate added functions here?...
 
-        importLibrary.add_import(function);
+    // Add a new import functions.
+    for (FunctionEntry &function : functions) {
+        imported_function importFunction;
+        importFunction.set_name(function.getName().toStdString());
+
+        importLibrary.add_import(importFunction);
     }
 
     imports.push_back(importLibrary);

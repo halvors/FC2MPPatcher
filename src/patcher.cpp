@@ -4,35 +4,11 @@
 #include <QTextStream>
 
 #include "patcher.h"
+#include "pefile.h"
 
-Patcher::Patcher(QObject* parent) : QObject(parent)
+QString Patcher::checksumFile(const QString &fileName)
 {
-
-}
-
-bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
-{
-    return target.checkSum == checksumFile(path + target.fileName);
-}
-
-void Patcher::backupFile(const QString &path, const TargetEntry &target)
-{
-    QStringList fileName = target.fileName.split(".");
-    QString suffix = fileName.takeLast();
-    QString filePath = path + fileName.first() + "." + suffix;
-    QString fileNameBackup = path + fileName.first() + Constants::target_backup_suffix + "." + suffix;
-
-    qDebug() << filePath;
-    qDebug() << fileNameBackup;
-
-    if (!QFile::exists(fileNameBackup)) {
-        QFile::copy(filePath, fileNameBackup);
-    }
-}
-
-QString Patcher::checksumFile(const QString &filePath)
-{
-    QFile file(filePath);
+    QFile file(fileName);
 
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha1);
@@ -45,19 +21,51 @@ QString Patcher::checksumFile(const QString &filePath)
     return QString();
 }
 
+bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
+{
+    return target.getFileCheckSum() == checksumFile(path + target.getFileName());
+}
+
+bool Patcher::copyFile(const QString &path, const TargetEntry &target, bool isBackup)
+{
+    QStringList split = target.getFileName().split(".");
+    QString suffix = "." + split.takeLast();
+    QString fileName = path + split.join(QString()) + suffix;
+    QString fileNameCopy = path + split.join(QString()) + Constants::target_backup_suffix + suffix;
+
+    if (isBackup) {
+        if (!QFile::exists(fileNameCopy)) {
+            return QFile::copy(fileName, fileNameCopy);
+        }
+    } else {
+        if (!QFile::exists(fileName) || QFile::remove(fileName)) {
+            return QFile::copy(fileNameCopy, fileName);
+        }
+    }
+
+    return false;
+}
+
+bool Patcher::backupFile(const QString &path, const TargetEntry &target)
+{
+    return copyFile(path, target);
+}
+
+bool Patcher::restoreFile(const QString &path, const TargetEntry &target)
+{
+    return copyFile(path, target, false);
+}
+
 void Patcher::applyPatch(const QString &path, const TargetEntry &target)
 {
-    // Backup original file.
-    backupFile(path, target);
-
     // Create PeFile instance for this particular target.
     PeFile* peFile = new PeFile();
 
     // Load PE from file.
-    peFile->load(path, target.fileName);
+    peFile->load(path, target.getFileName());
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_file, target.functions);
+    peFile->apply(Constants::patch_library_file, target.getFunctions());
 
     // Save PE from memory to file.
     peFile->save();
@@ -75,6 +83,7 @@ void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddre
         settings.setValue("Broadcast", address.broadcast().toString());
     settings.endGroup();
 
+    // Old way for compatibility with old library.
     QFile file(path + Constants::patch_network_configuration_file);
 
     if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {

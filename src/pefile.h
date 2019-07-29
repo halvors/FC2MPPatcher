@@ -2,6 +2,7 @@
 #define PE_H
 
 #include <QObject>
+#include <QList>
 #include <QString>
 
 #include <pe_bliss.h>
@@ -18,12 +19,12 @@ public:
     explicit PeFile(QObject* parent = nullptr);
     ~PeFile();
 
-    FunctionMap buildAddressOfFunctions();
-    bool patchCode(const FunctionMap &functions);
+    QList<FunctionEntry> buildAddressOfFunctions();
+    bool patchCode(QList<FunctionEntry> &functions);
 
     void clear();
     bool load(const QString &path, const QString &target);
-    void apply(const QString &libraryName, const FunctionMap &functions);
+    void apply(const QString &libraryName, QList<FunctionEntry> functions);
     bool save();
 
 private:

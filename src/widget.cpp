@@ -100,7 +100,7 @@ void Widget::populateComboboxWithNetworkInterfaces()
 void Widget::populateComboboxWithTargets()
 {
     for (TargetEntry target : Constants::targets) {
-        ui->comboBox_select_target->addItem(target.fileName, QVariant::fromValue<TargetEntry>(target));
+        ui->comboBox_select_target->addItem(target.getFileName(), QVariant::fromValue<TargetEntry>(target));
     }
 }
 
@@ -117,20 +117,11 @@ void Widget::pushButton_install_directory_clicked()
 
 void Widget::pushButton_reset_clicked()
 {
+    // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
     TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
 
-    QString fileName = path + target.fileName;
-    QStringList split = fileName.split(".");
-    QString fileNameBackup = split[0] + Constants::target_backup_suffix + split[1];
-
-    if (QFile::exists(fileNameBackup)) {
-        // Removed old main file.
-        QFile::remove(fileName);
-
-        // Copy backup to main file.
-        QFile::copy(fileNameBackup, fileName);
-    }
+    Patcher::restoreFile(path, target);
 }
 
 void Widget::pushButton_patch_clicked()
@@ -149,10 +140,14 @@ void Widget::pushButton_patch_clicked()
 
     // Validate target file against stored checksum.
     if (!Patcher::isFileValid(path, target)) {
-        QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.fileName + ", patching was aborted!");
+        QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.getFileName() + ", patching was aborted!");
 
         return;
     }
 
+    // Backup original file.
+    Patcher::backupFile(path, target);
+
+    // Start patching.
     Patcher::applyPatch(path, ui->comboBox_select_target->currentData().value<TargetEntry>());
 }

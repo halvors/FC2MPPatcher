@@ -1,28 +1,66 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <QHash>
 #include <QString>
+#include <QList>
 #include <QMetaType>
-
-typedef QHash<unsigned int, QString> FunctionMap;
+#include <QFlag>
 
 enum TargetType {
     STEAM,
     RETAIL
 };
 
-// Does Steam version differ from retail version?
-struct TargetEntry {
-    TargetType type;
-    const QString fileName;
-    const QString checkSum;
-    const FunctionMap functions;
+class FunctionEntry {
+public:
+    FunctionEntry(unsigned int address, const QString &name) :
+        address(address),
+        name(name) {}
+
+    unsigned int getAddress() const {
+        return address;
+    }
+
+    QString getName() const {
+        return name;
+    }
+
+private:
+    unsigned int address;
+    QString name;
 };
 
-struct FunctionEntry {
-    unsigned int address;
-    const QString functionName;
+// Does Steam version differ from retail version?
+class TargetEntry {
+public:
+    TargetEntry() {}
+    TargetEntry(TargetType type, const QString &fileName, const QString &fileCheckSum, QList<FunctionEntry> functions) :
+        type(type),
+        fileName(fileName),
+        fileCheckSum(fileCheckSum),
+        functions(functions) {}
+
+    TargetType getType() const {
+        return type;
+    }
+
+    QString getFileName() const {
+        return fileName;
+    }
+
+    QString getFileCheckSum() const {
+        return fileCheckSum;
+    }
+
+    QList<FunctionEntry> getFunctions() const {
+        return functions;
+    }
+
+private:
+    TargetType type;
+    QString fileName;
+    QString fileCheckSum;
+    QList<FunctionEntry> functions;
 };
 
 Q_DECLARE_METATYPE(TargetEntry)
