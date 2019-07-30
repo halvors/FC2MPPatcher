@@ -4,3 +4,4 @@
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
 - Automatically find Far Cry 2 installdir in registry.
 - Find steam installpath, and thereby find game installdir?
+- Detect Far Cry 2 installation type, Retail/GOG or Steam?

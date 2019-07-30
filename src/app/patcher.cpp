@@ -25,6 +25,19 @@ bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
     return target.getFileCheckSum() == checksumFile(path + target.getFileName());
 }
 
+bool Patcher::isFileTypeMismatch(const QString &path, const TargetEntry &target)
+{
+    QString checkSum = checksumFile(path + target.getFileName());
+
+    for (const TargetEntry &targetEntry : Constants::targets) {
+        if (targetEntry.getType() != target.getType() && targetEntry.getFileCheckSum() == checkSum) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool Patcher::copyFile(const QString &path, const TargetEntry &target, bool isBackup)
 {
     QStringList split = target.getFileName().split(".");
@@ -57,17 +70,16 @@ bool Patcher::restoreFile(const QString &path, const TargetEntry &target)
 
 void Patcher::applyPatch(const QString &path, const TargetEntry &target)
 {
-    // Create PeFile instance for this particular target.
-    PeFile* peFile = new PeFile();
+    qDebug() << "Patching:" << target.getFileName();
 
-    // Load PE from file.
-    peFile->load(path, target.getFileName());
+    // Create PeFile instance for this particular target.
+    PeFile* peFile = new PeFile(path + target.getFileName());
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_file, target.getFunctions());
+    peFile->apply(Constants::patch_library_file, target.getFunctions(), Constants::patch_pe_section);
 
-    // Save PE from memory to file.
-    peFile->save();
+    // Write PE to file.
+    peFile->write();
 
     delete peFile;
 }

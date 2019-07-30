@@ -1,6 +1,6 @@
 QT -= gui
 
-TARGET = MPPatch
+TARGET = mppatch
 TEMPLATE = lib
 
 DEFINES += MPPATCH_LIBRARY

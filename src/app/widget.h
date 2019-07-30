@@ -19,11 +19,6 @@ public:
     explicit Widget(QWidget* parent = nullptr);
     ~Widget();
 
-private slots:
-    void pushButton_install_directory_clicked();
-    void pushButton_reset_clicked();
-    void pushButton_patch_clicked();
-
 private:
     Ui::Widget* ui;
     QSettings* settings;
@@ -36,6 +31,11 @@ private:
     void populateComboboxWithTargets();
 
     QString findPath();
+
+private slots:
+    void pushButton_install_directory_clicked();
+    void pushButton_reset_clicked();
+    void pushButton_patch_clicked();
 };
 
 #endif // WIDGET_H

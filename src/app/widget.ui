@@ -82,14 +82,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QLabel" name="label_select_target">
+      <widget class="QLabel" name="label_select_type">
        <property name="text">
-        <string>Select target:</string>
+        <string>Select type:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox_select_target"/>
+      <widget class="QComboBox" name="comboBox_select_type"/>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_patch">

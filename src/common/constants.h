@@ -4,12 +4,13 @@
 #include <QString>
 #include <QList>
 #include <QMetaType>
-#include <QFlag>
 
 enum TargetType {
     RETAIL, // GOG is identical.
     STEAM
 };
+
+Q_DECLARE_METATYPE(TargetType)
 
 class FunctionEntry {
 public:
@@ -62,8 +63,6 @@ private:
     QList<FunctionEntry> functions;
 };
 
-Q_DECLARE_METATYPE(TargetEntry)
-
 namespace Constants {
     const QString app_name = "FC2MPPatcher";
     const QString app_version = "0.0.2";
@@ -77,7 +76,7 @@ namespace Constants {
     const QString settings_group_window_isMaximized = "isMaximized";
 
     const QString game_name = "Far Cry 2";
-    const QString game_install_directory = { "C:/Program Files/Steam/steamapps/common/Far Cry 2" };
+    const QString game_install_directory = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
     const QString game_executable_directory = "bin";
 
     const QString patch_pe_section = ".text";

@@ -1,5 +1,5 @@
-#ifndef PE_H
-#define PE_H
+#ifndef PEFILE_H
+#define PEFILE_H
 
 #include <QObject>
 #include <QList>
@@ -7,7 +7,7 @@
 
 #include <pe_bliss.h>
 
-#include "../common/constants.h"
+#include "constants.h"
 
 using namespace pe_bliss;
 
@@ -16,20 +16,19 @@ class PeFile : public QObject
     Q_OBJECT
 
 public:
-    explicit PeFile(QObject* parent = nullptr);
+    explicit PeFile(const QString &fileName, QObject* parent = nullptr);
     ~PeFile();
 
-    QList<FunctionEntry> buildAddressOfFunctions();
-    bool patchCode(QList<FunctionEntry> &functions);
-
-    void clear();
-    bool load(const QString &path, const QString &target);
-    void apply(const QString &libraryName, QList<FunctionEntry> functions);
-    bool save();
+    bool apply(const QString &libraryName, QList<FunctionEntry> functions, const QString &sectionName) const;
+    bool write() const;
 
 private:
-    QString path, target;
+    QString fileName;
     pe_base* image = nullptr;
+
+    bool read();
+    const QList<FunctionEntry> buildAddressOfFunctions() const;
+    bool patchFunctions(const QList<FunctionEntry> &functions, const QString &sectionName) const;
 };
 
-#endif // PE_H
+#endif // PEFILE_H

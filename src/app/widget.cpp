@@ -100,12 +100,8 @@ void Widget::populateComboboxWithNetworkInterfaces()
 
 void Widget::populateComboboxWithTargets()
 {
-    for (TargetEntry target : Constants::targets) {
-        // Temporarily only adding Steam version.
-        if (target.getType() == TargetType::STEAM) {
-            ui->comboBox_select_target->addItem(target.getFileName(), QVariant::fromValue<TargetEntry>(target));
-        }
-    }
+    ui->comboBox_select_type->addItem("Steam", QVariant::fromValue<TargetType>(TargetType::STEAM));
+    ui->comboBox_select_type->addItem("Retail", QVariant::fromValue<TargetType>(TargetType::RETAIL));
 }
 
 void Widget::pushButton_install_directory_clicked()
@@ -123,18 +119,20 @@ void Widget::pushButton_reset_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
-    TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
+    TargetType type = ui->comboBox_select_type->currentData().value<TargetType>();
 
-    Patcher::restoreFile(path, target);
-
-    this->findPath();
+    for (const TargetEntry &target : Constants::targets) {
+        if (target.getType() == type) {
+            Patcher::restoreFile(path, target);
+        }
+    }
 }
 
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
-    TargetEntry target = ui->comboBox_select_target->currentData().value<TargetEntry>();
+    TargetType type = ui->comboBox_select_type->currentData().value<TargetType>();
 
     // Verify that binary folder actually exists.
     if (!QDir(path).exists()) {
@@ -144,18 +142,27 @@ void Widget::pushButton_patch_clicked()
 
     Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
-    // Validate target file against stored checksum.
-    if (!Patcher::isFileValid(path, target)) {
-        QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.getFileName() + ", patching was aborted!");
+    for (const TargetEntry &target : Constants::targets) {
+        if (target.getType() == type) {
+            // Validate target file against stored checksum.
+            if (!Patcher::isFileValid(path, target)) {
+                // Check if we got a type mismatch.
+                if (Patcher::isFileTypeMismatch(path, target)) {
+                    qDebug() << "TargetType mismatch detected for " + target.getFileName() + ", please report!";
+                }
 
-        return;
+                QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.getFileName() + ", skipping file!");
+
+                continue;
+            }
+
+            // Backup original file.
+            Patcher::backupFile(path, target);
+
+            // Start patching.
+            Patcher::applyPatch(path, target);
+        }
     }
-
-    // Backup original file.
-    Patcher::backupFile(path, target);
-
-    // Start patching.
-    Patcher::applyPatch(path, ui->comboBox_select_target->currentData().value<TargetEntry>());
 }
 
 QString Widget::findPath() {
