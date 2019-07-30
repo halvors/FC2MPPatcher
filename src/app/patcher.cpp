@@ -76,7 +76,7 @@ void Patcher::applyPatch(const QString &path, const TargetEntry &target)
     PeFile* peFile = new PeFile(path + target.getFileName());
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_file, target.getFunctions(), Constants::patch_pe_section);
+    peFile->apply(Constants::patch_library_file, Constants::patch_library_functions, target.getFunctions(), Constants::patch_pe_section);
 
     // Write PE to file.
     peFile->write();

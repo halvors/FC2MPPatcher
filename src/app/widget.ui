@@ -41,7 +41,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lineEdit_install_directory"/>
+      <widget class="QLineEdit" name="lineEdit_install_directory">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the path to the Far Cry 2 install directory or select it using the directory selector to the right.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_install_directory">
@@ -62,7 +66,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox_network_interface"/>
+      <widget class="QComboBox" name="comboBox_network_interface">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an network interace that Far Cry 2 should bind to, usually your primary interface or VPN service like Hamachi if you want to use that.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_4">

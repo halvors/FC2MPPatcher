@@ -42,7 +42,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, QList<FunctionEntry> functions, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -57,7 +57,7 @@ bool PeFile::apply(const QString &libraryName, QList<FunctionEntry> functions, c
     importLibrary.set_name(libraryName.toStdString());
 
     // Add a new import functions to library.
-    for (const QString &functionName : Constants::patch_library_functions) {
+    for (const QString &functionName : libraryFunctions) {
         imported_function importFunction;
         importFunction.set_name(functionName.toStdString());
 
@@ -86,7 +86,7 @@ bool PeFile::apply(const QString &libraryName, QList<FunctionEntry> functions, c
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Patch code.
-    patchFunctions(functions, sectionName);
+    patchFunctions(libraryName, targetFunctions, sectionName);
 
     return true;
 }
@@ -121,17 +121,17 @@ bool PeFile::write() const
     return true;
 }
 
-const QList<FunctionEntry> PeFile::buildAddressOfFunctions() const
+const QList<FunctionEntry> PeFile::buildAddressOfFunctions(const QString &libraryName) const
 {
     QList<FunctionEntry> list;
 
     // Loop thru all imported libraries.
-    for (import_library library : get_imported_functions(*image)) {
+    for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() == Constants::patch_library_file.toStdString()) {
+        if (library.get_name() == libraryName.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
-            for (imported_function function : library.get_imported_functions()) {
+            for (const imported_function &function : library.get_imported_functions()) {
                 list.append({ address, QString::fromStdString(function.get_name()) });
                 address += 4; // Offset is 4 between entries.
             }
@@ -143,7 +143,7 @@ const QList<FunctionEntry> PeFile::buildAddressOfFunctions() const
     return list;
 }
 
-bool PeFile::patchFunctions(const QList<FunctionEntry> &functions, const QString &sectionName) const
+bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntry> &functions, const QString &sectionName) const
 {
     for (section &section : image->get_image_sections()) {
         // Only patch our specified section specified.
@@ -159,7 +159,7 @@ bool PeFile::patchFunctions(const QList<FunctionEntry> &functions, const QString
                 unsigned int newAddress = 0;
 
                 // Find address matching function.
-                for (const FunctionEntry &importFunction : buildAddressOfFunctions()) {
+                for (const FunctionEntry &importFunction : buildAddressOfFunctions(libraryName)) {
                     if (function.getName() == importFunction.getName()) {
                         newAddress = importFunction.getAddress();
 

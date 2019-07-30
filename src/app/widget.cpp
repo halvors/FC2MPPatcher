@@ -75,17 +75,18 @@ void Widget::closeEvent(QCloseEvent* event)
 
 void Widget::populateComboboxWithNetworkInterfaces()
 {
-    for (QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
-        QNetworkInterface::InterfaceFlags flags = interface.flags();
+    // Loop thru all of the systems network interfaces.
+    for (const QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
+        const QNetworkInterface::InterfaceFlags &flags = interface.flags();
 
         // Only show active network interfaces.
         if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
             QNetworkAddressEntry selectedAddressEntry;
 
             // Scan thru addresses for this interface.
-            for (QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
-                QHostAddress hostAddress = addressEntry.ip();
-                // Only select IPv4 addresses.
+            for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
+                const QHostAddress &hostAddress = addressEntry.ip();
+                // Only select first IPv4 address found.
                 if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
                     selectedAddressEntry = addressEntry;
                     break;
@@ -140,6 +141,7 @@ void Widget::pushButton_patch_clicked()
         return;
     }
 
+    // Generate network configuration.
     Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
     for (const TargetEntry &target : Constants::targets) {
