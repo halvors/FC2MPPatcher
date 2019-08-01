@@ -113,7 +113,7 @@ QString Patcher::findPath()
 
 #ifdef Q_OS_WIN
     // Extract Far Cry 2 registry installdir here.
-    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat, this);
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat);
     registry.beginGroup("7-Zip");
 
     qDebug() << "Registry:" << registry.value("Path").toString();

@@ -14,7 +14,7 @@ void MPPatch::readSettings()
     }
 }
 
-hostent* WSAAPI __stdcall MPPatch::patch_gethostbyname(char* name)
+hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 {
     Q_UNUSED(name);
 
@@ -23,9 +23,9 @@ hostent* WSAAPI __stdcall MPPatch::patch_gethostbyname(char* name)
     return gethostbyname(address);
 }
 
-ULONG __stdcall MPPatch::patch_GetAdaptersInfoPX(PIP_ADAPTER_INFO AdapterInfo, PULONG SizePointer)
+unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* AdapterInfo, unsigned long* SizePointer)
 {
-    ULONG result = GetAdaptersInfo(AdapterInfo, SizePointer);
+    unsigned long result = GetAdaptersInfo(AdapterInfo, SizePointer);
 
     if (result == ERROR_BUFFER_OVERFLOW) {
         return result;
@@ -33,7 +33,7 @@ ULONG __stdcall MPPatch::patch_GetAdaptersInfoPX(PIP_ADAPTER_INFO AdapterInfo, P
 
     readSettings();
 
-    PIP_ADAPTER_INFO adapter = AdapterInfo;
+    IP_ADAPTER_INFO* adapter = AdapterInfo;
 
     while (strcmp(adapter->IpAddressList.IpAddress.String, address) != 0) {
         adapter = adapter->Next;

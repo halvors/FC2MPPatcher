@@ -11,8 +11,8 @@
 class MPPatch
 {
 public:
-    static MPPATCHSHARED_EXPORT hostent* WSAAPI __stdcall patch_gethostbyname(char* name);
-    static MPPATCHSHARED_EXPORT ULONG __stdcall patch_GetAdaptersInfoPX(PIP_ADAPTER_INFO AdapterInfo, PULONG SizePointer);
+    static MPPATCHSHARED_EXPORT hostent* __stdcall WSAAPI getHostByName_patch(const char* name);
+    static MPPATCHSHARED_EXPORT unsigned long __stdcall getAdaptersInfo_patch(IP_ADAPTER_INFO* AdapterInfo, unsigned long* SizePointer);
 
 private:
     static QSettings* settings;

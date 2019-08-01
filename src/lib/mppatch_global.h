@@ -3,9 +3,6 @@
 
 #include <QtGlobal>
 
-#include <winsock2.h>
-#include <iphlpapi.h>
-
 #if defined(MPPATCH_LIBRARY)
 #  define MPPATCHSHARED_EXPORT Q_DECL_EXPORT
 #else
