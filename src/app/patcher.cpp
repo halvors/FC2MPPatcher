@@ -5,6 +5,8 @@
 #include "patcher.h"
 #include "pefile.h"
 
+
+
 QString Patcher::checksumFile(const QString &fileName)
 {
     QFile file(fileName);
@@ -93,4 +95,26 @@ void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddre
         settings.setValue(Constants::patch_network_configuration_broadcast, address.broadcast().toString());
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
+}
+
+QString Patcher::findPath()
+{
+    QString installDirectory = QString();
+
+#ifdef Q_OS_WIN
+    // Extract Far Cry 2 registry installdir here.
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat, this);
+    registry.beginGroup("7-Zip");
+
+    qDebug() << "Registry:" << registry.value("Path").toString();
+
+    registry.endGroup();
+#endif
+
+    return installDirectory;
+}
+
+TargetType Patcher::detectType(const QString &path)
+{
+    return TargetType::STEAM;
 }

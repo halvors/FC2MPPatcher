@@ -1,12 +1,13 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#include <QMetaType>
 #include <QString>
 #include <QList>
-#include <QMetaType>
+#include <QStringList>
 
 enum TargetType {
-    RETAIL, // GOG is identical.
+    RETAIL, // Note: GOG is identical.
     STEAM
 };
 
@@ -33,7 +34,6 @@ private:
 
 class TargetEntry {
 public:
-    TargetEntry() {}
     TargetEntry(TargetType type, const QString &fileName, const QString &fileCheckSum, QList<FunctionEntry> functions) :
         type(type),
         fileName(fileName),

@@ -23,7 +23,7 @@ public:
     bool write() const;
 
 private:
-    QString fileName;
+    const QString fileName; // TODO: add & reference here?
     pe_base* image = nullptr;
 
     bool read();

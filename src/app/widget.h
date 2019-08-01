@@ -24,13 +24,11 @@ private:
     QSettings* settings;
 
     void loadSettings();
-    void saveSettings();
+    void saveSettings() const;
     void closeEvent(QCloseEvent* event);
 
-    void populateComboboxWithNetworkInterfaces();
-    void populateComboboxWithTargets();
-
-    QString findPath();
+    void populateComboboxWithNetworkInterfaces() const;
+    void populateComboboxWithTargets() const;
 
 private slots:
     void pushButton_install_directory_clicked();

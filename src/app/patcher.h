@@ -18,6 +18,10 @@ public:
     static void applyPatch(const QString &path, const TargetEntry &target);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
+    static QString findPath();
+    static TargetType detectType(const QString &path);
+
+
 private:
     static QString checksumFile(const QString &fileName);
     static bool copyFile(const QString &path, const TargetEntry &target, bool isBackup);

@@ -1,4 +1,7 @@
 #include <QNetworkInterface>
+#include <QNetworkAddressEntry>
+#include <QHostAddress>
+#include <QAbstractSocket>
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
@@ -40,6 +43,7 @@ void Widget::loadSettings()
 
     int index = settings->value(Constants::settings_interface_index).toInt();
 
+    // Only set valid index in UI.
     if (index < ui->comboBox_network_interface->count()) {
         ui->comboBox_network_interface->setCurrentIndex(index);
     }
@@ -54,7 +58,7 @@ void Widget::loadSettings()
     settings->endGroup();
 }
 
-void Widget::saveSettings()
+void Widget::saveSettings() const
 {
     settings->setValue(Constants::settings_install_directory, ui->lineEdit_install_directory->text());
     settings->setValue(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex());
@@ -73,7 +77,7 @@ void Widget::closeEvent(QCloseEvent* event)
     saveSettings();
 }
 
-void Widget::populateComboboxWithNetworkInterfaces()
+void Widget::populateComboboxWithNetworkInterfaces() const
 {
     // Loop thru all of the systems network interfaces.
     for (const QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
@@ -99,7 +103,7 @@ void Widget::populateComboboxWithNetworkInterfaces()
     }
 }
 
-void Widget::populateComboboxWithTargets()
+void Widget::populateComboboxWithTargets() const
 {
     ui->comboBox_select_type->addItem("Steam", QVariant::fromValue<TargetType>(TargetType::STEAM));
     ui->comboBox_select_type->addItem("Retail", QVariant::fromValue<TargetType>(TargetType::RETAIL));
@@ -165,20 +169,4 @@ void Widget::pushButton_patch_clicked()
             Patcher::applyPatch(path, target);
         }
     }
-}
-
-QString Widget::findPath() {
-    QString installDirectory = QString();
-
-#ifdef Q_OS_WIN
-    // Extract Far Cry 2 registry installdir here.
-    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat, this);
-    registry.beginGroup("7-Zip");
-
-    qDebug() << "Registry:" << registry.value("Path").toString();
-
-    registry.endGroup();
-#endif
-
-    return installDirectory;
 }
