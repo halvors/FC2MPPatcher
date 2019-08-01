@@ -7,6 +7,7 @@
 #include <QStringList>
 
 enum TargetType {
+    UNKNOWN,
     RETAIL, // Note: GOG is identical.
     STEAM
 };
@@ -90,7 +91,7 @@ namespace Constants {
     const QString patch_network_configuration_netmask = "Netmask";
 
     const QStringList patch_library_functions = {
-        "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8",
+        "?patch_GetAdaptersInfoPX@MPPatch@@SGKPAU_IP_ADAPTER_INFO@@PAK@Z",
         "_Z14getHostbyname2Pc@4"
     };
 
@@ -100,15 +101,15 @@ namespace Constants {
           "3905709d89d75b1e1928c94685e70b22b25843fa",
           {
               { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getHostbyname }
+              { 0x1001431C, patch_library_function_getHostbyname }
           }
         },
         { TargetType::RETAIL,
           "FC2ServerLauncher.exe",
           "0949e9dc6fd2934673005a0baff4b30b843ada02",
           {
-              { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getHostbyname }
+              { 0x00C444A6, patch_library_function_getAdaptersInfo },
+              { 0x00BA4CFC, patch_library_function_getHostbyname }
           }
         },
         { TargetType::STEAM,

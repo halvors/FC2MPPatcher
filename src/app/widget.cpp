@@ -124,6 +124,7 @@ void Widget::pushButton_reset_clicked()
 {
     // Create path to binary folder.
     QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
+    /*
     TargetType type = ui->comboBox_select_type->currentData().value<TargetType>();
 
     for (const TargetEntry &target : Constants::targets) {
@@ -131,6 +132,25 @@ void Widget::pushButton_reset_clicked()
             Patcher::restoreFile(path, target);
         }
     }
+    */
+
+    QString text;
+
+    switch (Patcher::detectType(path)) {
+        case RETAIL:
+            text = "Retail";
+            break;
+
+        case STEAM:
+            text = "Steam";
+            break;
+
+        default:
+            text = "Unknown";
+            break;
+    }
+
+    qDebug() << "Type is:" << text;
 }
 
 void Widget::pushButton_patch_clicked()

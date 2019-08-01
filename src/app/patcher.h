@@ -12,6 +12,7 @@ class Patcher
 public:
     static bool isFileValid(const QString &path, const TargetEntry &target);
     static bool isFileTypeMismatch(const QString &path, const TargetEntry &target);
+    static TargetType detectType(const QString &path);
     static bool backupFile(const QString &path, const TargetEntry &target);
     static bool restoreFile(const QString &path, const TargetEntry &target);
 
@@ -19,8 +20,6 @@ public:
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
     static QString findPath();
-    static TargetType detectType(const QString &path);
-
 
 private:
     static QString checksumFile(const QString &fileName);

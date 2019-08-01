@@ -5,8 +5,6 @@
 #include "patcher.h"
 #include "pefile.h"
 
-
-
 QString Patcher::checksumFile(const QString &fileName)
 {
     QFile file(fileName);
@@ -25,6 +23,18 @@ QString Patcher::checksumFile(const QString &fileName)
 bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
 {
     return target.getFileCheckSum() == checksumFile(path + target.getFileName());
+}
+
+TargetType Patcher::detectType(const QString &path)
+{
+    // Loop thru target and return if a match is found.
+    for (const TargetEntry &target : Constants::targets) {
+        if (isFileValid(path, target)) {
+            return target.getType();
+        }
+    }
+
+    return TargetType::UNKNOWN;
 }
 
 bool Patcher::isFileTypeMismatch(const QString &path, const TargetEntry &target)
@@ -112,9 +122,4 @@ QString Patcher::findPath()
 #endif
 
     return installDirectory;
-}
-
-TargetType Patcher::detectType(const QString &path)
-{
-    return TargetType::STEAM;
 }
