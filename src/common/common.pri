@@ -1,4 +1,6 @@
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
-HEADERS += $$PWD/constants.h
+HEADERS += \
+    $$PWD/entry.h \
+    $$PWD/constants.h

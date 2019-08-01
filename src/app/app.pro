@@ -31,7 +31,6 @@ HEADERS += \
     widget.h \
     patcher.h \
     pefile.h \
-    entry.h \
     file.h
 
 FORMS += widget.ui
