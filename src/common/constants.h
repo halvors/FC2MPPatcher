@@ -82,16 +82,16 @@ namespace Constants {
     const QString patch_pe_section = ".text";
     const QString patch_library_name = "MPPatch";
     const QString patch_library_file = patch_library_name + ".dll";
-    const QString patch_library_function_getAdaptersInfo = "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8";
-    const QString patch_library_function_getHostbyname = "_Z14getHostbyname2Pc@4";
+    const QString patch_library_function_getAdaptersInfo = "?getAdaptersInfo_patch@MPPatch@@SGKPAU_IP_ADAPTER_INFO@@PAK@Z";
+    const QString patch_library_function_getHostByName = "?getHostByName_patch@MPPatch@@SGPAUhostent@@PBD@Z";
     const QString patch_network_configuration_file = "network.cfg";
     const QString patch_network_configuration_address = "Address";
     const QString patch_network_configuration_broadcast = "Broadcast";
     const QString patch_network_configuration_netmask = "Netmask";
 
     const QStringList patch_library_functions = {
-        "_Z17GetAdaptersInfoPXP16_IP_ADAPTER_INFOPm@8",
-        "_Z14getHostbyname2Pc@4"
+        patch_library_function_getAdaptersInfo,
+        patch_library_function_getHostByName
     };
 
     const TargetEntry targets[] = {
@@ -100,7 +100,7 @@ namespace Constants {
           "3905709d89d75b1e1928c94685e70b22b25843fa",
           {
               { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getHostbyname }
+              { 0x00000000, patch_library_function_getHostByName }
           }
         },
         { TargetType::RETAIL,
@@ -108,7 +108,7 @@ namespace Constants {
           "0949e9dc6fd2934673005a0baff4b30b843ada02",
           {
               { 0x00000000, patch_library_function_getAdaptersInfo },
-              { 0x00000000, patch_library_function_getHostbyname }
+              { 0x00000000, patch_library_function_getHostByName }
           }
         },
         { TargetType::STEAM,
@@ -116,7 +116,7 @@ namespace Constants {
           "b99ea707e1bba5ae964effd2cec94eed6b865739",
           {
               { 0x10C6A692, patch_library_function_getAdaptersInfo },
-              { 0x100141FC, patch_library_function_getHostbyname }
+              { 0x100141FC, patch_library_function_getHostByName }
           }
         },
         { TargetType::STEAM,
@@ -124,7 +124,7 @@ namespace Constants {
           "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
           {
               { 0x00C46A66, patch_library_function_getAdaptersInfo },
-              { 0x00BA714C, patch_library_function_getHostbyname }
+              { 0x00BA714C, patch_library_function_getHostByName }
           }
         }
     };
