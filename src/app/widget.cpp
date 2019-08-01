@@ -160,8 +160,13 @@ void Widget::pushButton_patch_clicked()
     QString path = getPath();
     bool patched = false;
 
+    // Scanning for valid files to start patching.
+    for (const FileEntry &file : Constants::files) {
+        File::restore(path, file);
+    }
+
     // Only show option to patch if not already patched.
-    if (!Patcher::isPatched(path)) {
+    if (true /*!Patcher::isPatched(path)*/) {
         // Apply patch to files, if successful continue.
         if (Patcher::patch(this, path)) {
             // Generate network configuration.

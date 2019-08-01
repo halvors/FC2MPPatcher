@@ -73,7 +73,7 @@ bool Patcher::patch(QWidget* parent, const QString &path)
                 if (!patchFile(path, file, target)) {
                     QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getFileName() + ", aborting!");
 
-                    return false;
+                    //return false;
                 }
             }
         }
