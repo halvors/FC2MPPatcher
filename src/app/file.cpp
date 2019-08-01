@@ -32,7 +32,7 @@ bool File::copy(const QString &path, const FileEntry &file, bool isBackup)
     QStringList split = file.getFileName().split(".");
     QString suffix = "." + split.takeLast();
     QString fileName = path + split.join(QString()) + suffix;
-    QString fileNameCopy = path + split.join(QString()) + Constants::target_backup_suffix + suffix;
+    QString fileNameCopy = path + split.join(QString()) + Constants::game_backup_suffix + suffix;
 
     if (isBackup) {
         if (!QFile::exists(fileNameCopy)) {
