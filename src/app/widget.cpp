@@ -140,7 +140,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 void Widget::updatePatchStatus(bool patched) const
 {
     // Update buttons text.
-    ui->pushButton_patch->setText(!patched ? "Patch" : "Un-patch");
+    ui->pushButton_patch->setText(patched ? "Patch" : "Un-patch");
 }
 
 void Widget::pushButton_install_directory_clicked()
@@ -158,7 +158,6 @@ void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
     QString path = getPath();
-    bool patched = false;
 
     // Only show option to patch if not already patched.
     if (!Patcher::isPatched(path)) {
@@ -167,7 +166,7 @@ void Widget::pushButton_patch_clicked()
             // Generate network configuration.
             Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
-            patched = true;
+            updatePatchStatus(true);
         }
     } else {
         // Scanning for valid files to start patching.
@@ -175,9 +174,10 @@ void Widget::pushButton_patch_clicked()
             File::restore(path, file);
         }
 
-        patched = false;
+        qDebug() << "1";
+
+        updatePatchStatus(false);
     }
 
-    // Update patch button status.
-    updatePatchStatus(patched);
+    qDebug() << "3";
 }
