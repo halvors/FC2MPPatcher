@@ -29,6 +29,7 @@ namespace Constants {
     const QString patch_library_file = patch_library_name.toLower() + ".dll";
     const QString patch_library_function_getAdaptersInfo = "?getAdaptersInfo_patch@MPPatch@@SGKPAU_IP_ADAPTER_INFO@@PAK@Z";
     const QString patch_library_function_getHostByName = "?getHostByName_patch@MPPatch@@SGPAUhostent@@PBD@Z";
+    const QString patch_library_function_sendTo = "?sendTo_patch@MPPatch@@SGHIPBDHHPBUsockaddr@@H@Z";
     const QString patch_network_configuration_file = "network.cfg";
     const QString patch_network_configuration_address = "Address";
     const QString patch_network_configuration_broadcast = "Broadcast";
@@ -36,7 +37,8 @@ namespace Constants {
 
     const QStringList patch_library_functions = {
         patch_library_function_getAdaptersInfo,
-        patch_library_function_getHostByName
+        patch_library_function_getHostByName,
+        patch_library_function_sendTo
     };
 
     const QList<FileEntry> files = {
@@ -56,7 +58,8 @@ namespace Constants {
                     "ce4470609070d58cbfa4a1bbccbb3998d8442e7e",
                     {
                         { 0x10C6A692, patch_library_function_getAdaptersInfo },
-                        { 0x100141FC, patch_library_function_getHostByName }
+                        { 0x100141FC, patch_library_function_getHostByName },
+                        { 0x10013F33, patch_library_function_sendTo }
                     }
                 },
             }
