@@ -27,12 +27,13 @@ private:
     void saveSettings() const;
     void closeEvent(QCloseEvent* event);
 
+    QString findPath();
+    QString getPath();
     void populateComboboxWithNetworkInterfaces() const;
-    void populateComboboxWithTargets() const;
+    void updatePatchStatus(bool patched) const;
 
 private slots:
     void pushButton_install_directory_clicked();
-    void pushButton_reset_clicked();
     void pushButton_patch_clicked();
 };
 

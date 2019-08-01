@@ -42,7 +42,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, const QString &libraryFile, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -72,7 +72,7 @@ bool PeFile::apply(const QString &libraryName, QStringList libraryFunctions, QLi
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(Constants::patch_library_name.toStdString()); // Section Name.
+    importSection.set_name(libraryFile.toStdString()); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
     // Add a section and get a link to the added section with calculated dimensions.
@@ -176,7 +176,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntr
 
                 // Creating pointer to the data that is to be updated (aka. does pointer yoga).
                 unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + function.getAddress() - baseImageAddress);
-                qDebug() << showbase << hex << "dataPtr:" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(function.getAddress() - baseImageAddress);
+                //qDebug() << showbase << hex << "dataPtr:" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(function.getAddress() - baseImageAddress);
 
                 // Change the old address to point to new function instead.
                 *dataPtr = newAddress;

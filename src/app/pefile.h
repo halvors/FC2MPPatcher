@@ -2,12 +2,13 @@
 #define PEFILE_H
 
 #include <QObject>
-#include <QList>
 #include <QString>
+#include <QStringList>
+#include <QList>
 
 #include <pe_bliss.h>
 
-#include "constants.h"
+#include "entry.h"
 
 using namespace pe_bliss;
 
@@ -19,7 +20,7 @@ public:
     explicit PeFile(const QString &fileName, QObject* parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const;
+    bool apply(const QString &libraryName, const QString &libraryFile, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const;
     bool write() const;
 
 private:

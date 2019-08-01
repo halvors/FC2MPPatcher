@@ -1,99 +1,85 @@
 #include <QFile>
 #include <QCryptographicHash>
+#include <QMessageBox>
 #include <QSettings>
 
 #include "patcher.h"
+#include "constants.h"
+#include "file.h"
 #include "pefile.h"
 
-QString Patcher::checksumFile(const QString &fileName)
+bool Patcher::isPatched(const QString &path)
 {
-    QFile file(fileName);
+    const QList<FileEntry> &files = Constants::files;
+    int length = files.length();
+    bool* patched = new bool[length];
+    int index = 0;
 
-    if (file.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(QCryptographicHash::Sha1);
+    for (const FileEntry &file : files) {
+        for (const TargetEntry &target : file.getTargets()) {
+            // Check if target is patched.
+            if (File::isValid(path, file, target, true)) {
+                patched[index] = true;
 
-        if (hash.addData(&file)) {
-            return hash.result().toHex();
+                break;
+            }
+        }
+
+        index++;
+    }
+
+    // Verify that all files is patched.
+    for (int i = 0; i < length; i++) {
+        if (!patched[i]) {
+            return false;
         }
     }
 
-    return QString();
+    return true;
 }
 
-bool Patcher::isFileValid(const QString &path, const TargetEntry &target)
+
+bool Patcher::patchFile(const QString &path, const FileEntry &file, const TargetEntry &target)
 {
-    return target.getFileCheckSum() == checksumFile(path + target.getFileName());
-}
+    QString fileName = path + file.getFileName();
 
-TargetType Patcher::detectType(const QString &path)
-{
-    // Loop thru target and return if a match is found.
-    for (const TargetEntry &target : Constants::targets) {
-        if (isFileValid(path, target)) {
-            return target.getType();
-        }
-    }
-
-    return TargetType::UNKNOWN;
-}
-
-bool Patcher::isFileTypeMismatch(const QString &path, const TargetEntry &target)
-{
-    QString checkSum = checksumFile(path + target.getFileName());
-
-    for (const TargetEntry &targetEntry : Constants::targets) {
-        if (targetEntry.getType() != target.getType() && targetEntry.getFileCheckSum() == checkSum) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool Patcher::copyFile(const QString &path, const TargetEntry &target, bool isBackup)
-{
-    QStringList split = target.getFileName().split(".");
-    QString suffix = "." + split.takeLast();
-    QString fileName = path + split.join(QString()) + suffix;
-    QString fileNameCopy = path + split.join(QString()) + Constants::target_backup_suffix + suffix;
-
-    if (isBackup) {
-        if (!QFile::exists(fileNameCopy)) {
-            return QFile::copy(fileName, fileNameCopy);
-        }
-    } else {
-        if (!QFile::exists(fileName) || QFile::remove(fileName)) {
-            return QFile::copy(fileNameCopy, fileName);
-        }
-    }
-
-    return false;
-}
-
-bool Patcher::backupFile(const QString &path, const TargetEntry &target)
-{
-    return copyFile(path, target, true);
-}
-
-bool Patcher::restoreFile(const QString &path, const TargetEntry &target)
-{
-    return copyFile(path, target, false);
-}
-
-void Patcher::applyPatch(const QString &path, const TargetEntry &target)
-{
-    qDebug() << "Patching:" << target.getFileName();
+    qDebug() << "Patching:" << fileName;
 
     // Create PeFile instance for this particular target.
-    PeFile* peFile = new PeFile(path + target.getFileName());
+    PeFile* peFile = new PeFile(fileName);
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_file, Constants::patch_library_functions, target.getFunctions(), Constants::patch_pe_section);
+    peFile->apply(Constants::patch_library_name, Constants::patch_library_file, Constants::patch_library_functions, target.getFunctions(), Constants::patch_pe_section);
 
     // Write PE to file.
     peFile->write();
 
     delete peFile;
+
+    return target.getFileCheckSumPatched() == File::getCheckSum(fileName);
+}
+
+bool Patcher::patch(QWidget* parent, const QString &path)
+{
+    // Scanning for valid files to start patching.
+    for (const FileEntry &file : Constants::files) {
+        for (const TargetEntry &target : file.getTargets()) {
+            // Validate target file against stored checksum.
+            if (File::isValid(path, file, target, false)) {
+                // Backup original file.
+                File::backup(path, file);
+
+                // Patch target file.
+                if (!patchFile(path, file, target)) {
+                    QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getFileName() + ", aborting!");
+
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
@@ -105,21 +91,4 @@ void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddre
         settings.setValue(Constants::patch_network_configuration_broadcast, address.broadcast().toString());
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
-}
-
-QString Patcher::findPath()
-{
-    QString installDirectory = QString();
-
-#ifdef Q_OS_WIN
-    // Extract Far Cry 2 registry installdir here.
-    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat);
-    registry.beginGroup("7-Zip");
-
-    qDebug() << "Registry:" << registry.value("Path").toString();
-
-    registry.endGroup();
-#endif
-
-    return installDirectory;
 }

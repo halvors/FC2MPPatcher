@@ -1,29 +1,21 @@
 #ifndef PATCHER_H
 #define PATCHER_H
 
-#include <QObject>
 #include <QString>
+#include <QWidget>
 #include <QNetworkAddressEntry>
 
-#include "constants.h"
+#include "entry.h"
 
 class Patcher
 {
 public:
-    static bool isFileValid(const QString &path, const TargetEntry &target);
-    static bool isFileTypeMismatch(const QString &path, const TargetEntry &target);
-    static TargetType detectType(const QString &path);
-    static bool backupFile(const QString &path, const TargetEntry &target);
-    static bool restoreFile(const QString &path, const TargetEntry &target);
-
-    static void applyPatch(const QString &path, const TargetEntry &target);
+    static bool isPatched(const QString &path);
+    static bool patch(QWidget* parent, const QString &path);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
-    static QString findPath();
-
 private:
-    static QString checksumFile(const QString &fileName);
-    static bool copyFile(const QString &path, const TargetEntry &target, bool isBackup);
+    static bool patchFile(const QString &path, const FileEntry &file, const TargetEntry &target);
 };
 
 #endif // PATCHER_H

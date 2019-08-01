@@ -8,6 +8,7 @@
 
 #include "widget.h"
 #include "ui_widget.h"
+#include "file.h"
 #include "patcher.h"
 
 Widget::Widget(QWidget* parent) :
@@ -18,16 +19,18 @@ Widget::Widget(QWidget* parent) :
 
     setWindowTitle(Constants::app_name + " " + Constants::app_version);
 
-    ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
-    populateComboboxWithNetworkInterfaces();
-    populateComboboxWithTargets();
-
     // Load settings from configuration file.
     settings = new QSettings(Constants::app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
+    // Setup UI.
+    ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
+    populateComboboxWithNetworkInterfaces();
+
+    bool patched = Patcher::isPatched(getPath());
+    updatePatchStatus(patched);
+
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
-    connect(ui->pushButton_reset, &QPushButton::clicked, this, &Widget::pushButton_reset_clicked);
     connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
 
@@ -77,6 +80,37 @@ void Widget::closeEvent(QCloseEvent* event)
     saveSettings();
 }
 
+QString Widget::findPath()
+{
+    QString installDirectory = QString();
+
+#ifdef Q_OS_WIN
+    // Extract Far Cry 2 registry installdir here.
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat);
+    registry.beginGroup("7-Zip");
+
+    qDebug() << "Registry:" << registry.value("Path").toString();
+
+    registry.endGroup();
+#endif
+
+    return installDirectory;
+}
+
+
+QString Widget::getPath()
+{
+    // Create path to binary folder.
+    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
+
+    // Verify that binary folder actually exists.
+    if (!QDir(path).exists()) {
+        QMessageBox::warning(this, "Warning", Constants::game_name + " installation directory not found, please select it manually.");
+    }
+
+    return path;
+}
+
 void Widget::populateComboboxWithNetworkInterfaces() const
 {
     // Loop thru all of the systems network interfaces.
@@ -103,10 +137,10 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     }
 }
 
-void Widget::populateComboboxWithTargets() const
+void Widget::updatePatchStatus(bool patched) const
 {
-    ui->comboBox_select_type->addItem("Steam", QVariant::fromValue<TargetType>(TargetType::STEAM));
-    ui->comboBox_select_type->addItem("Retail", QVariant::fromValue<TargetType>(TargetType::RETAIL));
+    // Update buttons text.
+    ui->pushButton_patch->setText(!patched ? "Patch" : "Un-patch");
 }
 
 void Widget::pushButton_install_directory_clicked()
@@ -120,73 +154,30 @@ void Widget::pushButton_install_directory_clicked()
     saveSettings();
 }
 
-void Widget::pushButton_reset_clicked()
-{
-    // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
-    /*
-    TargetType type = ui->comboBox_select_type->currentData().value<TargetType>();
-
-    for (const TargetEntry &target : Constants::targets) {
-        if (target.getType() == type) {
-            Patcher::restoreFile(path, target);
-        }
-    }
-    */
-
-    QString text;
-
-    switch (Patcher::detectType(path)) {
-        case RETAIL:
-            text = "Retail";
-            break;
-
-        case STEAM:
-            text = "Steam";
-            break;
-
-        default:
-            text = "Unknown";
-            break;
-    }
-
-    qDebug() << "Type is:" << text;
-}
-
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
-    TargetType type = ui->comboBox_select_type->currentData().value<TargetType>();
+    QString path = getPath();
+    bool patched = false;
 
-    // Verify that binary folder actually exists.
-    if (!QDir(path).exists()) {
-        QMessageBox::warning(this, "Warning", "Game file not found, please select the " + Constants::game_name + " installation directory.");
-        return;
-    }
+    // Only show option to patch if not already patched.
+    if (!Patcher::isPatched(path)) {
+        // Apply patch to files, if successful continue.
+        if (Patcher::patch(this, path)) {
+            // Generate network configuration.
+            Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
 
-    // Generate network configuration.
-    Patcher::generateNetworkConfigFile(path, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
-
-    for (const TargetEntry &target : Constants::targets) {
-        if (target.getType() == type) {
-            // Validate target file against stored checksum.
-            if (!Patcher::isFileValid(path, target)) {
-                // Check if we got a type mismatch.
-                if (Patcher::isFileTypeMismatch(path, target)) {
-                    qDebug() << "TargetType mismatch detected for " + target.getFileName() + ", please report!";
-                }
-
-                QMessageBox::warning(this, "Warning", "Invalid file checksum for " + target.getFileName() + ", skipping file!");
-
-                continue;
-            }
-
-            // Backup original file.
-            Patcher::backupFile(path, target);
-
-            // Start patching.
-            Patcher::applyPatch(path, target);
+            patched = true;
         }
+    } else {
+        // Scanning for valid files to start patching.
+        for (const FileEntry &file : Constants::files) {
+            File::restore(path, file);
+        }
+
+        patched = false;
     }
+
+    // Update patch button status.
+    updatePatchStatus(patched);
 }

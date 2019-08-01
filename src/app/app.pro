@@ -24,12 +24,15 @@ SOURCES += \
     main.cpp \
     widget.cpp \
     patcher.cpp \
-    pefile.cpp
+    pefile.cpp \
+    file.cpp
 
 HEADERS += \
     widget.h \
     patcher.h \
-    pefile.h
+    pefile.h \
+    entry.h \
+    file.h
 
 FORMS += widget.ui
 
