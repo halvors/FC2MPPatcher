@@ -23,9 +23,8 @@ private:
     Ui::Widget* ui;
     QSettings* settings;
 
-    void loadSettings();
-    void saveSettings() const;
     void closeEvent(QCloseEvent* event);
+    void loadSettings();
 
     QString findPath();
     QString getPath();
@@ -33,6 +32,8 @@ private:
     void updatePatchStatus(bool patched) const;
 
 private slots:
+    void saveSettings() const;
+
     void pushButton_install_directory_clicked();
     void pushButton_patch_clicked();
 };

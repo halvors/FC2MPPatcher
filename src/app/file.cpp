@@ -5,7 +5,7 @@
 #include "file.h"
 #include "constants.h"
 
-QString File::getCheckSum(const QString &fileName)
+QString File::checkSum(const QString &fileName)
 {
     QFile file(fileName);
 
@@ -20,11 +20,11 @@ QString File::getCheckSum(const QString &fileName)
     return QString();
 }
 
-bool File::isValid(const QString &path, const FileEntry &file, const TargetEntry &target, bool patched)
+bool File::isValid(const QString &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
 {
-    QString checkSum = patched ? target.getFileCheckSumPatched() : target.getFileCheckSum();
+    QString fileCheckSum = isPatched ? target.getFileCheckSumPatched() : target.getFileCheckSum();
 
-    return checkSum == getCheckSum(path + file.getFileName());
+    return fileCheckSum == checkSum(path + file.getFileName());
 }
 
 bool File::copy(const QString &path, const FileEntry &file, bool isBackup)
@@ -32,7 +32,7 @@ bool File::copy(const QString &path, const FileEntry &file, bool isBackup)
     QStringList split = file.getFileName().split(".");
     QString suffix = "." + split.takeLast();
     QString fileName = path + split.join(QString()) + suffix;
-    QString fileNameCopy = path + split.join(QString()) + Constants::game_backup_suffix + suffix;
+    QString fileNameCopy = path + split.join(QString()) + Constants::game_backup_file_suffix + suffix;
 
     if (isBackup) {
         if (!QFile::exists(fileNameCopy)) {

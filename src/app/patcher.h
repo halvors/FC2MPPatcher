@@ -12,7 +12,10 @@ class Patcher
 public:
     static bool isPatched(const QString &path);
     static bool patch(QWidget* parent, const QString &path);
+    static void undoPatch(const QString &path);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
+
+    void constexpr hash();
 
 private:
     static bool patchFile(const QString &path, const FileEntry &file, const TargetEntry &target);

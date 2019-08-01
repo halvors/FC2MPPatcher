@@ -22,7 +22,7 @@ namespace Constants {
     const QString game_name = "Far Cry 2";
     const QString game_install_directory = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
     const QString game_executable_directory = "bin";
-    const QString game_backup_suffix = "_Original";
+    const QString game_backup_file_suffix = "_Original";
 
     const QString patch_pe_section = ".text";
     const QString patch_library_name = "MPPatch";
@@ -75,7 +75,7 @@ namespace Constants {
                 },
                 { // Steam.
                     "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
-                    "2eb8294400c8b2d4956a48f4066754ef4eac6e7b",
+                    "e88d9be6ac835e4fff3d822328b7a310251cae95",
                     {
                         { 0x00C46A66, patch_library_functions[0] },
                         { 0x00BA714C, patch_library_functions[1] },

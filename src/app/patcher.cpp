@@ -10,34 +10,22 @@
 
 bool Patcher::isPatched(const QString &path)
 {
-    const QList<FileEntry> &files = Constants::files;
-    int length = files.length();
-    bool* patched = new bool[length];
-    int index = 0;
+    QList<FileEntry> files = Constants::files;
+    int count = 0;
 
     for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
-            // Check if target is patched.
+            // Check if target file is patched.
             if (File::isValid(path, file, target, true)) {
-                patched[index] = true;
+                count++;
 
                 break;
             }
         }
-
-        index++;
     }
 
-    // Verify that all files is patched.
-    for (int i = 0; i < length; i++) {
-        if (!patched[i]) {
-            return false;
-        }
-    }
-
-    return true;
+    return count == files.length();
 }
-
 
 bool Patcher::patchFile(const QString &path, const FileEntry &file, const TargetEntry &target)
 {
@@ -56,13 +44,16 @@ bool Patcher::patchFile(const QString &path, const FileEntry &file, const Target
 
     delete peFile;
 
-    return target.getFileCheckSumPatched() == File::getCheckSum(fileName);
+    return File::isValid(path, file, target, true);
 }
 
 bool Patcher::patch(QWidget* parent, const QString &path)
 {
+    QList<FileEntry> files = Constants::files;
+    int count = 0;
+
     // Scanning for valid files to start patching.
-    for (const FileEntry &file : Constants::files) {
+    for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
             // Validate target file against stored checksum.
             if (File::isValid(path, file, target, false)) {
@@ -72,14 +63,32 @@ bool Patcher::patch(QWidget* parent, const QString &path)
                 // Patch target file.
                 if (!patchFile(path, file, target)) {
                     QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getFileName() + ", aborting!");
+                    undoPatch(path);
 
-                    //return false;
+                    return false;
                 }
+
+                count++;
             }
         }
     }
 
+    // Something is not right, reverting back to backup files.
+    if (count < files.length()) {
+        QMessageBox::warning(parent, "Warning", "Not all files where patched, files have been restored, please try patching again.");
+        undoPatch(path);
+
+        return false;
+    }
+
     return true;
+}
+
+void Patcher::undoPatch(const QString &path) {
+    // Scanning for valid files to start patching.
+    for (const FileEntry &file : Constants::files) {
+        File::restore(path, file);
+    }
 }
 
 void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
