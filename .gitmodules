@@ -1,3 +1,3 @@
 [submodule "lib/libpebliss"]
 	path = lib/libpebliss
-	url = git@github.com:halvors/libpebliss.git
+	url = https://github.com/halvors/libpebliss.git
