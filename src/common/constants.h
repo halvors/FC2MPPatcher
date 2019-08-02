@@ -20,17 +20,31 @@ namespace Constants {
     const QString settings_group_window_isMaximized = "isMaximized";
 
     const QString game_name = "Far Cry 2";
-    const QString game_install_directory = "C:/Program Files/Steam/steamapps/common/Far Cry 2";
+    const QString game_install_directory = "C:/Program Files (x86)/Steam/steamapps/common/Far Cry 2";
     const QString game_executable_directory = "bin";
     const QString game_backup_file_suffix = "_Original";
 
     const QString patch_pe_section = ".text";
     const QString patch_library_name = "MPPatch";
     const QString patch_library_file = patch_library_name.toLower() + ".dll";
-    const QStringList patch_library_functions = {
+    const QStringList patch_library_functions = { // GCC
+        "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8",
+        "_ZN7MPPatch19getHostByName_patchEPKc@4",
+        "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24"
+    };
+    /*
+    const QStringList patch_library_functions = { // MSVC
         "?getAdaptersInfo_patch@MPPatch@@SGKPAU_IP_ADAPTER_INFO@@PAK@Z",
         "?getHostByName_patch@MPPatch@@SGPAUhostent@@PBD@Z",
         "?sendTo_patch@MPPatch@@SGHIPBDHHPBUsockaddr@@H@Z"
+    };
+    */
+    const QStringList patch_library_runtime_dependencies = {
+        patch_library_file,
+        "libgcc_s_dw2-1.dll",
+        "libstdc++-6.dll",
+        "libwinpthread-1.dll",
+        "Qt5Core.dll"
     };
     const QString patch_network_configuration_file = "network.cfg";
     const QString patch_network_configuration_address = "Address";
@@ -43,7 +57,7 @@ namespace Constants {
             {
                 { // Retail (GOG is identical).
                     "3905709d89d75b1e1928c94685e70b22b25843fa",
-                    "793bbd2009d886137af4696c42d7bd6d4b3a1130",
+                    "793bbd2009d886137af4696c42d7bd6d4b3a1130", // TODO: Recalculate.
                     {
                         { 0x10C5BDE2, patch_library_functions[0] },
                         { 0x1001431C, patch_library_functions[1] },
@@ -52,7 +66,8 @@ namespace Constants {
                 },
                 { // Steam.
                     "b99ea707e1bba5ae964effd2cec94eed6b865739",
-                    "5fc401a31d71dabc8a3df2400a10aabc963a3540",
+                    "4b3f9e8fe94a39fce6bfd44b1ab35ade3f68a7f4", // GCC
+                    //"5fc401a31d71dabc8a3df2400a10aabc963a3540", // MSVC
                     {
                         { 0x10C6A692, patch_library_functions[0] },
                         { 0x100141FC, patch_library_functions[1] },
@@ -66,7 +81,7 @@ namespace Constants {
             {
                 { // Retail (GOG is identical).
                     "0949e9dc6fd2934673005a0baff4b30b843ada02",
-                    "26694877b9465b1177f28583098f663ebc70fe85",
+                    "26694877b9465b1177f28583098f663ebc70fe85", // TODO: Recalculate.
                     {
                         { 0x00C444A6, patch_library_functions[0] },
                         { 0x00BA4CFC, patch_library_functions[1] },
@@ -75,7 +90,8 @@ namespace Constants {
                 },
                 { // Steam.
                     "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
-                    "e88d9be6ac835e4fff3d822328b7a310251cae95",
+                    "73c075df1c8610fbd80103049aac0a80a51c21ad", // GCC
+                    //"e88d9be6ac835e4fff3d822328b7a310251cae95", // MSVC
                     {
                         { 0x00C46A66, patch_library_functions[0] },
                         { 0x00BA714C, patch_library_functions[1] },

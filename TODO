@@ -7,6 +7,5 @@
 - Detect Far Cry 2 installation type, Retail/GOG or Steam?
 
 - Workaround for Windows:
-	Download: https://sourceforge.net/projects/mingw-w64/files/External%20binary%20packages%20%28Win64%20hosted%29/libiconv/
-
-	Extract to: C:/Qt/Tools/mingw730_64/x86_64-mingw32 og C:/Qt/Tools/mingw730_64
+	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download
+	Copy mingw32/lib and mingw32/include from file to C:\Qt\Tools\mingw730_32\i686-w64-mingw32

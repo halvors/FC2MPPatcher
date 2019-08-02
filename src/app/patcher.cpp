@@ -29,16 +29,10 @@ bool Patcher::isPatched(const QString &path)
 
 void Patcher::copyFiles(const QString &path)
 {
-    // Files to copy.
-    QStringList files = {
-        "mppatch.dll",
-        "Qt5Core.dll"
-    };
-
-    for (const QString &file : files) {
+    for (const QString &file : Constants::patch_library_runtime_dependencies) {
         QString fileName = path + file;
 
-        if (!QFile::exists(fileName)) {
+        if (!QFile::exists(fileName) || QFile::remove(fileName)) {
             qDebug() << "Copying file" << file << "to" << fileName;
 
             QFile::copy(file, fileName);
