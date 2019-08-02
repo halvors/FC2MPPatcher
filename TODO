@@ -8,4 +8,6 @@
 
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download
-	Copy mingw32/lib and mingw32/include from file to C:\Qt\Tools\mingw730_32\i686-w64-mingw32
+	Copy mingw32/lib/ and mingw32/include/ from file to C:\Qt\Tools\mingw730_32\i686-w64-mingw32
+	Download: libiconv-1.14-3-mingw32-bin.tar.lzma from same place.
+	Copy bin/ from file to C:\Qt\Tools\mingw730_32\

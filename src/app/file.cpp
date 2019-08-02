@@ -1,14 +1,12 @@
-#include <QFile>
 #include <QCryptographicHash>
+#include <QStringList>
 #include <QDebug>
 
 #include "file.h"
 #include "constants.h"
 
-QString File::checkSum(const QString &fileName)
+QString File::checkSum(QFile file)
 {
-    QFile file(fileName);
-
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha1);
 
@@ -20,34 +18,34 @@ QString File::checkSum(const QString &fileName)
     return QString();
 }
 
-bool File::isValid(const QString &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
+bool File::isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
 {
     QString fileCheckSum = isPatched ? target.getFileCheckSumPatched() : target.getFileCheckSum();
 
-    return fileCheckSum == checkSum(path + file.getFileName());
+    return fileCheckSum == checkSum(path.filePath(file.getFileName()));
 }
 
-bool File::copy(const QString &path, const FileEntry &file, bool isBackup)
+bool File::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
-    QStringList split = file.getFileName().split(".");
+    QStringList split = fileEntry.getFileName().split(".");
     QString suffix = "." + split.takeLast();
-    QString fileName = path + split.join(QString()) + suffix;
-    QString fileNameCopy = path + split.join(QString()) + Constants::game_backup_file_suffix + suffix;
+    QFile file = path.filePath(split.join(QString()) + suffix);
+    QFile fileCopy = path.filePath(split.join(QString()) + Constants::game_backup_file_suffix + suffix);
 
     if (isBackup) {
-        if (!QFile::exists(fileNameCopy)) {
-            return QFile::copy(fileName, fileNameCopy);
+        if (!fileCopy.exists()) {
+            return file.copy(fileCopy.fileName());
         }
     } else {
-        if (QFile::exists(fileNameCopy) && (!QFile::exists(fileName) || QFile::remove(fileName))) {
-            return QFile::copy(fileNameCopy, fileName);
+        if (fileCopy.exists() && (!file.exists() || file.remove())) {
+            return fileCopy.copy(file.fileName());
         }
     }
 
     return false;
 }
 
-bool File::backup(const QString &path, const FileEntry &file)
+bool File::backup(const QDir &path, const FileEntry &file)
 {
     bool result = copy(path, file, true);
 
@@ -58,7 +56,7 @@ bool File::backup(const QString &path, const FileEntry &file)
     return result;
 }
 
-bool File::restore(const QString &path, const FileEntry &file)
+bool File::restore(const QDir &path, const FileEntry &file)
 {
     bool result = copy(path, file, false);
 

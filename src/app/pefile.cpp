@@ -4,9 +4,9 @@
 
 #include "pefile.h"
 
-PeFile::PeFile(const QString &fileName, QObject* parent) :
+PeFile::PeFile(const QFile &file, QObject* parent) :
     QObject(parent),
-    fileName(fileName)
+    file(file)
 {
     // Read PE from file.
     read();
@@ -22,10 +22,10 @@ PeFile::~PeFile()
 bool PeFile::read()
 { 
     // Open the file.
-    std::ifstream inputStream(fileName.toStdString(), std::ios::in | std::ios::binary);
+    std::ifstream inputStream(file.fileName().toStdString(), std::ios::in | std::ios::binary);
 
     if (!inputStream) {
-        qDebug() << "Cannot open" << fileName;
+        qDebug() << "Cannot open" << file.fileName();
 
         return false;
     }
@@ -100,10 +100,10 @@ bool PeFile::write() const
 
     try {
         // Create a new PE file.
-        std::ofstream outputStream(fileName.toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
+        std::ofstream outputStream(file.fileName().toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!outputStream) {
-            qDebug() << "Cannot create" << fileName;
+            qDebug() << "Cannot create" << file.fileName();
 
             return false;
         }
@@ -111,7 +111,7 @@ bool PeFile::write() const
         // Rebuild PE file.
         rebuild_pe(*image, outputStream);
 
-        qDebug() << "PE was rebuilt and saved to" << fileName;
+        qDebug() << "PE was rebuilt and saved to" << file.fileName();
     } catch (const pe_exception &exception) {
         qDebug() << "Error:" << exception.what();
 

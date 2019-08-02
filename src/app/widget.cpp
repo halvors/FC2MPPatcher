@@ -4,6 +4,7 @@
 #include <QAbstractSocket>
 #include <QFileDialog>
 #include <QDir>
+#include <QFile>
 #include <QMessageBox>
 
 #include "widget.h"
@@ -27,7 +28,7 @@ Widget::Widget(QWidget* parent) :
     ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
     populateComboboxWithNetworkInterfaces();
 
-    bool patched = Patcher::isPatched(getPath());
+    bool patched = Patcher::isPatched(getPath(false));
     updatePatchStatus(patched);
 
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
@@ -43,15 +44,15 @@ Widget::~Widget()
 
 void Widget::closeEvent(QCloseEvent* event)
 {
-    QWidget::closeEvent(event);
-
     saveSettings();
+
+    QWidget::closeEvent(event);
 }
 
 void Widget::loadSettings()
 {
-    QString install_directory = settings->value(Constants::settings_install_directory, Constants::game_install_directory).toString();
-    ui->lineEdit_install_directory->setText(install_directory);
+    QString installDir = settings->value(Constants::settings_install_directory, findInstallDir().absolutePath()).toString();
+    ui->lineEdit_install_directory->setText(installDir);
 
     int index = settings->value(Constants::settings_interface_index).toInt();
 
@@ -82,35 +83,47 @@ void Widget::saveSettings() const
     settings->endGroup();
 }
 
-QString Widget::findPath()
+QDir Widget::findInstallDir() const
 {
-    QString installDirectory = QString();
+    QDir installDir = QDir();
 
 #ifdef Q_OS_WIN
-    // Extract Far Cry 2 registry installdir here.
-    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::NativeFormat);
-    registry.beginGroup("7-Zip");
-
-    qDebug() << "Registry:" << registry.value("Path").toString();
-
+    // Find Far Cry 2 install directory in registry.
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
+    registry.beginGroup(Constants::game_publisher);
+        registry.beginGroup(Constants::game_name);
+            installDir = registry.value("InstallDir").toString();
+        registry.endGroup();
     registry.endGroup();
 #endif
 
-    return installDirectory;
+    // Fallback to statically set installation directory if autodetection failed.
+    if (!installDir.exists()) {
+        installDir = Constants::game_install_directory;
+    }
+
+    return installDir;
 }
 
-
-QString Widget::getPath()
+QDir Widget::getPath(bool showWarning)
 {
     // Create path to binary folder.
-    QString path = ui->lineEdit_install_directory->text() + "/" + Constants::game_executable_directory + "/";
+    QDir path = ui->lineEdit_install_directory->text();
 
-    // Verify that binary folder actually exists.
-    if (!QDir(path).exists()) {
+    // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
+    if (path.cd(Constants::game_executable_directory) || path.exists()) {
+        for (const FileEntry &file : Constants::files) {
+            if (path.exists(file.getFileName())) {
+                return path;
+            }
+        }
+    }
+
+    if (showWarning) {
         QMessageBox::warning(this, "Warning", Constants::game_name + " installation directory not found, please select it manually.");
     }
 
-    return path;
+    return QDir();
 }
 
 void Widget::populateComboboxWithNetworkInterfaces() const
@@ -162,7 +175,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QString path = getPath();
+    QDir path = getPath();
 
     // Only show option to patch if not already patched.
     if (Patcher::isPatched(path)) {

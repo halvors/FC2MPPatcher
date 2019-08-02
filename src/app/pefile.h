@@ -2,6 +2,7 @@
 #define PEFILE_H
 
 #include <QObject>
+#include <QFile>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -17,14 +18,14 @@ class PeFile : public QObject
     Q_OBJECT
 
 public:
-    explicit PeFile(const QString &fileName, QObject* parent = nullptr);
+    explicit PeFile(const QFile &file, QObject* parent = nullptr);
     ~PeFile();
 
     bool apply(const QString &libraryName, const QString &libraryFile, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const;
     bool write() const;
 
 private:
-    const QString fileName; // TODO: add & reference here?
+    const QFile &file;
     pe_base* image = nullptr;
 
     bool read();

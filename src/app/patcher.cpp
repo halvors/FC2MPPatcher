@@ -8,7 +8,7 @@
 #include "file.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(const QString &path)
+bool Patcher::isPatched(const QDir &path)
 {
     QList<FileEntry> files = Constants::files;
     int count = 0;
@@ -27,27 +27,26 @@ bool Patcher::isPatched(const QString &path)
     return count == files.length();
 }
 
-void Patcher::copyFiles(const QString &path)
+void Patcher::copyFiles(const QDir &path)
 {
-    for (const QString &file : Constants::patch_library_runtime_dependencies) {
-        QString fileName = path + file;
+    for (const QString &fileName : Constants::patch_library_runtime_dependencies) {
+        QFile sourceFile = QFile(fileName);
+        QFile destinationFile = path.filePath(fileName);
 
-        if (!QFile::exists(fileName) || QFile::remove(fileName)) {
-            qDebug() << "Copying file" << file << "to" << fileName;
-
-            QFile::copy(file, fileName);
+        if (!destinationFile.exists() || destinationFile.remove()) {
+            sourceFile.copy(destinationFile.fileName());
         }
     }
 }
 
-bool Patcher::patchFile(const QString &path, const FileEntry &file, const TargetEntry &target)
+bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target)
 {
-    QString fileName = path + file.getFileName();
+    QFile file = path.filePath(fileEntry.getFileName());
 
-    qDebug() << "Patching:" << fileName;
+    qDebug() << "Patching:" << file;
 
     // Create PeFile instance for this particular target.
-    PeFile* peFile = new PeFile(fileName);
+    PeFile* peFile = new PeFile(file);
 
     // Apply PE and binary patches.
     peFile->apply(Constants::patch_library_name, Constants::patch_library_file, Constants::patch_library_functions, target.getFunctions(), Constants::patch_pe_section);
@@ -57,10 +56,10 @@ bool Patcher::patchFile(const QString &path, const FileEntry &file, const Target
 
     delete peFile;
 
-    return File::isValid(path, file, target, true);
+    return File::isValid(path, fileEntry, target, true);
 }
 
-bool Patcher::patch(QWidget* parent, const QString &path)
+bool Patcher::patch(QWidget* parent, const QDir &path)
 {
     QList<FileEntry> files = Constants::files;
     int count = 0;
@@ -100,7 +99,7 @@ bool Patcher::patch(QWidget* parent, const QString &path)
     return true;
 }
 
-void Patcher::undoPatch(const QString &path) {
+void Patcher::undoPatch(const QDir &path) {
     // Scanning for valid files to start patching.
     for (const FileEntry &file : Constants::files) {
         File::restore(path, file);
@@ -109,9 +108,10 @@ void Patcher::undoPatch(const QString &path) {
     }
 }
 
-void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address)
+void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressEntry &address)
 {
-    QSettings settings(path + Constants::patch_network_configuration_file, QSettings::IniFormat);
+    QFile file = path.filePath(Constants::patch_network_configuration_file);
+    QSettings settings(file.fileName(), QSettings::IniFormat);
 
     settings.beginGroup(Constants::patch_library_name);
         settings.setValue(Constants::patch_network_configuration_address, address.ip().toString());
@@ -119,5 +119,5 @@ void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddre
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
 
-    qDebug() << "Generated network configuration, saved to:" << path + Constants::patch_network_configuration_file;
+    qDebug() << "Generated network configuration, saved to:" << file;
 }

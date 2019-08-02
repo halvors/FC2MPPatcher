@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <QCloseEvent>
+#include <QDir>
 
 #include "constants.h"
 
@@ -26,8 +27,8 @@ private:
     void closeEvent(QCloseEvent* event);
     void loadSettings();
 
-    QString findPath();
-    QString getPath();
+    QDir findInstallDir() const;
+    QDir getPath(bool showWarning = true);
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;
 

@@ -9,7 +9,7 @@
 
 namespace Constants {
     const QString app_name = "FC2MPPatcher";
-    const QString app_version = "0.0.3";
+    const QString app_version = "0.0.4";
     const QString app_configuration_file = app_name.toLower() + ".ini";
 
     const QString settings_install_directory = "install_directory";
@@ -20,6 +20,7 @@ namespace Constants {
     const QString settings_group_window_isMaximized = "isMaximized";
 
     const QString game_name = "Far Cry 2";
+    const QString game_publisher = "Ubisoft";
     const QString game_install_directory = "C:/Program Files (x86)/Steam/steamapps/common/Far Cry 2";
     const QString game_executable_directory = "bin";
     const QString game_backup_file_suffix = "_Original";
@@ -27,18 +28,11 @@ namespace Constants {
     const QString patch_pe_section = ".text";
     const QString patch_library_name = "MPPatch";
     const QString patch_library_file = patch_library_name.toLower() + ".dll";
-    const QStringList patch_library_functions = { // GCC
+    const QStringList patch_library_functions = {
         "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8",
         "_ZN7MPPatch19getHostByName_patchEPKc@4",
         "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24"
     };
-    /*
-    const QStringList patch_library_functions = { // MSVC
-        "?getAdaptersInfo_patch@MPPatch@@SGKPAU_IP_ADAPTER_INFO@@PAK@Z",
-        "?getHostByName_patch@MPPatch@@SGPAUhostent@@PBD@Z",
-        "?sendTo_patch@MPPatch@@SGHIPBDHHPBUsockaddr@@H@Z"
-    };
-    */
     const QStringList patch_library_runtime_dependencies = {
         patch_library_file,
         "libgcc_s_dw2-1.dll",
@@ -67,7 +61,6 @@ namespace Constants {
                 { // Steam.
                     "b99ea707e1bba5ae964effd2cec94eed6b865739",
                     "4b3f9e8fe94a39fce6bfd44b1ab35ade3f68a7f4", // GCC
-                    //"5fc401a31d71dabc8a3df2400a10aabc963a3540", // MSVC
                     {
                         { 0x10C6A692, patch_library_functions[0] },
                         { 0x100141FC, patch_library_functions[1] },
@@ -91,7 +84,6 @@ namespace Constants {
                 { // Steam.
                     "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
                     "73c075df1c8610fbd80103049aac0a80a51c21ad", // GCC
-                    //"e88d9be6ac835e4fff3d822328b7a310251cae95", // MSVC
                     {
                         { 0x00C46A66, patch_library_functions[0] },
                         { 0x00BA714C, patch_library_functions[1] },
