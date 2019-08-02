@@ -27,6 +27,25 @@ bool Patcher::isPatched(const QString &path)
     return count == files.length();
 }
 
+void Patcher::copyFiles(const QString &path)
+{
+    // Files to copy.
+    QStringList files = {
+        "mppatch.dll",
+        "QtCore.dll"
+    };
+
+    for (const QString &file : files) {
+        QString fileName = path + file;
+
+        if (!QFile::exists(fileName)) {
+            qDebug() << "Copying file" << file << "to" << fileName;
+
+            QFile::copy(file, fileName);
+        }
+    }
+}
+
 bool Patcher::patchFile(const QString &path, const FileEntry &file, const TargetEntry &target)
 {
     QString fileName = path + file.getFileName();
@@ -81,6 +100,9 @@ bool Patcher::patch(QWidget* parent, const QString &path)
         return false;
     }
 
+    // Copy needed libraries.
+    copyFiles(path);
+
     return true;
 }
 
@@ -88,6 +110,8 @@ void Patcher::undoPatch(const QString &path) {
     // Scanning for valid files to start patching.
     for (const FileEntry &file : Constants::files) {
         File::restore(path, file);
+
+        // TODO: Delete files?
     }
 }
 
@@ -100,4 +124,6 @@ void Patcher::generateNetworkConfigFile(const QString &path, const QNetworkAddre
         settings.setValue(Constants::patch_network_configuration_broadcast, address.broadcast().toString());
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
+
+    qDebug() << "Generated network configuration, saved to:" << path + Constants::patch_network_configuration_file;
 }

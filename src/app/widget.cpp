@@ -28,14 +28,12 @@ Widget::Widget(QWidget* parent) :
     populateComboboxWithNetworkInterfaces();
 
     bool patched = Patcher::isPatched(getPath());
-    qDebug() << "Patched?: " << patched;
-
     updatePatchStatus(patched);
 
     connect(ui->pushButton_install_directory, &QPushButton::clicked, this, &Widget::pushButton_install_directory_clicked);
-    connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
-
     connect(ui->lineEdit_install_directory, &QLineEdit::textChanged, this, &Widget::saveSettings);
+    connect(ui->comboBox_network_interface, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Widget::comboBox_network_interface_currentIndexChanged);
+    connect(ui->pushButton_patch, &QPushButton::clicked, this, &Widget::pushButton_patch_clicked);
 }
 
 Widget::~Widget()
@@ -143,14 +141,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 
 void Widget::updatePatchStatus(bool patched) const
 {
-    // Update buttons text.
-    if (patched) {
-        ui->pushButton_patch->setText("Un-patch");
-    } else {
-        ui->pushButton_patch->setText("Patch");
-    }
-
-    //ui->pushButton_patch->setText(!patched ? "Patch" : "Un-patch");
+    ui->pushButton_patch->setText(!patched ? "Patch" : "Un-patch");
 }
 
 void Widget::pushButton_install_directory_clicked()
@@ -160,6 +151,12 @@ void Widget::pushButton_install_directory_clicked()
     if (QDir(installDirectory).exists()) {
         ui->lineEdit_install_directory->setText(installDirectory);
     }
+}
+
+void Widget::comboBox_network_interface_currentIndexChanged(int index)
+{
+    // Generate network configuration.
+    Patcher::generateNetworkConfigFile(getPath(), ui->comboBox_network_interface->itemData(index).value<QNetworkAddressEntry>());
 }
 
 void Widget::pushButton_patch_clicked()

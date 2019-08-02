@@ -5,3 +5,8 @@
 - Automatically find Far Cry 2 installdir in registry.
 - Find steam installpath, and thereby find game installdir?
 - Detect Far Cry 2 installation type, Retail/GOG or Steam?
+
+- Workaround for Windows:
+	Download: https://sourceforge.net/projects/mingw-w64/files/External%20binary%20packages%20%28Win64%20hosted%29/libiconv/
+
+	Extract to: C:/Qt/Tools/mingw730_64/x86_64-mingw32

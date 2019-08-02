@@ -15,9 +15,8 @@ public:
     static void undoPatch(const QString &path);
     static void generateNetworkConfigFile(const QString &path, const QNetworkAddressEntry &address);
 
-    void constexpr hash();
-
 private:
+    static void copyFiles(const QString &path);
     static bool patchFile(const QString &path, const FileEntry &file, const TargetEntry &target);
 };
 
