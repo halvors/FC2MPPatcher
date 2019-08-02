@@ -32,7 +32,7 @@ void Patcher::copyFiles(const QString &path)
     // Files to copy.
     QStringList files = {
         "mppatch.dll",
-        "QtCore.dll"
+        "Qt5Core.dll"
     };
 
     for (const QString &file : files) {
