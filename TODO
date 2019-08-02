@@ -9,4 +9,4 @@
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw-w64/files/External%20binary%20packages%20%28Win64%20hosted%29/libiconv/
 
-	Extract to: C:/Qt/Tools/mingw730_64/x86_64-mingw32
+	Extract to: C:/Qt/Tools/mingw730_64/x86_64-mingw32 og C:/Qt/Tools/mingw730_64
