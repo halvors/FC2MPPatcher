@@ -6,7 +6,7 @@
 
 class FunctionEntry {
 public:
-    FunctionEntry(unsigned int address, const QString &name) :
+    FunctionEntry(const unsigned int address, const QString &name) :
         address(address),
         name(name) {}
 
@@ -25,17 +25,17 @@ private:
 
 class TargetEntry {
 public:
-    TargetEntry(const QString &fileCheckSum, const QString &fileCheckSumPatched, QList<FunctionEntry> functions) :
-        fileCheckSum(fileCheckSum),
-        fileCheckSumPatched(fileCheckSumPatched),
+    TargetEntry(const QString &checkSum, const QString &checkSumPatched, const QList<FunctionEntry> &functions) :
+        checkSum(checkSum),
+        checkSumPatched(checkSumPatched),
         functions(functions) {}
 
-    QString getFileCheckSum() const {
-        return fileCheckSum;
+    QString getCheckSum() const {
+        return checkSum;
     }
 
-    QString getFileCheckSumPatched() const {
-        return fileCheckSumPatched;
+    QString getCheckSumPatched() const {
+        return checkSumPatched;
     }
 
     QList<FunctionEntry> getFunctions() const {
@@ -43,19 +43,19 @@ public:
     }
 
 private:
-    QString fileCheckSum;
-    QString fileCheckSumPatched;
+    QString checkSum;
+    QString checkSumPatched;
     QList<FunctionEntry> functions;
 };
 
 class FileEntry {
 public:
-    FileEntry(const QString &fileName, QList<TargetEntry> targets) :
-        fileName(fileName),
+    FileEntry(const QString &name, const QList<TargetEntry> &targets) :
+        name(name),
         targets(targets) {}
 
-    QString getFileName() const {
-        return fileName;
+    QString getName() const {
+        return name;
     }
 
     QList<TargetEntry> getTargets() const {
@@ -63,9 +63,8 @@ public:
     }
 
 private:
-    QString fileName;
+    QString name;
     QList<TargetEntry> targets;
 };
-
 
 #endif // ENTRY_H

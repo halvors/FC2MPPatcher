@@ -20,14 +20,12 @@ QString File::checkSum(QFile file)
 
 bool File::isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
 {
-    QString fileCheckSum = isPatched ? target.getFileCheckSumPatched() : target.getFileCheckSum();
-
-    return fileCheckSum == checkSum(path.filePath(file.getFileName()));
+    return (isPatched ? target.getCheckSumPatched() : target.getCheckSum()) == checkSum(path.filePath(file.getName()));
 }
 
 bool File::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
-    QStringList split = fileEntry.getFileName().split(".");
+    QStringList split = fileEntry.getName().split(".");
     QString suffix = "." + split.takeLast();
     QFile file = path.filePath(split.join(QString()) + suffix);
     QFile fileCopy = path.filePath(split.join(QString()) + Constants::game_backup_file_suffix + suffix);
@@ -50,7 +48,7 @@ bool File::backup(const QDir &path, const FileEntry &file)
     bool result = copy(path, file, true);
 
     if (result) {
-        qDebug() << "Backing up:" << file.getFileName();
+        qDebug() << "Backing up:" << file.getName();
     }
 
     return result;
@@ -61,7 +59,7 @@ bool File::restore(const QDir &path, const FileEntry &file)
     bool result = copy(path, file, false);
 
     if (result) {
-        qDebug() << "Restoring:" << file.getFileName();
+        qDebug() << "Restoring:" << file.getName();
     }
 
     return result;

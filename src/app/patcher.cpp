@@ -41,7 +41,7 @@ void Patcher::copyFiles(const QDir &path)
 
 bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target)
 {
-    QFile file = path.filePath(fileEntry.getFileName());
+    QFile file = path.filePath(fileEntry.getName());
 
     qDebug() << "Patching:" << file;
 
@@ -74,7 +74,7 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 
                 // Patch target file.
                 if (!patchFile(path, file, target)) {
-                    QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getFileName() + ", aborting!");
+                    QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getName() + ", aborting!");
                     undoPatch(path);
 
                     return false;

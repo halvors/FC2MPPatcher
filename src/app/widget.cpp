@@ -113,7 +113,7 @@ QDir Widget::getPath(bool showWarning)
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
     if (path.cd(Constants::game_executable_directory) || path.exists()) {
         for (const FileEntry &file : Constants::files) {
-            if (path.exists(file.getFileName())) {
+            if (path.exists(file.getName())) {
                 return path;
             }
         }
