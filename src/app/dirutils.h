@@ -10,11 +10,13 @@ class DirUtils
 public:
     static bool isGameDir(QDir &dir);
     static QString findInstallDir();
-    static QString getSteamInstallDir(int appId);
-    static QString getRetailInstallDir();
+    static QString getSteamGameDir(int appId);
+    static QString getRetailGameDir();
 
 private:
     static QString getSteamDir();
+    static QStringList findSteamLibraries(QDir dir);
+    static QJsonObject getJsonFromFile(QFile &file);
     static QString getJsonFromAcf(const QStringList &lines);
 };
 

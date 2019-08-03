@@ -1,12 +1,12 @@
 #include <QSettings>
 #include <QDebug>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QJsonDocument>
+#include <QRegExp>
 
 #include "dirutils.h"
 #include "constants.h"
-#include "entry.h"
 
 bool DirUtils::isGameDir(QDir &dir)
 {
@@ -26,14 +26,14 @@ bool DirUtils::isGameDir(QDir &dir)
 QString DirUtils::findInstallDir()
 {
     // Look for Far Cry 2 install directory in registry.
-    QDir dir = DirUtils::getRetailInstallDir();
+    QDir dir = DirUtils::getRetailGameDir();
 
     if (DirUtils::isGameDir(dir)) {
         //return dir.absolutePath();
     }
 
     // Look for Far Cry 2 install directory in Steam.
-    dir = DirUtils::getSteamInstallDir(Constants::game_steam_appId);
+    dir = DirUtils::getSteamGameDir(Constants::game_steam_appId);
 
     if (DirUtils::isGameDir(dir)) {
         return dir.absolutePath();
@@ -43,7 +43,7 @@ QString DirUtils::findInstallDir()
     return Constants::game_install_directory;
 }
 
-QString DirUtils::getRetailInstallDir()
+QString DirUtils::getRetailGameDir()
 {
 #ifdef Q_OS_WIN
     // Look for Far Cry 2 install directory in registry.
@@ -64,35 +64,39 @@ QString DirUtils::getRetailInstallDir()
     return QString();
 }
 
-QString DirUtils::getSteamInstallDir(int appId)
+QString DirUtils::getSteamGameDir(int appId)
 {
     QDir dir = getSteamDir();
 
-    // Entering directory where steamapps is stored.
-    if (dir.cd("steamapps")) {
-        // Assemble manifest file using provided appId.
-        QFile file = dir.filePath("appmanifest_" + QString::number(appId) + ".acf");
+    qDebug() << "Found steam directory:" << dir.absolutePath();
 
-        // Try to read the manifest file.
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QString data = file.readAll();
-            file.close();
+    // Search for other steam libraries.
+    QStringList libraries = findSteamLibraries(dir);
 
-            // Only continue parsing json if we need it.
-            if (dir.cd("common")) {
-                // Convert Acf to Json.
-                QString json = getJsonFromAcf(data.split("\n"));
+    // Add this directory as the default steam library.
+    libraries.prepend(".");
 
-                // Read Json.
-                QJsonDocument jsonDocument = QJsonDocument::fromJson(json.toUtf8());
-                QJsonObject jsonObject = jsonDocument.object();
-                QJsonValue jsonValue = jsonObject.value("installdir");
+    for (QDir dir : libraries) {
+        qDebug() << dir.absolutePath();
 
-                // Enter found directory.
-                if (dir.cd(jsonValue.toString())) {
-                    qDebug() << "Found install directory: " << dir.absolutePath();
+        // Entering directory where steamapps is stored.
+        if (dir.cd("steamapps")) {
+            // Assemble manifest file using provided appId.
+            QFile manifestFile = dir.filePath("appmanifest_" + QString::number(appId) + ".acf");
 
-                    return dir.absolutePath();
+            if (manifestFile.exists()) {
+                QJsonObject object = getJsonFromFile(manifestFile);
+
+                // Only continue parsing json if we need it.
+                if (dir.cd("common")) {
+                    QJsonValue value = object.value("installdir");
+
+                    // Enter found game directory.
+                    if (dir.cd(value.toString())) {
+                        qDebug() << "Found install directory: " << dir.absolutePath();
+
+                        return dir.absolutePath();
+                    }
                 }
             }
         }
@@ -103,12 +107,14 @@ QString DirUtils::getSteamInstallDir(int appId)
 
 QString DirUtils::getSteamDir()
 {
-#ifdef Q_OS_WIN
+    QString steamDir;
+
+#ifdef Q_OS_WIN    
     // Find Steam install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup("Valve");
         registry.beginGroup("Steam");
-            return registry.value("InstallPath").toString();
+            steamDir = registry.value("InstallPath").toString();
         registry.endGroup();
     registry.endGroup();
 #elif defined(Q_OS_LINUX)
@@ -116,47 +122,95 @@ QString DirUtils::getSteamDir()
 
     // TODO: Check this?
     if (dir.cd(".steam")) {
-        return dir.absolutePath();
+        steamDir = dir.absolutePath();
     }
 #endif
 
-    return QString();
+    return steamDir;
+}
+
+QStringList DirUtils::findSteamLibraries(QDir dir)
+{
+    QStringList libraries;
+
+    // Entering directory where steamapps is stored.
+    if (dir.cd("steamapps")) {
+        QFile libraryFile = dir.filePath("libraryfolders.vdf");
+
+        if (libraryFile.exists()) {
+            QJsonObject object = getJsonFromFile(libraryFile);
+            QJsonObject::iterator iterator;
+
+            for (iterator = object.begin(); iterator != object.end(); iterator++) {
+                bool valid = false;
+
+                // Check if key is of integer type.
+                iterator.key().toInt(&valid);
+
+                // Only read valid values.
+                if (valid) {
+                    libraries.append(iterator.value().toString());
+
+                    qDebug() << "Found steam library:" << iterator.value().toString();
+                }
+            }
+        }
+    }
+
+    return libraries;
+}
+
+QJsonObject DirUtils::getJsonFromFile(QFile &file)
+{
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString data = file.readAll();
+        file.close();
+
+        // Convert acf to json.
+        QString json = getJsonFromAcf(data.split("\n"));
+
+        // Parse json.
+        QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+
+        return document.object();
+    }
+
+    return QJsonObject();
 }
 
 QString DirUtils::getJsonFromAcf(const QStringList &lines)
 {
     static QRegExp singleLine("^(\\t+\".+\")\\t\\t(\".*\")$");
     static QRegExp startOfObject("^\\t+\".+\"$");
-
-    QString sb;
+    QString json;
 
     for (int i = 1; i < lines.length(); i++) {
         if (singleLine.exactMatch(lines[i])) {
-            sb.append(singleLine.cap(1));
-            sb.append(": ");
-            sb.append(singleLine.cap(2));
+            json.append(singleLine.cap(1));
+            json.append(": ");
+            json.append(singleLine.cap(2));
 
             // Last value of object must not have a tailing comma.
             if (i + 1 < lines.length() && lines[i + 1].endsWith("}")) {
-                sb.append("\n");
+                json.append("\n");
             } else {
-                sb.append("\n,");
+                json.append("\n,");
             }
         } else if (lines[i].startsWith("\t") && lines[i].endsWith("}")) {
-            sb.append(lines[i]);
+            json.append(lines[i]);
 
             if (i + 1 < lines.length() && lines[i + 1].endsWith("}")) {
-                sb.append("\n");
+                json.append("\n");
             } else {
-                sb.append("\n,");
+                json.append("\n,");
             }
         } else if (startOfObject.exactMatch(lines[i])) {
-            sb.append(lines[i]);
-            sb.append("\n:");
+            json.append(lines[i]);
+            json.append("\n:");
         } else {
-            sb.append("\n" + lines[i]);
+            json.append("\n" + lines[i]);
         }
     }
 
-    return sb;
+    return json;
 }
