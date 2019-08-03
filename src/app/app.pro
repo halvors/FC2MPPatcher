@@ -21,6 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    dirutils.cpp \
         main.cpp \
         widget.cpp \
         patcher.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
     fileutils.cpp
 
 HEADERS += \
+    dirutils.h \
         widget.h \
         patcher.h \
         pefile.h \

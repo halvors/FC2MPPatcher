@@ -9,10 +9,10 @@ QString FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha1);
+        hash.addData(&file);
+        file.close();
 
-        if (hash.addData(&file)) {
-            return hash.result().toHex();
-        }
+        return hash.result().toHex();
     }
 
     return QString();

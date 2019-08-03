@@ -2,8 +2,8 @@
 #define FILEUTILS_H
 
 #include <QDir>
-#include <QFile>
 #include <QString>
+#include <QFile>
 
 #include "entry.h"
 
