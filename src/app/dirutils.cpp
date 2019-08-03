@@ -1,9 +1,8 @@
 #include <QSettings>
 #include <QDebug>
 #include <QJsonObject>
-#include <QJsonValue>
 #include <QJsonDocument>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include "dirutils.h"
 #include "constants.h"
@@ -180,35 +179,42 @@ QJsonObject DirUtils::getJsonFromFile(QFile &file)
 
 QString DirUtils::getJsonFromAcf(const QStringList &lines)
 {
-    static QRegExp singleLine("^(\\t+\".+\")\\t\\t(\".*\")$");
-    static QRegExp startOfObject("^\\t+\".+\"$");
+    static const QRegularExpression singleLine("^(\\t+\".+\")\\t\\t(\".*\")$");
+    static const QRegularExpression startOfObject("^\\t+\".+\"$");
     QString json;
 
+    auto appendLine = [&](const QString &string = QString()) {
+        return json.append("\n" + string);
+    };
+
     for (int i = 1; i < lines.length(); i++) {
-        if (singleLine.exactMatch(lines[i])) {
-            json.append(singleLine.cap(1));
+        QRegularExpressionMatch singleLineMatch = singleLine.match(lines[i]);
+        int nextIndex = i + 1;
+
+        if (singleLineMatch.hasMatch()) {
+            json.append(singleLineMatch.captured(1));
             json.append(": ");
-            json.append(singleLine.cap(2));
+            json.append(singleLineMatch.captured(2));
 
             // Last value of object must not have a tailing comma.
-            if (i + 1 < lines.length() && lines[i + 1].endsWith("}")) {
-                json.append("\n");
+            if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
+                appendLine();
             } else {
-                json.append("\n,");
+                appendLine(",");
             }
         } else if (lines[i].startsWith("\t") && lines[i].endsWith("}")) {
             json.append(lines[i]);
 
-            if (i + 1 < lines.length() && lines[i + 1].endsWith("}")) {
-                json.append("\n");
+            if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
+                appendLine();
             } else {
-                json.append("\n,");
+                appendLine(",");
             }
-        } else if (startOfObject.exactMatch(lines[i])) {
+        } else if (startOfObject.match(lines[i]).hasMatch()) {
             json.append(lines[i]);
-            json.append("\n:");
+            appendLine(":");
         } else {
-            json.append("\n" + lines[i]);
+            appendLine(lines[i]);
         }
     }
 
