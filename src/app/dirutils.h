@@ -9,6 +9,7 @@ class DirUtils
 {
 public:
     static bool isGameDir(QDir &dir);
+    static QString findInstallDir();
     static QString getSteamInstallDir(int appId);
     static QString getRetailInstallDir();
 

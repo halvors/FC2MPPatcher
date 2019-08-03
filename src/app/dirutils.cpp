@@ -23,6 +23,26 @@ bool DirUtils::isGameDir(QDir &dir)
     return false;
 }
 
+QString DirUtils::findInstallDir()
+{
+    // Look for Far Cry 2 install directory in registry.
+    QDir dir = DirUtils::getRetailInstallDir();
+
+    if (DirUtils::isGameDir(dir)) {
+        //return dir.absolutePath();
+    }
+
+    // Look for Far Cry 2 install directory in Steam.
+    dir = DirUtils::getSteamInstallDir(Constants::game_steam_appId);
+
+    if (DirUtils::isGameDir(dir)) {
+        return dir.absolutePath();
+    }
+
+    // Fallback to statically set installation directory if autodetection failed.
+    return Constants::game_install_directory;
+}
+
 QString DirUtils::getRetailInstallDir()
 {
     QDir dir;

@@ -52,7 +52,7 @@ void Widget::closeEvent(QCloseEvent* event)
 
 void Widget::loadSettings()
 {
-    QString installDir = settings->value(Constants::settings_install_directory, findInstallDir().absolutePath()).toString();
+    QString installDir = settings->value(Constants::settings_install_directory, DirUtils::findInstallDir()).toString();
     ui->lineEdit_install_directory->setText(installDir);
 
     int index = settings->value(Constants::settings_interface_index).toInt();
@@ -87,26 +87,6 @@ void Widget::saveSettings() const
         settings->setValue(Constants::settings_group_window_position, pos());
         settings->setValue(Constants::settings_group_window_isMaximized, isMaximized());
     settings->endGroup();
-}
-
-QDir Widget::findInstallDir() const
-{
-    // Look for Far Cry 2 install directory in registry.
-    QDir dir = DirUtils::getRetailInstallDir();
-
-    if (DirUtils::isGameDir(dir)) {
-        return dir;
-    }
-
-    // Look for Far Cry 2 install directory in Steam.
-    dir = DirUtils::getSteamInstallDir(Constants::game_steam_appId);
-
-    if (DirUtils::isGameDir(dir)) {
-        return dir;
-    }
-
-    // Fallback to statically set installation directory if autodetection failed.
-    return Constants::game_install_directory;
 }
 
 QDir Widget::getInstallDir(bool showWarning)
