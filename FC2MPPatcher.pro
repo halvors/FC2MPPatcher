@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-        libpebliss \
-        app
+    libpebliss \
+    app
 
 win32 {
     SUBDIRS += libpatch

@@ -4,31 +4,12 @@
 #include <QString>
 #include <QList>
 
-class FunctionEntry {
-public:
-    FunctionEntry(const unsigned int address, const QString &name) :
-        address(address),
-        name(name) {}
-
-    unsigned int getAddress() const {
-        return address;
-    }
-
-    QString getName() const {
-        return name;
-    }
-
-private:
-    unsigned int address;
-    QString name;
-};
-
 class TargetEntry {
 public:
-    TargetEntry(const QString &checkSum, const QString &checkSumPatched, const QList<FunctionEntry> &functions) :
+    TargetEntry(const QString &checkSum, const QString &checkSumPatched, const QList<unsigned int> &addresses) :
         checkSum(checkSum),
         checkSumPatched(checkSumPatched),
-        functions(functions) {}
+        addresses(addresses) {}
 
     QString getCheckSum() const {
         return checkSum;
@@ -38,14 +19,14 @@ public:
         return checkSumPatched;
     }
 
-    QList<FunctionEntry> getFunctions() const {
-        return functions;
+    QList<unsigned int> getAddresses() const {
+        return addresses;
     }
 
 private:
     QString checkSum;
     QString checkSumPatched;
-    QList<FunctionEntry> functions;
+    QList<unsigned int> addresses;
 };
 
 class FileEntry {

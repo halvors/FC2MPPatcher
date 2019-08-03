@@ -21,7 +21,7 @@ public:
     explicit PeFile(const QFile &file, QObject* parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<FunctionEntry> &targetFunctions, const QString &sectionName) const;
+    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
     bool write() const;
 
 private:
@@ -29,8 +29,8 @@ private:
     pe_base* image = nullptr;
 
     bool read();
-    const QList<FunctionEntry> buildAddressOfFunctionsList(const QString &libraryName) const;
-    bool patchFunctions(const QString &libraryName, const QList<FunctionEntry> &functions, const QString &sectionName) const;
+    QList<unsigned int> getFunctionAddresses(const QString &libraryName) const;
+    bool patchFunctions(const QString &libraryName, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
 };
 
 #endif // PEFILE_H

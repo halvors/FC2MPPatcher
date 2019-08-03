@@ -29,13 +29,21 @@ bool Patcher::isPatched(const QDir &path)
 
 void Patcher::copyFiles(const QDir &path)
 {
+    bool success = false;
+
     for (const QString &fileName : Constants::patch_library_runtime_dependencies) {
         QFile sourceFile = QFile(fileName);
         QFile destinationFile = path.filePath(fileName);
 
         if (!destinationFile.exists() || destinationFile.remove()) {
-            sourceFile.copy(destinationFile.fileName());
+            success = sourceFile.copy(destinationFile.fileName());
         }
+    }
+
+    if (success) {
+        qDebug() << "Copying runtime dependencies.";
+    } else {
+        qDebug() << "Error: Could not copy runtime dependencies, missing from application directory.";
     }
 }
 
@@ -43,13 +51,13 @@ bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const Targ
 {
     QFile file = path.filePath(fileEntry.getName());
 
-    qDebug() << "Patching:" << file;
+    qDebug() << "Patching:" << file.fileName();
 
     // Create PeFile instance for this particular target.
     PeFile* peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(Constants::patch_library_name, Constants::patch_library_file, Constants::patch_library_functions, target.getFunctions(), Constants::patch_pe_section);
+    peFile->apply(Constants::patch_library_name, Constants::patch_library_file, Constants::patch_library_functions, target.getAddresses(), Constants::patch_pe_section);
 
     // Write PE to file.
     peFile->write();
@@ -100,12 +108,12 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 }
 
 void Patcher::undoPatch(const QDir &path) {
-    // Scanning for valid files to start patching.
+    // Restore patched files.
     for (const FileEntry &file : Constants::files) {
         FileUtils::restore(path, file);
-
-        // TODO: Delete files?
     }
+
+    // TODO: Delete files (mppatch.dll, dlls and _Original)?
 }
 
 void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressEntry &address)
@@ -119,5 +127,5 @@ void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressE
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
 
-    qDebug() << "Generated network configuration, saved to:" << file;
+    qDebug() << "Generated network configuration, saved to:" << file.fileName();
 }

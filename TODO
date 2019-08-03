@@ -1,10 +1,11 @@
-- Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
 - Automatically search for install directory.
 	- Find steam installpath, and thereby find game installdir (WIP)
-		- Handle installs to other steam libraries. And possibly linux support?
+		- And possibly linux support?
 		See: https://stackoverflow.com/questions/34090258/find-steam-games-folder
 - Auto rescan for installdir if invalid directory is set?
+- Should we return first installdir found or give the user abilibty to select installation to path?
 
+- Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download
 	Copy mingw32/lib/ and mingw32/include/ from file to C:\Qt\Tools\mingw730_32\i686-w64-mingw32

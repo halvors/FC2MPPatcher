@@ -42,7 +42,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<FunctionEntry> &targetFunctions, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -85,7 +85,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Patch code.
-    patchFunctions(libraryName, targetFunctions, sectionName);
+    patchFunctions(libraryName, libraryFunctions, addresses, sectionName);
 
     return true;
 }
@@ -120,9 +120,9 @@ bool PeFile::write() const
     return true;
 }
 
-const QList<FunctionEntry> PeFile::buildAddressOfFunctionsList(const QString &libraryName) const
+QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) const
 {
-    QList<FunctionEntry> list;
+    QList<unsigned int> functionAddresses;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
@@ -130,8 +130,8 @@ const QList<FunctionEntry> PeFile::buildAddressOfFunctionsList(const QString &li
         if (library.get_name() == libraryName.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
-            for (const imported_function &function : library.get_imported_functions()) {
-                list.append({ address, QString::fromStdString(function.get_name()) });
+            for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
+                functionAddresses.append(address);
                 address += 4; // Offset is 4 between entries.
             }
 
@@ -139,10 +139,10 @@ const QList<FunctionEntry> PeFile::buildAddressOfFunctionsList(const QString &li
         }
     }
 
-    return list;
+    return functionAddresses;
 }
 
-bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntry> &functions, const QString &sectionName) const
+bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
 {
     for (section &section : image->get_image_sections()) {
         // Only patch our specified section specified.
@@ -153,33 +153,28 @@ bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntr
             // Read raw data of section as byte array.
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
-            // Patching all functions specified for this target.
-            for (const FunctionEntry &function : functions) {
-                unsigned int newAddress = 0;
+            // Get a compiled list of all functiona addreses.
+            const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryName);
 
-                // Find address matching function.
-                for (const FunctionEntry &importFunction : buildAddressOfFunctionsList(libraryName)) {
-                    if (function.getName() == importFunction.getName()) {
-                        newAddress = importFunction.getAddress();
-
-                        break;
-                    }
-                }
+            // Patching all addresses specified for this target.
+            for (int i = 0; i < addresses.length(); i++) {
+                unsigned int address = addresses[i];
+                unsigned int functionAddress = functionAddresses[i];
 
                 // Verify to some degree addresses to be patched.
-                if (function.getAddress() == 0 || newAddress == 0) {
+                if (address == 0 || functionAddress == 0) {
                     qDebug() << "Error: An address is zero, something went wrong! Aborting.";
 
                     return false;
                 }
 
                 // Creating pointer to the data that is to be updated (aka. does pointer yoga).
-                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + function.getAddress() - baseImageAddress);
+                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + address - baseImageAddress);
 
                 // Change the old address to point to new function instead.
-                *dataPtr = newAddress;
+                *dataPtr = functionAddress;
 
-                qDebug() << showbase << hex << "Patched function" << function.getName() << ", address changed from" << function.getAddress() << "to" << newAddress;
+                qDebug() << showbase << hex << "Patched function" << libraryFunctions[i] << ", address changed from" << address << "to" << functionAddress;
             }
 
             return true;
