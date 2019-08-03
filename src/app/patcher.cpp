@@ -5,7 +5,7 @@
 
 #include "patcher.h"
 #include "constants.h"
-#include "file.h"
+#include "fileutils.h"
 #include "pefile.h"
 
 bool Patcher::isPatched(const QDir &path)
@@ -16,7 +16,7 @@ bool Patcher::isPatched(const QDir &path)
     for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
             // Check if target file is patched.
-            if (File::isValid(path, file, target, true)) {
+            if (FileUtils::isValid(path, file, target, true)) {
                 count++;
 
                 break;
@@ -56,7 +56,7 @@ bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const Targ
 
     delete peFile;
 
-    return File::isValid(path, fileEntry, target, true);
+    return FileUtils::isValid(path, fileEntry, target, true);
 }
 
 bool Patcher::patch(QWidget* parent, const QDir &path)
@@ -68,9 +68,9 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
     for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
             // Validate target file against stored checksum.
-            if (File::isValid(path, file, target, false)) {
+            if (FileUtils::isValid(path, file, target, false)) {
                 // Backup original file.
-                File::backup(path, file);
+                FileUtils::backup(path, file);
 
                 // Patch target file.
                 if (!patchFile(path, file, target)) {
@@ -102,7 +102,7 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 void Patcher::undoPatch(const QDir &path) {
     // Scanning for valid files to start patching.
     for (const FileEntry &file : Constants::files) {
-        File::restore(path, file);
+        FileUtils::restore(path, file);
 
         // TODO: Delete files?
     }

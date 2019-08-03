@@ -1,5 +1,5 @@
-#ifndef FILE_H
-#define FILE_H
+#ifndef FILEUTILS_H
+#define FILEUTILS_H
 
 #include <QDir>
 #include <QFile>
@@ -7,7 +7,7 @@
 
 #include "entry.h"
 
-class File
+class FileUtils
 {
 public:
     static bool isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched);
@@ -19,4 +19,4 @@ private:
     static bool copy(const QDir &path, const FileEntry &fileEntry, bool isBackup);
 };
 
-#endif // FILE_H
+#endif // FILEUTILS_H

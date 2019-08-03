@@ -25,13 +25,13 @@ SOURCES += \
         widget.cpp \
         patcher.cpp \
         pefile.cpp \
-        file.cpp
+    fileutils.cpp
 
 HEADERS += \
         widget.h \
         patcher.h \
         pefile.h \
-        file.h
+    fileutils.h
 
 FORMS += widget.ui
 

@@ -2,10 +2,10 @@
 #include <QStringList>
 #include <QDebug>
 
-#include "file.h"
+#include "fileutils.h"
 #include "constants.h"
 
-QString File::checkSum(QFile file)
+QString FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha1);
@@ -18,12 +18,12 @@ QString File::checkSum(QFile file)
     return QString();
 }
 
-bool File::isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
+bool FileUtils::isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
 {
     return (isPatched ? target.getCheckSumPatched() : target.getCheckSum()) == checkSum(path.filePath(file.getName()));
 }
 
-bool File::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
+bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
     QStringList split = fileEntry.getName().split(".");
     QString suffix = "." + split.takeLast();
@@ -43,7 +43,7 @@ bool File::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
     return false;
 }
 
-bool File::backup(const QDir &path, const FileEntry &file)
+bool FileUtils::backup(const QDir &path, const FileEntry &file)
 {
     bool result = copy(path, file, true);
 
@@ -54,7 +54,7 @@ bool File::backup(const QDir &path, const FileEntry &file)
     return result;
 }
 
-bool File::restore(const QDir &path, const FileEntry &file)
+bool FileUtils::restore(const QDir &path, const FileEntry &file)
 {
     bool result = copy(path, file, false);
 

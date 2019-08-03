@@ -1,10 +1,7 @@
-- Patch FC2ServerLauncher.exe or/and Dunia.dll with PE imports for MPPatch.dll.
-- Automatically search for install directory, and backup files before altering them.
-- Avoid crashing if specifying an invalid file path to PeLib::PeFile.
+- Automatically search for install directory.
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
-- Automatically find Far Cry 2 installdir in registry.
 - Find steam installpath, and thereby find game installdir?
-- Detect Far Cry 2 installation type, Retail/GOG or Steam?
+	https://stackoverflow.com/questions/34090258/find-steam-games-folder
 
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download

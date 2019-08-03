@@ -1,15 +1,14 @@
+#include <QDir>
+#include <QMessageBox>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
 #include <QHostAddress>
 #include <QAbstractSocket>
 #include <QFileDialog>
-#include <QDir>
-#include <QFile>
-#include <QMessageBox>
 
 #include "widget.h"
 #include "ui_widget.h"
-#include "file.h"
+#include "fileutils.h"
 #include "patcher.h"
 
 Widget::Widget(QWidget* parent) :
