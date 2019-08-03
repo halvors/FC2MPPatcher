@@ -25,14 +25,12 @@ bool DirUtils::isGameDir(QDir &dir)
 
 QString DirUtils::getRetailInstallDir()
 {
-    QDir dir;
-
 #ifdef Q_OS_WIN
     // Look for Far Cry 2 install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup(Constants::game_publisher);
         registry.beginGroup(Constants::game_name);
-            dir = registry.value("InstallDir").toString();
+            QDir dir = registry.value("InstallDir").toString();
         registry.endGroup();
     registry.endGroup();
 
@@ -85,21 +83,24 @@ QString DirUtils::getSteamInstallDir(int appId)
 
 QString DirUtils::getSteamDir()
 {
-    QString dir;
-
 #ifdef Q_OS_WIN
     // Find Steam install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup("Valve");
         registry.beginGroup("Steam");
-            dir = registry.value("InstallPath").toString();
+            return registry.value("InstallPath").toString();
         registry.endGroup();
     registry.endGroup();
-#elif Q_OS_LINUX
-    dir = QDir::home().cd(".steam"); // TODO: Check this?
+#elif defined(Q_OS_LINUX)
+    QDir dir = QDir::home();
+
+    // TODO: Check this?
+    if (dir.cd(".steam")) {
+        return dir.absolutePath();
+    }
 #endif
 
-    return dir;
+    return QString();
 }
 
 QString DirUtils::getJsonFromAcf(const QStringList &lines)

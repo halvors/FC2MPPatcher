@@ -28,13 +28,13 @@ private:
     void loadSettings();
     void saveSettings() const;
 
-    QDir findInstallDir() const;
-    QDir getInstallDir(bool showWarning = true);
+    QString findInstallDir() const;
+    QString getInstallDir(bool showWarning = true);
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;
 
 private slots:
-    void updateInstallDir(QDir dir = QDir());
+    void updateInstallDir(const QString &installDir = QString());
 
     void pushButton_install_directory_clicked();
     void comboBox_network_interface_currentIndexChanged(int index);

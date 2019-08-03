@@ -52,7 +52,7 @@ void Widget::closeEvent(QCloseEvent* event)
 
 void Widget::loadSettings()
 {
-    QString installDir = settings->value(Constants::settings_install_directory, findInstallDir().absolutePath()).toString();
+    QString installDir = settings->value(Constants::settings_install_directory, findInstallDir()).toString();
     ui->lineEdit_install_directory->setText(installDir);
 
     int index = settings->value(Constants::settings_interface_index).toInt();
@@ -89,47 +89,51 @@ void Widget::saveSettings() const
     settings->endGroup();
 }
 
-QDir Widget::findInstallDir() const
+QString Widget::findInstallDir() const
 {
     // Look for Far Cry 2 install directory in registry.
     QDir dir = DirUtils::getRetailInstallDir();
 
     if (DirUtils::isGameDir(dir)) {
-        return dir;
+        return dir.absolutePath();
     }
 
     // Look for Far Cry 2 install directory in Steam.
     dir = DirUtils::getSteamInstallDir(Constants::game_steam_appId);
 
     if (DirUtils::isGameDir(dir)) {
-        return dir;
+        return dir.absolutePath();
     }
 
     // Fallback to statically set installation directory if autodetection failed.
     return Constants::game_install_directory;
 }
 
-QDir Widget::getInstallDir(bool showWarning)
+QString Widget::getInstallDir(bool showWarning)
 {
     // Create path to binary folder.
     QDir dir = ui->lineEdit_install_directory->text();
 
     if (DirUtils::isGameDir(dir)) {
-        return dir;
+        return dir.absolutePath();
     }
 
     if (showWarning) {
         QMessageBox::warning(this, "Warning", Constants::game_name + " installation directory not found, please select it manually.");
     }
 
-    return QDir();
+    return QString();
 }
 
-void Widget::updateInstallDir(QDir dir)
+void Widget::updateInstallDir(const QString &installDir)
 {
+    QDir dir = installDir;
+
     if (DirUtils::isGameDir(dir)) {
         ui->lineEdit_install_directory->setText(dir.absolutePath());
     }
+
+    ui->lineEdit_install_directory->setText(dir.absolutePath());
 }
 
 void Widget::populateComboboxWithNetworkInterfaces() const
@@ -165,9 +169,9 @@ void Widget::updatePatchStatus(bool patched) const
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QDir dir = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
-    updateInstallDir(dir);
+    updateInstallDir(installDir);
 }
 
 void Widget::comboBox_network_interface_currentIndexChanged(int index)
