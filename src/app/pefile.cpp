@@ -7,7 +7,7 @@
 PeFile::PeFile(const QFile &file, QObject* parent) :
     QObject(parent),
     file(file)
-{
+{    
     // Read PE from file.
     read();
 }
@@ -42,7 +42,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, const QString &libraryFile, QStringList libraryFunctions, QList<FunctionEntry> targetFunctions, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<FunctionEntry> &targetFunctions, const QString &sectionName) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -50,7 +50,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, QStri
     }
 
     // Get the list of imported libraries and functions.
-    imported_functions_list imports = imported_functions_list(get_imported_functions(*image));
+    imported_functions_list imports = get_imported_functions(*image);
 
     // Create a new library from which we will import functions.
     import_library importLibrary;
@@ -60,7 +60,6 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, QStri
     for (const QString &functionName : libraryFunctions) {
         imported_function importFunction;
         importFunction.set_name(functionName.toStdString());
-
         importLibrary.add_import(importFunction);
     }
 
@@ -79,7 +78,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, QStri
     section &attachedSection = image->add_section(importSection);
 
     // Structure responsible for import reassembler settings
-    import_rebuilder_settings settings(true, false); // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
+    import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
     settings.fill_missing_original_iats(true); // Needed to preserve original IAT.
 
     // Rebuild imports.
@@ -121,7 +120,7 @@ bool PeFile::write() const
     return true;
 }
 
-const QList<FunctionEntry> PeFile::buildAddressOfFunctions(const QString &libraryName) const
+const QList<FunctionEntry> PeFile::buildAddressOfFunctionsList(const QString &libraryName) const
 {
     QList<FunctionEntry> list;
 
@@ -159,7 +158,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntr
                 unsigned int newAddress = 0;
 
                 // Find address matching function.
-                for (const FunctionEntry &importFunction : buildAddressOfFunctions(libraryName)) {
+                for (const FunctionEntry &importFunction : buildAddressOfFunctionsList(libraryName)) {
                     if (function.getName() == importFunction.getName()) {
                         newAddress = importFunction.getAddress();
 
@@ -176,10 +175,10 @@ bool PeFile::patchFunctions(const QString &libraryName, const QList<FunctionEntr
 
                 // Creating pointer to the data that is to be updated (aka. does pointer yoga).
                 unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + function.getAddress() - baseImageAddress);
-                //qDebug() << showbase << hex << "dataPtr:" << reinterpret_cast<void*>(dataPtr) << "=" << reinterpret_cast<void*>(data) << "+" << reinterpret_cast<void*>(function.getAddress() - baseImageAddress);
 
                 // Change the old address to point to new function instead.
                 *dataPtr = newAddress;
+
                 qDebug() << showbase << hex << "Patched function" << function.getName() << ", address changed from" << function.getAddress() << "to" << newAddress;
             }
 

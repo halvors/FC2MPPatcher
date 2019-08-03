@@ -89,27 +89,31 @@ void Widget::saveSettings() const
     settings->endGroup();
 }
 
-QDir Widget::getInstallDir(bool showWarning)
+QString Widget::getInstallDir(bool showWarning)
 {
     // Create path to binary folder.
     QDir dir = ui->lineEdit_install_directory->text();
 
     if (DirUtils::isGameDir(dir)) {
-        return dir;
+        return dir.absolutePath();
     }
 
     if (showWarning) {
         QMessageBox::warning(this, "Warning", Constants::game_name + " installation directory not found, please select it manually.");
     }
 
-    return QDir();
+    return QString();
 }
 
-void Widget::updateInstallDir(QDir dir)
+void Widget::updateInstallDir(const QString &installDir)
 {
+    QDir dir = installDir;
+
     if (DirUtils::isGameDir(dir)) {
         ui->lineEdit_install_directory->setText(dir.absolutePath());
     }
+
+    ui->lineEdit_install_directory->setText(dir.absolutePath());
 }
 
 void Widget::populateComboboxWithNetworkInterfaces() const
@@ -145,9 +149,9 @@ void Widget::updatePatchStatus(bool patched) const
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QDir dir = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
-    updateInstallDir(dir);
+    updateInstallDir(installDir);
 }
 
 void Widget::comboBox_network_interface_currentIndexChanged(int index)

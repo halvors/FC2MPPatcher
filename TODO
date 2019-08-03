@@ -3,6 +3,7 @@
 	- Find steam installpath, and thereby find game installdir (WIP)
 		- Handle installs to other steam libraries. And possibly linux support?
 		See: https://stackoverflow.com/questions/34090258/find-steam-games-folder
+- Auto rescan for installdir if invalid directory is set?
 
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download
