@@ -1,8 +1,3 @@
-- Automatically search for install directory.
-	- Find steam installpath, and thereby find game installdir (WIP)
-		- And possibly linux support?
-		See: https://stackoverflow.com/questions/34090258/find-steam-games-folder
-- Auto rescan for installdir if invalid directory is set?
 - Should we return first installdir found or give the user abilibty to select installation to path?
 
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.

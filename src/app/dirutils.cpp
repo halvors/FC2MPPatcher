@@ -22,13 +22,20 @@ bool DirUtils::isGameDir(QDir &dir)
     return false;
 }
 
+bool DirUtils::isGameDir(const QString &path)
+{
+    QDir dir = path;
+
+    return isGameDir(dir);
+}
+
 QString DirUtils::findInstallDir()
 {
     // Look for Far Cry 2 install directory in registry.
     QDir dir = DirUtils::getRetailGameDir();
 
     if (DirUtils::isGameDir(dir)) {
-        //return dir.absolutePath();
+        return dir.absolutePath();
     }
 
     // Look for Far Cry 2 install directory in Steam.
@@ -72,12 +79,7 @@ QString DirUtils::getSteamGameDir(int appId)
     // Search for other steam libraries.
     QStringList libraries = findSteamLibraries(dir);
 
-    // Add this directory as the default steam library.
-    libraries.prepend(".");
-
     for (QDir dir : libraries) {
-        qDebug() << dir.absolutePath();
-
         // Entering directory where steamapps is stored.
         if (dir.cd("steamapps")) {
             // Assemble manifest file using provided appId.
@@ -92,7 +94,7 @@ QString DirUtils::getSteamGameDir(int appId)
 
                     // Enter found game directory.
                     if (dir.cd(value.toString())) {
-                        qDebug() << "Found install directory: " << dir.absolutePath();
+                        qDebug() << "Found game install directory:" << dir.absolutePath();
 
                         return dir.absolutePath();
                     }
@@ -119,8 +121,7 @@ QString DirUtils::getSteamDir()
 #elif defined(Q_OS_LINUX)
     QDir dir = QDir::home();
 
-    // TODO: Check this?
-    if (dir.cd(".steam")) {
+    if (dir.cd(".steam/steam")) {
         steamDir = dir.absolutePath();
     }
 #endif
@@ -131,6 +132,9 @@ QString DirUtils::getSteamDir()
 QStringList DirUtils::findSteamLibraries(QDir dir)
 {
     QStringList libraries;
+
+    // Add this directory as the default steam library.
+    libraries.prepend(dir.absolutePath());
 
     // Entering directory where steamapps is stored.
     if (dir.cd("steamapps")) {
@@ -184,7 +188,7 @@ QString DirUtils::getJsonFromAcf(const QStringList &lines)
     QString json;
 
     auto appendLine = [&](const QString &string = QString()) {
-        return json.append("\n" + string);
+        return json.append(QChar::LineFeed + string);
     };
 
     for (int i = 1; i < lines.length(); i++) {
@@ -202,7 +206,7 @@ QString DirUtils::getJsonFromAcf(const QStringList &lines)
             } else {
                 appendLine(",");
             }
-        } else if (lines[i].startsWith("\t") && lines[i].endsWith("}")) {
+        } else if (lines[i].startsWith(QChar::Tabulation) && lines[i].endsWith("}")) {
             json.append(lines[i]);
 
             if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
