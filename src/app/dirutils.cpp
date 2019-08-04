@@ -7,6 +7,9 @@
 #include "dirutils.h"
 #include "constants.h"
 
+QString DirUtils::steamDir;
+QStringList DirUtils::steamLibraries;
+
 bool DirUtils::isGameDir(QDir &dir)
 {
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
@@ -108,8 +111,7 @@ QString DirUtils::getSteamGameDir(int appId)
 
 QString DirUtils::getSteamDir()
 {
-    QString steamDir;
-
+    if (steamDir.isEmpty()) {
 #ifdef Q_OS_WIN    
     // Find Steam install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
@@ -125,42 +127,43 @@ QString DirUtils::getSteamDir()
         steamDir = dir.absolutePath();
     }
 #endif
+    }
 
     return steamDir;
 }
 
 QStringList DirUtils::findSteamLibraries(QDir dir)
 {
-    QStringList libraries;
+    if (steamLibraries.isEmpty()) {
+        // Add this directory as the default steam library.
+        steamLibraries.prepend(dir.absolutePath());
 
-    // Add this directory as the default steam library.
-    libraries.prepend(dir.absolutePath());
+        // Entering directory where steamapps is stored.
+        if (dir.cd("steamapps")) {
+            QFile libraryFile = dir.filePath("libraryfolders.vdf");
 
-    // Entering directory where steamapps is stored.
-    if (dir.cd("steamapps")) {
-        QFile libraryFile = dir.filePath("libraryfolders.vdf");
+            if (libraryFile.exists()) {
+                QJsonObject object = getJsonFromFile(libraryFile);
+                QJsonObject::iterator iterator;
 
-        if (libraryFile.exists()) {
-            QJsonObject object = getJsonFromFile(libraryFile);
-            QJsonObject::iterator iterator;
+                for (iterator = object.begin(); iterator != object.end(); iterator++) {
+                    bool valid = false;
 
-            for (iterator = object.begin(); iterator != object.end(); iterator++) {
-                bool valid = false;
+                    // Check if key is of integer type.
+                    iterator.key().toInt(&valid);
 
-                // Check if key is of integer type.
-                iterator.key().toInt(&valid);
+                    // Only read valid values.
+                    if (valid) {
+                        steamLibraries.append(iterator.value().toString());
 
-                // Only read valid values.
-                if (valid) {
-                    libraries.append(iterator.value().toString());
-
-                    qDebug() << "Found steam library:" << iterator.value().toString();
+                        qDebug() << "Found steam library:" << iterator.value().toString();
+                    }
                 }
             }
         }
     }
 
-    return libraries;
+    return steamLibraries;
 }
 
 QJsonObject DirUtils::getJsonFromFile(QFile &file)
@@ -170,7 +173,7 @@ QJsonObject DirUtils::getJsonFromFile(QFile &file)
         file.close();
 
         // Convert acf to json.
-        QString json = getJsonFromAcf(data.split("\n"));
+        QString json = getJsonFromAcf(data.split(QChar::LineFeed));
 
         // Parse json.
         QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());

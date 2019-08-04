@@ -15,6 +15,9 @@ public:
     static QString getRetailGameDir();
 
 private:
+    static QString steamDir;
+    static QStringList steamLibraries;
+
     static QString getSteamDir();
     static QStringList findSteamLibraries(QDir dir);
     static QJsonObject getJsonFromFile(QFile &file);
