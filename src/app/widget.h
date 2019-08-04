@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <QCloseEvent>
-#include <QDir>
+#include <QString>
 
 #include "constants.h"
 
