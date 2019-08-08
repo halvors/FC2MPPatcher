@@ -82,8 +82,8 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 
                 // Patch target file.
                 if (!patchFile(path, file, target)) {
-                    QMessageBox::warning(parent, "Warning", "Invalid checksum for patched file " + file.getName() + ", aborting!");
-                    undoPatch(path);
+                    QMessageBox::warning(parent, "Warning", QString("Invalid checksum for patched file %1, aborting!").arg(file.getName()));
+                    //undoPatch(path);
 
                     return false;
                 }
@@ -96,7 +96,7 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", "Not all files where patched, files have been restored, please try patching again.");
-        undoPatch(path);
+        //undoPatch(path);
 
         return false;
     }

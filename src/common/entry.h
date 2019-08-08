@@ -1,21 +1,20 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
-#include <QString>
 #include <QList>
 
 class TargetEntry {
 public:
-    TargetEntry(const QString &checkSum, const QString &checkSumPatched, const QList<unsigned int> &addresses) :
+    TargetEntry(const char* checkSum, const char* checkSumPatched, const QList<unsigned int> &addresses) :
         checkSum(checkSum),
         checkSumPatched(checkSumPatched),
         addresses(addresses) {}
 
-    QString getCheckSum() const {
+    const char* getCheckSum() const {
         return checkSum;
     }
 
-    QString getCheckSumPatched() const {
+    const char* getCheckSumPatched() const {
         return checkSumPatched;
     }
 
@@ -24,18 +23,18 @@ public:
     }
 
 private:
-    QString checkSum;
-    QString checkSumPatched;
+    const char* checkSum;
+    const char* checkSumPatched;
     QList<unsigned int> addresses;
 };
 
 class FileEntry {
 public:
-    FileEntry(const QString &name, const QList<TargetEntry> &targets) :
+    FileEntry(const char* name, const QList<TargetEntry> &targets) :
         name(name),
         targets(targets) {}
 
-    QString getName() const {
+    const char* getName() const {
         return name;
     }
 
@@ -44,7 +43,7 @@ public:
     }
 
 private:
-    QString name;
+    const char* name;
     QList<TargetEntry> targets;
 };
 

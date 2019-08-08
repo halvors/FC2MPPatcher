@@ -6,7 +6,7 @@
 #include <QAbstractSocket>
 #include <QFileDialog>
 
-#include <QException>
+#include <QVersionNumber>
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -20,14 +20,14 @@ Widget::Widget(QWidget* parent) :
 {
     ui->setupUi(this);
 
-    setWindowTitle(Constants::app_name + " " + Constants::app_version);
+    setWindowTitle(QString("%1 %2").arg(Constants::app_name, QVersionNumber(Constants::app_version_major, Constants::app_version_minor, Constants::app_version_micro).toString()));
 
     // Load settings from configuration file.
     settings = new QSettings(Constants::app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
     // Setup UI.
-    ui->label_installation_directory->setText("Select the " + Constants::game_name + " installation directory:");
+    ui->label_installation_directory->setText(QString("Select the %1 installation directory:").arg(Constants::game_name));
     populateComboboxWithNetworkInterfaces();
 
     bool patched = Patcher::isPatched(getInstallDir(false));
@@ -103,7 +103,7 @@ QString Widget::getInstallDir(bool showWarning)
     }
 
     if (showWarning) {
-        QMessageBox::warning(this, "Warning", Constants::game_name + " installation directory not found, please select it manually.");
+        QMessageBox::warning(this, "Warning", QString("%1 installation directory not found, please select it manually.").arg(Constants::game_name ));
     }
 
     return QString();
@@ -149,7 +149,7 @@ void Widget::updatePatchStatus(bool patched) const
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString installDir = QFileDialog::getExistingDirectory(this, "Select the " + Constants::game_name + " installation directory", ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, QString("Select the %1 installation directory").arg(Constants::game_name), ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
     updateInstallDir(installDir);
 }

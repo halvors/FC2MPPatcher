@@ -8,7 +8,7 @@
 QString FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(QCryptographicHash::Sha1);
+        QCryptographicHash hash(QCryptographicHash::Sha256);
         hash.addData(&file);
         file.close();
 
@@ -25,8 +25,8 @@ bool FileUtils::isValid(const QDir &path, const FileEntry &file, const TargetEnt
 
 bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
-    QStringList split = fileEntry.getName().split(".");
-    QString suffix = "." + split.takeLast();
+    QStringList split = QString(fileEntry.getName()).split(".");
+    QString suffix = '.' + split.takeLast();
     QFile file = path.filePath(split.join(QString()) + suffix);
     QFile fileCopy = path.filePath(split.join(QString()) + Constants::game_backup_file_suffix + suffix);
 

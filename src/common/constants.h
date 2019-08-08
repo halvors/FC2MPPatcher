@@ -8,27 +8,29 @@
 #include "entry.h"
 
 namespace Constants {
-    const QString app_name = "FC2MPPatcher";
-    const QString app_version = "0.0.4";
-    const QString app_configuration_file = app_name.toLower() + ".ini";
+    constexpr char app_name[] = "FC2MPPatcher";
+    constexpr int app_version_major = 0;
+    constexpr int app_version_minor = 0;
+    constexpr int app_version_micro = 4;
+    const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
-    const QString settings_install_directory = "install_directory";
-    const QString settings_interface_index = "interface_index";
-    const QString settings_group_window = "Window";
-    const QString settings_group_window_size = "size";
-    const QString settings_group_window_position = "position";
-    const QString settings_group_window_isMaximized = "isMaximized";
+    constexpr char settings_install_directory[] = "install_directory";
+    constexpr char settings_interface_index[] = "interface_index";
+    constexpr char settings_group_window[] = "Window";
+    constexpr char settings_group_window_size[] = "size";
+    constexpr char settings_group_window_position[] = "position";
+    constexpr char settings_group_window_isMaximized[] = "isMaximized";
 
-    const QString game_name = "Far Cry 2";
-    const QString game_publisher = "Ubisoft";
-    const QString game_install_directory = "C:/Program Files (x86)/Steam/steamapps/common/Far Cry 2";
-    const QString game_executable_directory = "bin";
-    const QString game_backup_file_suffix = "_Original";
-    const int game_steam_appId = 19900;
+    constexpr char game_name[] = "Far Cry 2";
+    constexpr char game_publisher[] = "Ubisoft";
+    constexpr char game_install_directory[] = "C:/Program Files (x86)/Steam/steamapps/common/Far Cry 2";
+    constexpr char game_executable_directory[] = "bin";
+    constexpr char game_backup_file_suffix[] = "_Original";
+    constexpr int game_steam_appId = 19900;
 
-    const QString patch_pe_section = ".text";
-    const QString patch_library_name = "MPPatch";
-    const QString patch_library_file = patch_library_name.toLower() + ".dll";
+    constexpr char patch_pe_section[] = ".text";
+    constexpr char patch_library_name[] = "MPPatch";
+    const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
     const QStringList patch_library_functions = {
         "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo
         "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName
@@ -41,18 +43,18 @@ namespace Constants {
         "libwinpthread-1.dll",
         "Qt5Core.dll"
     };
-    const QString patch_network_configuration_file = "network.cfg";
-    const QString patch_network_configuration_address = "Address";
-    const QString patch_network_configuration_broadcast = "Broadcast";
-    const QString patch_network_configuration_netmask = "Netmask";
+    constexpr char patch_network_configuration_file[] = "network.cfg";
+    constexpr char patch_network_configuration_address[] = "Address";
+    constexpr char patch_network_configuration_broadcast[] = "Broadcast";
+    constexpr char patch_network_configuration_netmask[] = "Netmask";
 
     const QList<FileEntry> files = {
         {
             "Dunia.dll",
             {
                 { // Retail (GOG is identical).
-                    "3905709d89d75b1e1928c94685e70b22b25843fa",
-                    "793bbd2009d886137af4696c42d7bd6d4b3a1130", // TODO: Recalculate.
+                    "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
+                    "7a56f15deab0fde10078ade6fa0d284f8184e7528f2377bfef453cc8f85db86d",
                     {
                         0x10C5BDE2, // getAdapersInfo
                         0x1001431C, // getHostByName
@@ -60,8 +62,8 @@ namespace Constants {
                     }
                 },
                 { // Steam.
-                    "b99ea707e1bba5ae964effd2cec94eed6b865739",
-                    "4b3f9e8fe94a39fce6bfd44b1ab35ade3f68a7f4", // GCC
+                    "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
+                    "638fba83ae75cc18ba3d170ce2f61a8b6d3d2a437df9e91461d8cb0c03c7a88c",
                     {
                         0x10C6A692, // getAdapersInfo
                         0x100141FC, // getHostByName
@@ -74,8 +76,8 @@ namespace Constants {
             "FC2ServerLauncher.exe",
             {
                 { // Retail (GOG is identical).
-                    "0949e9dc6fd2934673005a0baff4b30b843ada02",
-                    "26694877b9465b1177f28583098f663ebc70fe85", // TODO: Recalculate.
+                    "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
+                    "69aa665ca67ef15a6c1e5d6b202c20014f74984d6d279f7d335a68da2c1ee5c6",
                     {
                         0x00C444A6, // getAdapersInfo
                         0x00BA4CFC, // getHostByName
@@ -83,8 +85,8 @@ namespace Constants {
                     }
                 },
                 { // Steam.
-                    "a9ba7b50f1c541254a27299dd471fa0ebc1db02b",
-                    "73c075df1c8610fbd80103049aac0a80a51c21ad", // GCC
+                    "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
+                    "ea611c01716a0d07a47abf93f7a2d986c19eb061c2d774f234f686b6f687337c",
                     {
                         0x00C46A66, // getAdapersInfo
                         0x00BA714C, // getHostByName

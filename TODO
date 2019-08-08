@@ -1,4 +1,6 @@
 - Should we return first installdir found or give the user abilibty to select installation to path?
+- Use regex to validate input?
+- Properly detect UPlay version.
 
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
 - Workaround for Windows:
