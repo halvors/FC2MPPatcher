@@ -27,7 +27,7 @@ Widget::Widget(QWidget* parent) :
     loadSettings();
 
     // Setup UI.
-    ui->label_installation_directory->setText(QString("Select the %1 installation directory:").arg(Constants::game_name));
+    ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(Constants::game_name));
     populateComboboxWithNetworkInterfaces();
 
     bool patched = Patcher::isPatched(getInstallDir(false));
@@ -58,7 +58,7 @@ void Widget::loadSettings()
     if (!DirUtils::isGameDir(installDir)) {
         installDir = DirUtils::findInstallDir();
 
-        qDebug() << "Detected install directory:" << installDir;
+        qDebug() << tr("Detected install directory: %1").arg(installDir);
     }
 
     ui->lineEdit_install_directory->setText(installDir);
@@ -103,7 +103,7 @@ QString Widget::getInstallDir(bool showWarning)
     }
 
     if (showWarning) {
-        QMessageBox::warning(this, "Warning", QString("%1 installation directory not found, please select it manually.").arg(Constants::game_name ));
+        QMessageBox::warning(this, "Warning", tr("%1 installation directory not found, please select it manually.").arg(Constants::game_name ));
     }
 
     return QString();
@@ -144,12 +144,12 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 
 void Widget::updatePatchStatus(bool patched) const
 {
-    ui->pushButton_patch->setText(!patched ? "Patch" : "Un-patch");
+    ui->pushButton_patch->setText(!patched ? tr("Install patch") : tr("Uninstall patch"));
 }
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString installDir = QFileDialog::getExistingDirectory(this, QString("Select the %1 installation directory").arg(Constants::game_name), ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(Constants::game_name), ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
     updateInstallDir(installDir);
 }

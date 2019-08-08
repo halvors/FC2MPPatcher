@@ -64,7 +64,7 @@ QString DirUtils::getRetailGameDir()
     registry.endGroup();
 
     if (dir.exists()) {
-        qDebug() << "Found install directory: " << dir.absolutePath();
+        qDebug() << QT_TR_NOOP(QString("Found installation directory: %1").arg(dir.absolutePath()));
 
         return dir.absolutePath();
     }
@@ -77,7 +77,7 @@ QString DirUtils::getSteamGameDir(int appId)
 {
     QDir dir = getSteamDir();
 
-    qDebug() << "Found steam directory:" << dir.absolutePath();
+    qDebug() << QT_TR_NOOP(QString("Found steam directory: %1").arg(dir.absolutePath()));
 
     // Search for other steam libraries.
     QStringList libraries = findSteamLibraries(dir);
@@ -97,7 +97,7 @@ QString DirUtils::getSteamGameDir(int appId)
 
                     // Enter found game directory.
                     if (dir.cd(value.toString())) {
-                        qDebug() << "Found game install directory:" << dir.absolutePath();
+                        qDebug() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
 
                         return dir.absolutePath();
                     }
@@ -156,7 +156,7 @@ QStringList DirUtils::findSteamLibraries(QDir dir)
                     if (valid) {
                         steamLibraries.append(iterator.value().toString());
 
-                        qDebug() << "Found steam library:" << iterator.value().toString();
+                        qDebug() << QT_TR_NOOP(QString("Found steam library: %1").arg(iterator.value().toString()));
                     }
                 }
             }

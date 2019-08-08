@@ -18,17 +18,23 @@ QString FileUtils::checkSum(QFile file)
     return QString();
 }
 
-bool FileUtils::isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched)
+bool FileUtils::isValid(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target, bool isPatched)
 {
-    return (isPatched ? target.getCheckSumPatched() : target.getCheckSum()) == checkSum(path.filePath(file.getName()));
+    return (isPatched ? target.getCheckSumPatched() : target.getCheckSum()) == checkSum(path.filePath(fileEntry.getName()));
+}
+
+QString FileUtils::appendToName(const QDir &path, const FileEntry &fileEntry, const QString &toAppend)
+{
+    QStringList split = QString(fileEntry.getName()).split(".");
+    QString suffix = '.' + split.takeLast();
+
+    return path.filePath(split.join(QString()) + toAppend + suffix);
 }
 
 bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
-    QStringList split = QString(fileEntry.getName()).split(".");
-    QString suffix = '.' + split.takeLast();
-    QFile file = path.filePath(split.join(QString()) + suffix);
-    QFile fileCopy = path.filePath(split.join(QString()) + Constants::game_backup_file_suffix + suffix);
+    QFile file = path.filePath(fileEntry.getName());
+    QFile fileCopy = appendToName(path, fileEntry, Constants::game_backup_file_suffix);
 
     if (isBackup) {
         if (!fileCopy.exists()) {
@@ -43,23 +49,23 @@ bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup
     return false;
 }
 
-bool FileUtils::backup(const QDir &path, const FileEntry &file)
+bool FileUtils::backup(const QDir &path, const FileEntry &fileEntry)
 {
-    bool result = copy(path, file, true);
+    bool result = copy(path, fileEntry, true);
 
     if (result) {
-        qDebug() << "Backing up:" << file.getName();
+        qDebug() << QT_TR_NOOP(QString("Backing up: %1").arg(fileEntry.getName()));
     }
 
     return result;
 }
 
-bool FileUtils::restore(const QDir &path, const FileEntry &file)
+bool FileUtils::restore(const QDir &path, const FileEntry &fileEntry)
 {
-    bool result = copy(path, file, false);
+    bool result = copy(path, fileEntry, false);
 
     if (result) {
-        qDebug() << "Restoring:" << file.getName();
+        qDebug() << QT_TR_NOOP(QString("Restoring: %1").arg(fileEntry.getName()));
     }
 
     return result;

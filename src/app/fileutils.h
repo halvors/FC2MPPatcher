@@ -10,9 +10,10 @@
 class FileUtils
 {
 public:
-    static bool isValid(const QDir &path, const FileEntry &file, const TargetEntry &target, bool isPatched);
-    static bool backup(const QDir &path, const FileEntry &file);
-    static bool restore(const QDir &path, const FileEntry &file);
+    static bool isValid(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target, bool isPatched);
+    static QString appendToName(const QDir &path, const FileEntry &fileEntry, const QString &toAppend);
+    static bool backup(const QDir &path, const FileEntry &fileEntry);
+    static bool restore(const QDir &path, const FileEntry &fileEntry);
 
 private:
     static QString checkSum(QFile file);

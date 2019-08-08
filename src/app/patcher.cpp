@@ -41,9 +41,9 @@ void Patcher::copyFiles(const QDir &path)
     }
 
     if (success) {
-        qDebug() << "Copying runtime dependencies.";
+        qDebug() << QT_TR_NOOP("Copying runtime dependencies.");
     } else {
-        qDebug() << "Error: Could not copy runtime dependencies, missing from application directory.";
+        qDebug() << QT_TR_NOOP("Error: Could not copy runtime dependencies, missing from application directory.");
     }
 }
 
@@ -51,7 +51,7 @@ bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const Targ
 {
     QFile file = path.filePath(fileEntry.getName());
 
-    qDebug() << "Patching:" << file.fileName();
+    qDebug() << QT_TR_NOOP(QString("Patching: %1").arg(file.fileName()));
 
     // Create PeFile instance for this particular target.
     PeFile* peFile = new PeFile(file);
@@ -82,7 +82,7 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 
                 // Patch target file.
                 if (!patchFile(path, file, target)) {
-                    QMessageBox::warning(parent, "Warning", QString("Invalid checksum for patched file %1, aborting!").arg(file.getName()));
+                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
                     undoPatch(path);
 
                     return false;
@@ -95,7 +95,7 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
-        QMessageBox::warning(parent, "Warning", "Not all files where patched, files have been restored, please try patching again.");
+        QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
         undoPatch(path);
 
         return false;
@@ -109,11 +109,20 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
 
 void Patcher::undoPatch(const QDir &path) {
     // Restore patched files.
-    for (const FileEntry &file : Constants::files) {
-        FileUtils::restore(path, file);
+    for (const FileEntry &fileEntry : Constants::files) {
+        FileUtils::restore(path, fileEntry);
     }
 
-    // TODO: Delete files (mppatch.dll, dlls and _Original)?
+    // Delete backed up game files.
+    for (const FileEntry &fileEntry : Constants::files) {
+        QFile::remove(path.filePath(QString(fileEntry.getName()) + Constants::game_backup_file_suffix));
+    }
+
+    // Delete patch library file.
+    QFile::remove(path.filePath(Constants::patch_library_file));
+
+    // Remove network configuration file.
+    QFile::remove(path.filePath(Constants::patch_network_configuration_file));
 }
 
 void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressEntry &address)
@@ -127,5 +136,5 @@ void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressE
         settings.setValue(Constants::patch_network_configuration_netmask, address.netmask().toString());
     settings.endGroup();
 
-    qDebug() << "Generated network configuration, saved to:" << file.fileName();
+    qDebug() << QT_TR_NOOP(QString("Generated network configuration, saved to: %1").arg(file.fileName()));
 }

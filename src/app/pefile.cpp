@@ -25,7 +25,7 @@ bool PeFile::read()
     std::ifstream inputStream(file.fileName().toStdString(), std::ios::in | std::ios::binary);
 
     if (!inputStream) {
-        qDebug() << "Cannot open" << file.fileName();
+        qDebug() << QT_TR_NOOP(QString("Cannot open: %1").arg(file.fileName()));
 
         return false;
     }
@@ -34,7 +34,7 @@ bool PeFile::read()
         // Create an instance of a PE or PE + class using a factory
         image = new pe_base(pe_factory::create_pe(inputStream));
     } catch (const pe_exception &exception) {
-        qDebug() << "Error:" << exception.what();
+        qDebug() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
 
         return false;
     }
@@ -102,7 +102,7 @@ bool PeFile::write() const
         std::ofstream outputStream(file.fileName().toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!outputStream) {
-            qDebug() << "Cannot create" << file.fileName();
+            qDebug() << QT_TR_NOOP(QString("Cannot create: %1").arg(file.fileName()));
 
             return false;
         }
@@ -110,9 +110,9 @@ bool PeFile::write() const
         // Rebuild PE file.
         rebuild_pe(*image, outputStream);
 
-        qDebug() << "PE was rebuilt and saved to" << file.fileName();
+        qDebug() << QT_TR_NOOP(QString("PE was rebuilt and saved to: %1").arg(file.fileName()));
     } catch (const pe_exception &exception) {
-        qDebug() << "Error:" << exception.what();
+        qDebug() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
 
         return false;
     }
@@ -174,6 +174,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libra
                 // Change the old address to point to new function instead.
                 *dataPtr = functionAddress;
 
+                // TODO: add translation support for this string?
                 qDebug() << showbase << hex << "Patched function" << libraryFunctions[i] << ", address changed from" << address << "to" << functionAddress;
             }
 
