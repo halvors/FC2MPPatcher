@@ -13,8 +13,8 @@ constexpr int app_version_minor = 0;
 constexpr int app_version_micro = 5;
 const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
-constexpr char settings_install_directory[] = "install_directory";
-constexpr char settings_interface_index[] = "interface_index";
+constexpr char settings_install_directory[] = "installDirectory";
+constexpr char settings_interface_index[] = "interfaceIndex";
 constexpr char settings_group_window[] = "Window";
 constexpr char settings_group_window_size[] = "size";
 constexpr char settings_group_window_position[] = "position";

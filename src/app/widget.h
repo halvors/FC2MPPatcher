@@ -30,7 +30,6 @@ private:
     QString findInstallDirectory() const;
     QString getInstallDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
-    void updateInstallDirectory(const QString &installDirectory = QString());
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;
 

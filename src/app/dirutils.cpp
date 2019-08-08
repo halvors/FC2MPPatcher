@@ -9,7 +9,7 @@
 
 QStringList DirUtils::installDirectories;
 
-bool DirUtils::isGameDirectory(QDir &dir)
+bool DirUtils::isGameDirectory(QDir dir)
 {
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
     if (dir.exists() | dir.cd(game_executable_directory)) {
@@ -26,9 +26,7 @@ bool DirUtils::isGameDirectory(QDir &dir)
 
 bool DirUtils::isGameDirectory(const QString &path)
 {
-    QDir dir = path;
-
-    return isGameDirectory(dir);
+    return isGameDirectory(QDir(path));
 }
 
 QStringList& DirUtils::findInstallDirectories()
@@ -85,8 +83,6 @@ QStringList SteamUtils::libraries;
 QString SteamUtils::getGameDirectory(int appId)
 {
     QDir dir = getInstallDirectory();
-
-    qDebug() << QT_TR_NOOP(QString("Found steam directory: %1").arg(dir.absolutePath()));
 
     // Search for other steam libraries.
     QStringList libraries = findLibraries(dir);
@@ -150,6 +146,10 @@ QString SteamUtils::getInstallDirectory()
         installDirectory = dir.absolutePath();
     }
 #endif
+
+    if (!installDirectory.isEmpty()) {
+        qDebug() << QT_TR_NOOP(QString("Found steam installation directory: %1").arg(dir.absolutePath()));
+    }
 
     return installDirectory;
 }
