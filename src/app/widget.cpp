@@ -20,14 +20,14 @@ Widget::Widget(QWidget* parent) :
 {
     ui->setupUi(this);
 
-    setWindowTitle(QString("%1 %2").arg(Constants::app_name, QVersionNumber(Constants::app_version_major, Constants::app_version_minor, Constants::app_version_micro).toString()));
+    setWindowTitle(QString("%1 %2").arg(app_name, QVersionNumber(app_version_major, app_version_minor, app_version_micro).toString()));
 
     // Load settings from configuration file.
-    settings = new QSettings(Constants::app_configuration_file, QSettings::IniFormat, this);
+    settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
     // Setup UI.
-    ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(Constants::game_name));
+    ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
     populateComboboxWithNetworkInterfaces();
 
     bool patched = Patcher::isPatched(getInstallDir(false));
@@ -53,7 +53,7 @@ void Widget::closeEvent(QCloseEvent* event)
 
 void Widget::loadSettings()
 {
-    QString installDir = settings->value(Constants::settings_install_directory).toString();
+    QString installDir = settings->value(settings_install_directory).toString();
 
     if (!DirUtils::isGameDir(installDir)) {
         installDir = DirUtils::findInstallDir();
@@ -63,18 +63,18 @@ void Widget::loadSettings()
 
     ui->lineEdit_install_directory->setText(installDir);
 
-    int index = settings->value(Constants::settings_interface_index).toInt();
+    int index = settings->value(settings_interface_index).toInt();
 
     // Only set valid index in UI.
     if (index < ui->comboBox_network_interface->count()) {
         ui->comboBox_network_interface->setCurrentIndex(index);
     }
 
-    settings->beginGroup(Constants::settings_group_window);
-        resize(settings->value(Constants::settings_group_window_size, size()).toSize());
-        move(settings->value(Constants::settings_group_window_position, pos()).toPoint());
+    settings->beginGroup(settings_group_window);
+        resize(settings->value(settings_group_window_size, size()).toSize());
+        move(settings->value(settings_group_window_position, pos()).toPoint());
 
-        if (settings->value(Constants::settings_group_window_isMaximized, false).toBool()) {
+        if (settings->value(settings_group_window_isMaximized, false).toBool()) {
             showMaximized();
         }
     settings->endGroup();
@@ -83,13 +83,13 @@ void Widget::loadSettings()
 void Widget::saveSettings() const
 {
     QString installDir = ui->lineEdit_install_directory->text();
-    settings->setValue(Constants::settings_install_directory, installDir);
-    settings->setValue(Constants::settings_interface_index, ui->comboBox_network_interface->currentIndex());
+    settings->setValue(settings_install_directory, installDir);
+    settings->setValue(settings_interface_index, ui->comboBox_network_interface->currentIndex());
 
-    settings->beginGroup(Constants::settings_group_window);
-        settings->setValue(Constants::settings_group_window_size, size());
-        settings->setValue(Constants::settings_group_window_position, pos());
-        settings->setValue(Constants::settings_group_window_isMaximized, isMaximized());
+    settings->beginGroup(settings_group_window);
+        settings->setValue(settings_group_window_size, size());
+        settings->setValue(settings_group_window_position, pos());
+        settings->setValue(settings_group_window_isMaximized, isMaximized());
     settings->endGroup();
 }
 
@@ -103,7 +103,7 @@ QString Widget::getInstallDir(bool showWarning)
     }
 
     if (showWarning) {
-        QMessageBox::warning(this, "Warning", tr("%1 installation directory not found, please select it manually.").arg(Constants::game_name ));
+        QMessageBox::warning(this, "Warning", tr("%1 installation directory not found, please select it manually.").arg(game_name));
     }
 
     return QString();
@@ -149,7 +149,7 @@ void Widget::updatePatchStatus(bool patched) const
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString installDir = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(Constants::game_name), ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(game_name), ui->lineEdit_install_directory->text(), QFileDialog::ReadOnly);
 
     updateInstallDir(installDir);
 }

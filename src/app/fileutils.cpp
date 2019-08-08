@@ -3,7 +3,7 @@
 #include <QDebug>
 
 #include "fileutils.h"
-#include "constants.h"
+#include "global.h"
 
 QString FileUtils::checkSum(QFile file)
 {
@@ -34,7 +34,7 @@ QString FileUtils::appendToName(const QDir &path, const FileEntry &fileEntry, co
 bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
 {
     QFile file = path.filePath(fileEntry.getName());
-    QFile fileCopy = appendToName(path, fileEntry, Constants::game_backup_file_suffix);
+    QFile fileCopy = appendToName(path, fileEntry, game_backup_file_suffix);
 
     if (isBackup) {
         if (!fileCopy.exists()) {

@@ -6,7 +6,7 @@
 #include <QCloseEvent>
 #include <QString>
 
-#include "constants.h"
+#include "global.h"
 
 namespace Ui {
     class Widget;

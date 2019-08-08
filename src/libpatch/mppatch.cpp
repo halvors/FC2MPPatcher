@@ -1,5 +1,5 @@
 #include "mppatch.h"
-#include "constants.h"
+#include "global.h"
 
 void MPPatch::readSettings()
 {

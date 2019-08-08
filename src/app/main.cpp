@@ -5,8 +5,8 @@
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    a.setOrganizationName(Constants::app_name);
-    a.setApplicationName(Constants::app_name);
+    a.setOrganizationName(app_name);
+    a.setApplicationName(app_name);
 
     Widget w;
     w.show();

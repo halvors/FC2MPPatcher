@@ -5,7 +5,7 @@
 #include <QRegularExpression>
 
 #include "dirutils.h"
-#include "constants.h"
+#include "global.h"
 
 QString DirUtils::steamDir;
 QStringList DirUtils::steamLibraries;
@@ -13,8 +13,8 @@ QStringList DirUtils::steamLibraries;
 bool DirUtils::isGameDir(QDir &dir)
 {
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
-    if (dir.exists() | dir.cd(Constants::game_executable_directory)) {
-        for (const FileEntry &file : Constants::files) {
+    if (dir.exists() | dir.cd(game_executable_directory)) {
+        for (const FileEntry &file : files) {
             // TODO: Check against checksum here?
             if (dir.exists(file.getName())) {
                 return true;
@@ -42,7 +42,7 @@ QString DirUtils::findInstallDir()
     }
 
     // Look for Far Cry 2 install directory in Steam.
-    dir = DirUtils::getSteamGameDir(Constants::game_steam_appId);
+    dir = DirUtils::getSteamGameDir(game_steam_app_id);
 
     if (DirUtils::isGameDir(dir)) {
         return dir.absolutePath();
@@ -84,24 +84,24 @@ QString DirUtils::getSteamGameDir(int appId)
 
     for (QDir dir : libraries) {
         // Entering directory where steamapps is stored.
-        if (!dir.cd("steamapps")) {
+        if (!dir.cd(game_steam_app_directory)) {
             continue;
         }
 
         // Assemble manifest file using provided appId.
-        QFile manifestFile = dir.filePath(QString("appmanifest_%1.acf").arg(appId));
+        QFile manifestFile = dir.filePath(QString("%1_%2.%3").arg(game_steam_app_manifest_name).arg(appId).arg(game_steam_app_manifest_suffix));
 
         if (!manifestFile.exists()) {
             continue;
         }
 
         // Only continue parsing json if we need it.
-        if (!dir.cd("common")) {
+        if (!dir.cd(game_steam_app_directory_common)) {
             continue;
         }
 
         QJsonObject object = getJsonFromFile(manifestFile);
-        QJsonValue value = object.value("installdir");
+        QJsonValue value = object.value(game_steam_app_manifest_key);
 
         // Enter found game directory.
         if (dir.cd(value.toString())) {
@@ -120,15 +120,15 @@ QString DirUtils::getSteamDir()
 #ifdef Q_OS_WIN    
     // Find Steam install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
-    registry.beginGroup("Valve");
-        registry.beginGroup("Steam");
+    registry.beginGroup(game_steam_publisher);
+        registry.beginGroup(game_steam_name);
             steamDir = registry.value("InstallPath").toString();
         registry.endGroup();
     registry.endGroup();
 #elif defined(Q_OS_LINUX)
     QDir dir = QDir::home();
 
-    if (dir.cd(".steam/steam")) {
+    if (dir.cd(QString(".%1/%1").arg(game_steam_name).toLower())) {
         steamDir = dir.absolutePath();
     }
 #endif
@@ -139,32 +139,38 @@ QString DirUtils::getSteamDir()
 
 QStringList DirUtils::findSteamLibraries(QDir dir)
 {
-    if (steamLibraries.isEmpty()) {
-        // Add this directory as the default steam library.
-        steamLibraries.prepend(dir.absolutePath());
+    if (!steamLibraries.isEmpty()) {
+        return steamLibraries;
+    }
 
-        // Entering directory where steamapps is stored.
-        if (dir.cd("steamapps")) {
-            QFile libraryFile = dir.filePath("libraryfolders.vdf");
+    // Add this directory as the default steam library.
+    steamLibraries.prepend(dir.absolutePath());
 
-            if (libraryFile.exists()) {
-                QJsonObject object = getJsonFromFile(libraryFile);
-                QJsonObject::iterator iterator;
+    // Entering directory where steamapps is stored.
+    if (!dir.cd(game_steam_app_directory)) {
+        return steamLibraries;
+    }
 
-                for (iterator = object.begin(); iterator != object.end(); iterator++) {
-                    bool valid = false;
+    QFile libraryFile = dir.filePath("libraryfolders.vdf");
 
-                    // Check if key is of integer type.
-                    iterator.key().toInt(&valid);
+    if (!libraryFile.exists()) {
+        return steamLibraries;
+    }
 
-                    // Only read valid values.
-                    if (valid) {
-                        steamLibraries.append(iterator.value().toString());
+    QJsonObject object = getJsonFromFile(libraryFile);
+    QJsonObject::iterator iterator;
 
-                        qDebug() << QT_TR_NOOP(QString("Found steam library: %1").arg(iterator.value().toString()));
-                    }
-                }
-            }
+    for (iterator = object.begin(); iterator != object.end(); iterator++) {
+        bool valid = false;
+
+        // Check if key is of integer type.
+        iterator.key().toInt(&valid);
+
+        // Only read valid values.
+        if (valid) {
+            steamLibraries.append(iterator.value().toString());
+
+            qDebug() << QT_TR_NOOP(QString("Found steam library: %1").arg(iterator.value().toString()));
         }
     }
 
@@ -173,7 +179,7 @@ QStringList DirUtils::findSteamLibraries(QDir dir)
 
 QJsonObject DirUtils::getJsonFromFile(QFile &file)
 {
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QString data = file.readAll();
         file.close();
 
@@ -199,9 +205,16 @@ QString DirUtils::getJsonFromAcf(const QStringList &lines)
         return json.append(QChar::LineFeed + string);
     };
 
+    auto endLine = [&](int nextIndex) {
+        if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
+            appendLine();
+        } else {
+            appendLine(",");
+        }
+    };
+
     for (int i = 1; i < lines.length(); i++) {
         QRegularExpressionMatch singleLineMatch = singleLine.match(lines[i]);
-        int nextIndex = i + 1;
 
         if (singleLineMatch.hasMatch()) {
             json.append(singleLineMatch.captured(1));
@@ -209,19 +222,12 @@ QString DirUtils::getJsonFromAcf(const QStringList &lines)
             json.append(singleLineMatch.captured(2));
 
             // Last value of object must not have a tailing comma.
-            if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
-                appendLine();
-            } else {
-                appendLine(",");
-            }
+            endLine(i + 1);
         } else if (lines[i].startsWith(QChar::Tabulation) && lines[i].endsWith("}")) {
             json.append(lines[i]);
 
-            if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
-                appendLine();
-            } else {
-                appendLine(",");
-            }
+            // Last value of object must not have a tailing comma.
+            endLine(i + 1);
         } else if (startOfObject.match(lines[i]).hasMatch()) {
             json.append(lines[i]);
             appendLine(":");
