@@ -49,7 +49,7 @@ QString DirUtils::findInstallDir()
     }
 
     // Fallback to statically set installation directory if autodetection failed.
-    return Constants::game_install_directory;
+    return QString();
 }
 
 QString DirUtils::getRetailGameDir()
@@ -84,25 +84,30 @@ QString DirUtils::getSteamGameDir(int appId)
 
     for (QDir dir : libraries) {
         // Entering directory where steamapps is stored.
-        if (dir.cd("steamapps")) {
-            // Assemble manifest file using provided appId.
-            QFile manifestFile = dir.filePath("appmanifest_" + QString::number(appId) + ".acf");
+        if (!dir.cd("steamapps")) {
+            continue;
+        }
 
-            if (manifestFile.exists()) {
-                QJsonObject object = getJsonFromFile(manifestFile);
+        // Assemble manifest file using provided appId.
+        QFile manifestFile = dir.filePath(QString("appmanifest_%1.acf").arg(appId));
 
-                // Only continue parsing json if we need it.
-                if (dir.cd("common")) {
-                    QJsonValue value = object.value("installdir");
+        if (!manifestFile.exists()) {
+            continue;
+        }
 
-                    // Enter found game directory.
-                    if (dir.cd(value.toString())) {
-                        qDebug() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
+        // Only continue parsing json if we need it.
+        if (!dir.cd("common")) {
+            continue;
+        }
 
-                        return dir.absolutePath();
-                    }
-                }
-            }
+        QJsonObject object = getJsonFromFile(manifestFile);
+        QJsonValue value = object.value("installdir");
+
+        // Enter found game directory.
+        if (dir.cd(value.toString())) {
+            qDebug() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
+
+            return dir.absolutePath();
         }
     }
 
@@ -168,7 +173,7 @@ QStringList DirUtils::findSteamLibraries(QDir dir)
 
 QJsonObject DirUtils::getJsonFromFile(QFile &file)
 {
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QString data = file.readAll();
         file.close();
 

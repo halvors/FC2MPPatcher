@@ -23,7 +23,6 @@ namespace Constants {
 
     constexpr char game_name[] = "Far Cry 2";
     constexpr char game_publisher[] = "Ubisoft";
-    constexpr char game_install_directory[] = "C:/Program Files (x86)/Steam/steamapps/common/Far Cry 2";
     constexpr char game_executable_directory[] = "bin";
     constexpr char game_backup_file_suffix[] = "_Original";
     constexpr int game_steam_appId = 19900;
