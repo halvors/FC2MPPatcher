@@ -172,7 +172,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
             }
 
             // TODO: Handle this if it's empty.
-            ui->comboBox_network_interface->addItem(interface.name() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
+            ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
         }
     }
 }
