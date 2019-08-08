@@ -26,15 +26,16 @@ private:
 
     void closeEvent(QCloseEvent* event);
     void loadSettings();
-    void saveSettings() const;
 
-    QString findInstallDir() const;
-    QString getInstallDir(bool showWarning = true);
+    QString findInstallDirectory() const;
+    QString getInstallDirectory(bool warning = true);
+    void populateComboboxWithInstallDirectories() const;
+    void updateInstallDirectory(const QString &installDirectory = QString());
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;
 
 private slots:
-    void updateInstallDir(const QString &installDir = QString());
+    void saveSettings() const;
 
     void pushButton_install_directory_clicked();
     void comboBox_network_interface_currentIndexChanged(int index);

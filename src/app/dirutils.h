@@ -8,18 +8,34 @@
 class DirUtils
 {
 public:
-    static bool isGameDir(QDir &dir);
-    static bool isGameDir(const QString &path);
-    static QString findInstallDir();
-    static QString getSteamGameDir(int appId);
-    static QString getRetailGameDir();
+    static bool isGameDirectory(QDir &dir);
+    static bool isGameDirectory(const QString &path);
+    static QStringList& findInstallDirectories();
 
 private:
-    static QString steamDir;
-    static QStringList steamLibraries;
+    static QStringList installDirectories;
+};
 
-    static QString getSteamDir();
-    static QStringList findSteamLibraries(QDir dir);
+class RetailUtils
+{
+public:
+    static QString getGameDirectory();
+
+private:
+    static QString installDirectory;
+};
+
+class SteamUtils
+{
+public:
+    static QString getGameDirectory(int appId);
+
+private:
+    static QString installDirectory;
+    static QStringList libraries;
+
+    static QString getInstallDirectory();
+    static QStringList& findLibraries(QDir &dir);
     static QJsonObject getJsonFromFile(QFile &file);
     static QString getJsonFromAcf(const QStringList &lines);
 };

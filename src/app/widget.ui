@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label_installation_directory">
        <property name="text">
-        <string>Select installation directory:</string>
+        <string>Select the game installation directory:</string>
        </property>
       </widget>
      </item>
@@ -41,9 +41,15 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLineEdit" name="lineEdit_install_directory">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the path to the Far Cry 2 install directory or select it using the directory selector to the right.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <widget class="QComboBox" name="comboBox_install_directory">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
