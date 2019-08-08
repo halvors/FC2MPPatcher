@@ -4,10 +4,10 @@
 void MPPatch::readSettings()
 {
     if (!settings) {
-        settings = new QSettings(Constants::patch_network_configuration_file, QSettings::IniFormat);
-        settings->beginGroup(Constants::patch_library_name);
-            address = settings->value(Constants::patch_network_configuration_address).toString();
-            broadcast = settings->value(Constants::patch_network_configuration_broadcast).toString();
+        settings = new QSettings(patch_network_configuration_file, QSettings::IniFormat);
+        settings->beginGroup(patch_library_name);
+            address = settings->value(patch_network_configuration_address).toString();
+            broadcast = settings->value(patch_network_configuration_broadcast).toString();
         settings->endGroup();
     }
 }

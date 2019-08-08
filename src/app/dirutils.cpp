@@ -61,8 +61,8 @@ QString RetailUtils::getGameDirectory()
 #ifdef Q_OS_WIN
     // Look for Far Cry 2 install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
-    registry.beginGroup(Constants::game_publisher);
-        registry.beginGroup(Constants::game_name);
+    registry.beginGroup(game_publisher);
+        registry.beginGroup(game_name);
             QDir dir = registry.value("InstallDir").toString();
         registry.endGroup();
     registry.endGroup();
@@ -148,7 +148,7 @@ QString SteamUtils::getInstallDirectory()
 #endif
 
     if (!installDirectory.isEmpty()) {
-        qDebug() << QT_TR_NOOP(QString("Found steam installation directory: %1").arg(dir.absolutePath()));
+        qDebug() << QT_TR_NOOP(QString("Found steam installation directory: %1").arg(installDirectory));
     }
 
     return installDirectory;
