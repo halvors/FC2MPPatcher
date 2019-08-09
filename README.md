@@ -4,10 +4,10 @@ Is an utility for patching your Far Cry 2 installation to support multiplayer pr
 The reason for this being necessary is due to changes in the Windows API on newer versions and that Ubisoft did not implement it properly to begin with.
 
 # Thanks to
-## Authors
-zenoy <insert email here?> - For actually patching the assembly code, the time "wasted" digging into it, and patcher implementation of it.
-halvors <insert email here?> - For patcher implementation, and the interface to support it.
+### Authors
+<i>zenoy</i> <insert email here?> - For actually patching the assembly code, the time "wasted" digging into it, and patcher implementation of it.
+<i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.
 
-## Others
+### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!
 Thanks to the Qt project for an amazing library to work with.
