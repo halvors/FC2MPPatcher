@@ -45,6 +45,8 @@ hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 
 int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET socket, const char* buffer, int length, int flags, const struct sockaddr* to, int toLength)
 {
+    readSettings();
+
     sockaddr_in* toAddress = (sockaddr_in*) to;
 
     if (toAddress->sin_addr.s_addr == 0xFFFFFFFF) {
