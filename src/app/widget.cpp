@@ -186,9 +186,13 @@ void Widget::pushButton_install_directory_clicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(game_name), ui->comboBox_install_directory->currentText(), QFileDialog::ReadOnly);
 
-    if (DirUtils::isGameDirectory(path)) {
-        ui->comboBox_install_directory->setCurrentText(path);
+    if (!DirUtils::isGameDirectory(path)) {
+        QMessageBox::information(this, "Information", tr("Selected directory is not an %1 installation directory, please try again.").arg(game_name));
+
+        return;
     }
+
+    ui->comboBox_install_directory->setCurrentText(path);
 }
 
 void Widget::comboBox_network_interface_currentIndexChanged(int index)
