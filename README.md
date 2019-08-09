@@ -5,8 +5,8 @@ The reason for this being necessary is due to changes in the Windows API on newe
 
 # Thanks to
 ### Authors
-<i>zenoy</i> <insert email here?> - Patching the assembly code, the time "wasted" digging into that, and patcher implementation.\n
-<i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.\n
+<i>zenoy</i> <insert email here?> - Patching the assembly code, the time "wasted" digging into that, and patcher implementation.  
+<i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.  
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!
