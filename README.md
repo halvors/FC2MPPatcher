@@ -15,5 +15,5 @@ If you experience diffculties patching the game, first make sure you got the 1.0
 <i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.  
 
 ### Others
-Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!
-Thanks to the Qt project for an amazing library to work with.
+Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
+Thanks to the Qt project for an amazing library to work with.  
