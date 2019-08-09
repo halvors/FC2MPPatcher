@@ -8,31 +8,32 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(const QDir &path)
+bool Patcher::isPatched(const QDir &dir)
 {
     int count = 0;
 
     for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
             // Check if target file is patched.
-            if (FileUtils::isValid(path, file, target, true)) {
+            if (FileUtils::isValid(dir, file, target, true)) {
                 count++;
 
                 break;
             }
         }
     }
+    qDebug() << QString("%1 av %2").arg(count).arg(files.length());
 
     return count == files.length();
 }
 
-void Patcher::copyFiles(const QDir &path)
+void Patcher::copyFiles(const QDir &dir)
 {
     bool success = false;
 
     for (const QString &fileName : patch_library_runtime_dependencies) {
         QFile sourceFile = QFile(fileName);
-        QFile destinationFile = path.filePath(fileName);
+        QFile destinationFile = dir.filePath(fileName);
 
         if (!destinationFile.exists() || destinationFile.remove()) {
             success = sourceFile.copy(destinationFile.fileName());
@@ -46,9 +47,9 @@ void Patcher::copyFiles(const QDir &path)
     }
 }
 
-bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target)
+bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target)
 {
-    QFile file = path.filePath(fileEntry.getName());
+    QFile file = dir.filePath(fileEntry.getName());
 
     qDebug() << QT_TR_NOOP(QString("Patching: %1").arg(file.fileName()));
 
@@ -63,10 +64,10 @@ bool Patcher::patchFile(const QDir &path, const FileEntry &fileEntry, const Targ
 
     delete peFile;
 
-    return FileUtils::isValid(path, fileEntry, target, true);
+    return FileUtils::isValid(dir, fileEntry, target, true);
 }
 
-bool Patcher::patch(QWidget* parent, const QDir &path)
+bool Patcher::patch(QWidget* parent, const QDir &dir)
 {
     int count = 0;
 
@@ -74,14 +75,14 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
     for (const FileEntry &file : files) {
         for (const TargetEntry &target : file.getTargets()) {
             // Validate target file against stored checksum.
-            if (FileUtils::isValid(path, file, target, false)) {
+            if (FileUtils::isValid(dir, file, target, false)) {
                 // Backup original file.
-                FileUtils::backup(path, file);
+                FileUtils::backup(dir, file);
 
                 // Patch target file.
-                if (!patchFile(path, file, target)) {
+                if (!patchFile(dir, file, target)) {
                     QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
-                    undoPatch(path);
+                    undoPatch(dir);
 
                     return false;
                 }
@@ -94,43 +95,43 @@ bool Patcher::patch(QWidget* parent, const QDir &path)
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        undoPatch(path);
+        undoPatch(dir);
 
         return false;
     }
 
     // Copy needed libraries.
-    copyFiles(path);
+    copyFiles(dir);
 
     return true;
 }
 
-void Patcher::undoPatch(const QDir &path) {
+void Patcher::undoPatch(const QDir &dir) {
     // Restore patched files.
     for (const FileEntry &fileEntry : files) {
-        FileUtils::restore(path, fileEntry);
+        FileUtils::restore(dir, fileEntry);
     }
 
     // Delete backed up game files.
     for (const FileEntry &fileEntry : files) {
-        QFile::remove(path.filePath(FileUtils::appendToName(path, fileEntry, game_backup_file_suffix)));
+        QFile::remove(dir.filePath(FileUtils::appendToName(dir, fileEntry, game_backup_file_suffix)));
     }
 
     // Delete patch library file.
-    QFile::remove(path.filePath(patch_library_file));
+    QFile::remove(dir.filePath(patch_library_file));
 
     // Remove patch runtime dependencies.
     for (const QString &fileName : patch_library_runtime_dependencies) {
-        QFile::remove(path.filePath(fileName));
+        QFile::remove(dir.filePath(fileName));
     }
 
     // Remove network configuration file.
-    QFile::remove(path.filePath(patch_network_configuration_file));
+    QFile::remove(dir.filePath(patch_network_configuration_file));
 }
 
-void Patcher::generateNetworkConfigFile(const QDir &path, const QNetworkAddressEntry &address)
+void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address)
 {
-    QFile file = path.filePath(patch_network_configuration_file);
+    QFile file = dir.filePath(patch_network_configuration_file);
     QSettings settings(file.fileName(), QSettings::IniFormat);
 
     settings.beginGroup(patch_library_name);

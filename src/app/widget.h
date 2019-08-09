@@ -27,8 +27,8 @@ private:
     void closeEvent(QCloseEvent* event);
     void loadSettings();
 
-    QString findInstallDirectory() const;
     QString getInstallDirectory(bool warning = true);
+    QString getExecutableDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;

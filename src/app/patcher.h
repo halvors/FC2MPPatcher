@@ -10,14 +10,14 @@
 class Patcher
 {
 public:
-    static bool isPatched(const QDir &path);
-    static bool patch(QWidget* parent, const QDir &path);
-    static void undoPatch(const QDir &path);
-    static void generateNetworkConfigFile(const QDir &path, const QNetworkAddressEntry &address);
+    static bool isPatched(const QDir &dir);
+    static bool patch(QWidget* parent, const QDir &dir);
+    static void undoPatch(const QDir &dir);
+    static void generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address);
 
 private:
-    static void copyFiles(const QDir &path);
-    static bool patchFile(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target);
+    static void copyFiles(const QDir &dir);
+    static bool patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target);
 };
 
 #endif // PATCHER_H

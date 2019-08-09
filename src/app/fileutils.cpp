@@ -18,25 +18,28 @@ QString FileUtils::checkSum(QFile file)
     return QString();
 }
 
-bool FileUtils::isValid(const QDir &path, const FileEntry &fileEntry, const TargetEntry &target, bool isPatched)
+bool FileUtils::isValid(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target, bool patched)
 {
-    return (isPatched ? target.getCheckSumPatched() : target.getCheckSum()) == checkSum(path.filePath(fileEntry.getName()));
+    QString fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
+    const char* targetCheckSum = patched ? target.getCheckSumPatched() : target.getCheckSum();
+
+    return fileCheckSum == targetCheckSum;
 }
 
-QString FileUtils::appendToName(const QDir &path, const FileEntry &fileEntry, const QString &toAppend)
+QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &toAppend)
 {
     QStringList split = QString(fileEntry.getName()).split(".");
     QString suffix = '.' + split.takeLast();
 
-    return path.filePath(split.join(QString()) + toAppend + suffix);
+    return dir.filePath(split.join(QString()) + toAppend + suffix);
 }
 
-bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup)
+bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
 {
-    QFile file = path.filePath(fileEntry.getName());
-    QFile fileCopy = appendToName(path, fileEntry, game_backup_file_suffix);
+    QFile file = dir.filePath(fileEntry.getName());
+    QFile fileCopy = appendToName(dir, fileEntry, game_backup_file_suffix);
 
-    if (isBackup) {
+    if (backup) {
         if (!fileCopy.exists()) {
             return file.copy(fileCopy.fileName());
         }
@@ -49,9 +52,9 @@ bool FileUtils::copy(const QDir &path, const FileEntry &fileEntry, bool isBackup
     return false;
 }
 
-bool FileUtils::backup(const QDir &path, const FileEntry &fileEntry)
+bool FileUtils::backup(const QDir &dir, const FileEntry &fileEntry)
 {
-    bool result = copy(path, fileEntry, true);
+    bool result = copy(dir, fileEntry, true);
 
     if (result) {
         qDebug() << QT_TR_NOOP(QString("Backing up: %1").arg(fileEntry.getName()));
@@ -60,9 +63,9 @@ bool FileUtils::backup(const QDir &path, const FileEntry &fileEntry)
     return result;
 }
 
-bool FileUtils::restore(const QDir &path, const FileEntry &fileEntry)
+bool FileUtils::restore(const QDir &dir, const FileEntry &fileEntry)
 {
-    bool result = copy(path, fileEntry, false);
+    bool result = copy(dir, fileEntry, false);
 
     if (result) {
         qDebug() << QT_TR_NOOP(QString("Restoring: %1").arg(fileEntry.getName()));

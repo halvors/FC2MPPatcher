@@ -41,7 +41,7 @@ Widget::Widget(QWidget* parent) :
     loadSettings();
 
     // Update patch button according to patch status.
-    bool patched = Patcher::isPatched(getInstallDirectory(false));
+    bool patched = Patcher::isPatched(getExecutableDirectory(false));
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
@@ -135,6 +135,14 @@ QString Widget::getInstallDirectory(bool warning)
     return QString();
 }
 
+QString Widget::getExecutableDirectory(bool warning)
+{
+    QDir dir = getInstallDirectory(warning);
+    dir.cd(game_executable_directory);
+
+    return dir.absolutePath();
+}
+
 void Widget::populateComboboxWithInstallDirectories() const
 {
     for (const QString &path : DirUtils::findInstallDirectories()) {
@@ -205,8 +213,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QDir dir = getInstallDirectory();
-    dir.cd(game_executable_directory);
+    QDir dir = getExecutableDirectory();
 
     // Only show option to patch if not already patched.
     if (Patcher::isPatched(dir)) {
