@@ -7,6 +7,7 @@
 #include <QHostAddress>
 #include <QAbstractSocket>
 #include <QFileDialog>
+#include <QDateTime>
 
 #include "widget.h"
 #include "ui_widget.h"
@@ -195,6 +196,8 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
 {
     QDir dir = getInstallDirectory();
 
+    log(tr("Generated network configuration, saved to: %1").arg(dir.absolutePath()));
+
     // Only update network configuration if game is patched.
     if (Patcher::isPatched(dir)) {
         // Generate network configuration.
@@ -222,4 +225,17 @@ void Widget::pushButton_patch_clicked()
             updatePatchStatus(true);
         }
     }
+}
+
+void Widget::log(const QString &message)
+{
+    ui->textEdit->append(QString("<span style=\"color:grey;\">[%1]</span>: %2").arg(QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss"), message));
+}
+
+void Widget::on_pushButton_clicked()
+{
+    bool visible = ui->textEdit->isVisible();
+
+    ui->pushButton->setText(visible ? "Show" : "Hide");
+    ui->textEdit->setVisible(!visible);
 }

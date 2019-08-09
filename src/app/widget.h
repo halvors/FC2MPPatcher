@@ -33,12 +33,15 @@ private:
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;
 
+    void log(const QString &message);
+
 private slots:
     void saveSettings() const;
 
     void pushButton_install_directory_clicked();
     void comboBox_network_interface_currentIndexChanged(int index);
     void pushButton_patch_clicked();
+    void on_pushButton_clicked();
 };
 
 #endif // WIDGET_H
