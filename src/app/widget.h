@@ -28,7 +28,6 @@ private:
     void loadSettings();
 
     QString getInstallDirectory(bool warning = true);
-    QString getExecutableDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
     void populateComboboxWithNetworkInterfaces() const;
     void updatePatchStatus(bool patched) const;

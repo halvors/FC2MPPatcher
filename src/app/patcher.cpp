@@ -8,21 +8,23 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(const QDir &dir)
+bool Patcher::isPatched(QDir dir)
 {
     int count = 0;
 
-    for (const FileEntry &file : files) {
-        for (const TargetEntry &target : file.getTargets()) {
-            // Check if target file is patched.
-            if (FileUtils::isValid(dir, file, target, true)) {
-                count++;
+    // Should we be looking in executable directory instead?
+    if (dir.exists() | dir.cd(game_executable_directory)) {
+        for (const FileEntry &file : files) {
+            for (const TargetEntry &target : file.getTargets()) {
+                // Check if target file is patched.
+                if (FileUtils::isValid(dir, file, target, true)) {
+                    count++;
 
-                break;
+                    break;
+                }
             }
         }
     }
-    qDebug() << QString("%1 av %2").arg(count).arg(files.length());
 
     return count == files.length();
 }

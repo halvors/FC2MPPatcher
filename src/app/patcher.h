@@ -10,7 +10,7 @@
 class Patcher
 {
 public:
-    static bool isPatched(const QDir &dir);
+    static bool isPatched(QDir dir);
     static bool patch(QWidget* parent, const QDir &dir);
     static void undoPatch(const QDir &dir);
     static void generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address);
