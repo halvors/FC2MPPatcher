@@ -175,7 +175,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libra
                 *dataPtr = functionAddress;
 
                 // TODO: add translation support for this string?
-                qDebug() << showbase << hex << "Patched function" << libraryFunctions[i] << ", address changed from" << address << "to" << functionAddress;
+                qDebug() << QT_TR_NOOP(QString("Patched function call to %1, address changed from 0x%2 to 0x%3").arg(libraryFunctions[i]).arg(address, 0, 16).arg(functionAddress, 0, 16));
             }
 
             return true;

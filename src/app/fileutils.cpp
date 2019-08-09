@@ -26,12 +26,12 @@ bool FileUtils::isValid(const QDir &dir, const FileEntry &fileEntry, const Targe
     return fileCheckSum == targetCheckSum;
 }
 
-QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &toAppend)
+QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append)
 {
     QStringList split = QString(fileEntry.getName()).split(".");
     QString suffix = '.' + split.takeLast();
 
-    return dir.filePath(split.join(QString()) + toAppend + suffix);
+    return dir.filePath(split.join(QString()) + append + suffix);
 }
 
 bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
@@ -57,7 +57,7 @@ bool FileUtils::backup(const QDir &dir, const FileEntry &fileEntry)
     bool result = copy(dir, fileEntry, true);
 
     if (result) {
-        qDebug() << QT_TR_NOOP(QString("Backing up: %1").arg(fileEntry.getName()));
+        qDebug() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileEntry.getName()));
     }
 
     return result;
@@ -68,7 +68,7 @@ bool FileUtils::restore(const QDir &dir, const FileEntry &fileEntry)
     bool result = copy(dir, fileEntry, false);
 
     if (result) {
-        qDebug() << QT_TR_NOOP(QString("Restoring: %1").arg(fileEntry.getName()));
+        qDebug() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileEntry.getName()));
     }
 
     return result;

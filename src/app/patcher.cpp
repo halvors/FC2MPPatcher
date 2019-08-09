@@ -34,7 +34,7 @@ void Patcher::copyFiles(const QDir &dir)
     bool success = false;
 
     for (const QString &fileName : patch_library_runtime_dependencies) {
-        QFile sourceFile = QFile(fileName);
+        QFile sourceFile = fileName;
         QFile destinationFile = dir.filePath(fileName);
 
         if (!destinationFile.exists() || destinationFile.remove()) {
@@ -43,9 +43,9 @@ void Patcher::copyFiles(const QDir &dir)
     }
 
     if (success) {
-        qDebug() << QT_TR_NOOP("Copying runtime dependencies.");
+        qDebug() << QT_TR_NOOP(QString("Copying runtime dependencies."));
     } else {
-        qDebug() << QT_TR_NOOP("Error: Could not copy runtime dependencies, missing from application directory.");
+        qDebug() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
     }
 }
 

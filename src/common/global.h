@@ -8,6 +8,7 @@
 #include "entry.h"
 
 constexpr char app_name[] = "FC2MPPatcher";
+const QString app_organization = app_name;
 constexpr int app_version_major = 0;
 constexpr int app_version_minor = 0;
 constexpr int app_version_micro = 6;

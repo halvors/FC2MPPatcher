@@ -4,12 +4,13 @@
 
 int main(int argc, char* argv[])
 {
-    QApplication a(argc, argv);
-    a.setOrganizationName(app_name);
-    a.setApplicationName(app_name);
+    QApplication app(argc, argv);
+    app.setOrganizationName(app_name);
+    app.setApplicationName(app_organization);
 
-    Widget w;
-    w.show();
+    // Display the GUI widget.
+    Widget widget;
+    widget.show();
 
-    return a.exec();
+    return app.exec();
 }
