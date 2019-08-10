@@ -122,7 +122,7 @@ bool PeFile::write() const
 
 QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) const
 {
-    QList<unsigned int> functionAddresses;
+    QList<unsigned int> addresses;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
@@ -131,7 +131,7 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) con
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
             for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
-                functionAddresses.append(address);
+                addresses.append(address);
                 address += 4; // Offset is 4 between entries.
             }
 
@@ -139,7 +139,7 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) con
         }
     }
 
-    return functionAddresses;
+    return addresses;
 }
 
 bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
@@ -163,7 +163,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libra
 
                 // Verify to some degree addresses to be patched.
                 if (address == 0 || functionAddress == 0) {
-                    qDebug() << "Error: An address is zero, something went wrong! Aborting.";
+                    qDebug() << QT_TR_NOOP(QString("Error: An address is zero, something went wrong! Aborting."));
 
                     return false;
                 }
