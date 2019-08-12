@@ -39,6 +39,7 @@ constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 constexpr char patch_pe_section[] = ".text";
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
+const QString patch_library_pe_section = QString(patch_library_name).toLower();
 const QStringList patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName
@@ -62,7 +63,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                "7a56f15deab0fde10078ade6fa0d284f8184e7528f2377bfef453cc8f85db86d",
+                "b9c679413fd28558d3e14deda8e91c6241e5f8a08003a1938e926a0e6513bb03",
                 {
                     0x10C5BDE2, // getAdapersInfo
                     0x1001431C, // getHostByName
@@ -71,7 +72,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "638fba83ae75cc18ba3d170ce2f61a8b6d3d2a437df9e91461d8cb0c03c7a88c",
+                "8c910c8077b8a37acb65f7d7c856265275c794de772b40e7765ab4d2a7a806ad",
                 {
                     0x10C6A692, // getAdapersInfo
                     0x100141FC, // getHostByName
@@ -85,7 +86,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                "69aa665ca67ef15a6c1e5d6b202c20014f74984d6d279f7d335a68da2c1ee5c6",
+                "c4d8ea74d7e29f3a0fa30c5bae177d27c3792393535dd0cc8ff4364968ce84e4",
                 {
                     0x00C444A6, // getAdapersInfo
                     0x00BA4CFC, // getHostByName
@@ -94,7 +95,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "ea611c01716a0d07a47abf93f7a2d986c19eb061c2d774f234f686b6f687337c",
+                "ea612e4e3c46ca477058509be31cf6f34b99b4ed1bb03fbe28e53f9679b047b4",
                 {
                     0x00C46A66, // getAdapersInfo
                     0x00BA714C, // getHostByName

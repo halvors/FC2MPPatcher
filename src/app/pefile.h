@@ -21,7 +21,7 @@ public:
     explicit PeFile(const QFile &file, QObject* parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
+    bool apply(const QString &libraryName, const QString &libraryPeSection, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
     bool write() const;
 
 private:

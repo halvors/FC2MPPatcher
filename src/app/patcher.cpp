@@ -1,5 +1,4 @@
 #include <QFile>
-#include <QCryptographicHash>
 #include <QMessageBox>
 #include <QSettings>
 
@@ -59,7 +58,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile* peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_name, patch_library_file, patch_library_functions, target.getAddresses(), patch_pe_section);
+    peFile->apply(patch_library_name, patch_library_pe_section, patch_library_functions, target.getAddresses(), patch_pe_section);
 
     // Write PE to file.
     peFile->write();
@@ -84,9 +83,8 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
                 // Patch target file.
                 if (!patchFile(dir, file, target)) {
                     QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
-                    undoPatch(dir);
 
-                    return false;
+                    return !undoPatch(dir);
                 }
 
                 count++;
@@ -97,9 +95,8 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        undoPatch(dir);
 
-        return false;
+        return !undoPatch(dir);
     }
 
     // Copy needed libraries.
@@ -108,7 +105,7 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     return true;
 }
 
-void Patcher::undoPatch(const QDir &dir) {
+bool Patcher::undoPatch(const QDir &dir) {
     // Restore patched files.
     for (const FileEntry &fileEntry : files) {
         FileUtils::restore(dir, fileEntry);
@@ -129,6 +126,8 @@ void Patcher::undoPatch(const QDir &dir) {
 
     // Remove network configuration file.
     QFile::remove(dir.filePath(patch_network_configuration_file));
+
+    return true;
 }
 
 void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address)

@@ -82,7 +82,11 @@ void Widget::loadSettings()
 
         // Avoid duplicate install directories.
         if (!installDirectories.contains(dir.absolutePath())) {
+            // Insert item first in list.
             ui->comboBox_install_directory->insertItem(0, dir.absolutePath());
+
+            // Set current index to first element in list.
+            ui->comboBox_install_directory->setCurrentIndex(0);
         }
     }
 
