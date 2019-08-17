@@ -1,5 +1,6 @@
-# FC2MPPatch
-Is an utility for patching your Far Cry 2 installation to support multiplayer properly, so that LAN play and play over various VPN services works as expected.
+# FC2MPPatcher
+An utility for patching your Far Cry 2 installation to support multiplayer agian. 
+Currently fixes Unranked online multiplayer, LAN multiplayer (also over various VPN services).
 
 The reason for this being necessary is due to changes in the Windows API on newer versions and that Ubisoft did not implement it properly to begin with.
 
@@ -9,10 +10,13 @@ If you experience diffculties patching the game, first make sure you got the 1.0
 
 <b>Note:</b> This is not a fix for Ubisoft taking down their online backend, you still have to be on the LAN network or same VPN service as your friends/peers.
 
-# Thanks to
+## Technical information
+
+## Thanks to
 ### Authors
-<i>zenoy</i> <insert email here?> - Patching the assembly code, the time "wasted" digging into that, and patcher implementation.  
-<i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.  
+<i>zenoy</i> - Patching the assembly code, the time "wasted" figuring out.  
+<i>halvors</i> - For patcher implementation, and the interface to support it.  
+<i>svinsen</i> - For testing thru gameplay.
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
