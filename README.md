@@ -25,6 +25,10 @@ You're welcome to read thrught our code!
 
 ## Technical information
 
+## Discord
+Please join us at Discord for support, and to find other people to play with!
+https://discord.gg/82G9Fh5
+
 ## Thanks to
 ### Contributors
 <i>zenoy</i> - Patching the assembly code, the time "wasted" figuring out.  
