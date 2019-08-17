@@ -20,7 +20,8 @@ The reason for this being necessary is due to changes in the Windows API on newe
  * The newest version of the game from (Steam, GOG or Uplay) or Retail version with Patch 1.03 applied. 
 
 ### Antivirus
-This patch wil probably trigger a false positive in your antivirus software because it alters the gme files of Far Cry 2, this is normal. You're welcome to read thrught our code!
+This patch wil probably trigger a false positive in your antivirus software because it alters the gme files of Far Cry 2, this is normal.  
+You're welcome to read thrught our code!
 
 ## Technical information
 
