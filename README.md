@@ -1,4 +1,4 @@
-# FC2MPPatcher
+# FC2MPPatch
 Is an utility for patching your Far Cry 2 installation to support multiplayer properly, so that LAN play and play over various VPN services works as expected.
 
 The reason for this being necessary is due to changes in the Windows API on newer versions and that Ubisoft did not implement it properly to begin with.
