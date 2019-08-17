@@ -83,8 +83,9 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
                 // Patch target file.
                 if (!patchFile(dir, file, target)) {
                     QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
+                    undoPatch(dir);
 
-                    return !undoPatch(dir);
+                    return false;
                 }
 
                 count++;
@@ -95,8 +96,9 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
+        undoPatch(dir);
 
-        return !undoPatch(dir);
+        return false;
     }
 
     // Copy needed libraries.
@@ -105,7 +107,7 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     return true;
 }
 
-bool Patcher::undoPatch(const QDir &dir) {
+void Patcher::undoPatch(const QDir &dir) {
     // Restore patched files.
     for (const FileEntry &fileEntry : files) {
         FileUtils::restore(dir, fileEntry);
@@ -126,8 +128,6 @@ bool Patcher::undoPatch(const QDir &dir) {
 
     // Remove network configuration file.
     QFile::remove(dir.filePath(patch_network_configuration_file));
-
-    return true;
 }
 
 void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address)
