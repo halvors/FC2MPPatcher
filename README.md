@@ -1,18 +1,30 @@
 # FC2MPPatcher
-Is an utility for patching your Far Cry 2 installation to support multiplayer properly, so that LAN play and play over various VPN services works as expected.
+An utility for patching your Far Cry 2 installation to support multiplayer agian. 
+Currently fixes Unranked online multiplayer, LAN multiplayer (also over various VPN services).
 
-The reason for this being necessary is due to changes in the Windows API on newer versions and that Ubisoft did not implement it properly to begin with.
-
-This resolved issues with the game or server trying to bind to the wrong network interface, that matches doesn't show up when they should, and sometimes seen as "9999" ping issue. And also makes it possible again to host a match directly from the game itself.
+This resolves for Game and dedicated server:
+ * Binding to the wrong network interface, resolving issues with unranked online multiplayer. 
+ * Annoncing wrong IP address in multiplayer, showing 9999 ping for mathces in lobby. 
+ * Broadcasting to wrong address, causing issues with LAN multiplayer (including over VPN). 
+ * Joining matches hosted ingame.
 
 If you experience diffculties patching the game, first make sure you got the 1.03 patch installed, if your version of the game isn't supported (only Retail, Steam and GOG is tested), please report on the issue tracker, it's a quick fix.
 
-<b>Note:</b> This is not a fix for Ubisoft taking down their online backend, you still have to be on the LAN network or same VPN service as your friends/peers.
+The reason for this being necessary is due to changes in the Windows API on newer versions, that is not compatible with Ubisoft's somewhat strange implementation.
 
-# Thanks to
-### Authors
-<i>zenoy</i> <insert email here?> - Patching the assembly code, the time "wasted" digging into that, and patcher implementation.  
-<i>halvors</i> <insert email here?> - For patcher implementation, and the interface to support it.  
+## Installation
+<b>NOTE:</b> As mentioned in license, we're not responsible for breaking your game or getting you banned.
+
+### Requirements
+ * The game files itself. (We do not ship any game files as they are copyrighted by Ubisoft). 
+ * The newest version of the game from (Steam, GOG or Uplay) or Retail version with Patch 1.03 applied. 
+
+## Technical information
+
+## Thanks to
+### Contributors
+<i>zenoy</i> - Patching the assembly code, the time "wasted" figuring out.  
+<i>halvors</i> - For patcher implementation, and the interface to support it.  
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
