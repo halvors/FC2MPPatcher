@@ -136,7 +136,7 @@ QString SteamUtils::getInstallDirectory()
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup(game_steam_publisher);
         registry.beginGroup(game_steam_name);
-            installDirectory = registry.value("InstallPath").toString();
+            installDirectory = QDir(registry.value("InstallPath").toString()).absolutePath();
         registry.endGroup();
     registry.endGroup();
 #elif defined(Q_OS_LINUX)
@@ -186,9 +186,10 @@ QStringList& SteamUtils::findLibraries(QDir &dir)
 
         // Only read valid values.
         if (valid) {
-            libraries.append(iterator.value().toString());
+            QDir dir = iterator.value().toString();
+            libraries.append(dir.absolutePath());
 
-            qDebug() << QT_TR_NOOP(QString("Found steam library: %1").arg(iterator.value().toString()));
+            qDebug() << QT_TR_NOOP(QString("Found steam library: %1").arg(dir.absolutePath()));
         }
     }
 
