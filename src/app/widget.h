@@ -35,6 +35,7 @@ private:
 private slots:
     void saveSettings() const;
 
+    void comboBox_install_directory_currentIndexChanged(int index);
     void pushButton_install_directory_clicked();
     void comboBox_network_interface_currentIndexChanged(int index);
     void pushButton_patch_clicked();

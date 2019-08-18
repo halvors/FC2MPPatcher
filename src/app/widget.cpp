@@ -45,8 +45,8 @@ Widget::Widget(QWidget* parent) :
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
+    connect(ui->comboBox_install_directory,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::comboBox_install_directory_currentIndexChanged);
     connect(ui->pushButton_install_directory,   &QPushButton::clicked,                                  this, &Widget::pushButton_install_directory_clicked);
-
     connect(ui->comboBox_network_interface,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::comboBox_network_interface_currentIndexChanged);
     connect(ui->pushButton_patch,               &QPushButton::clicked,                                  this, &Widget::pushButton_patch_clicked);
 
@@ -153,7 +153,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     // If no network interfaces is found, return early.
     if (interfaces.isEmpty()) {
         ui->comboBox_network_interface->setEnabled(false);
-        ui->comboBox_network_interface->addItem(tr("No network interfaces found."));
+        ui->comboBox_network_interface->addItem(tr("No network interface found."));
 
         return;
     }
@@ -175,7 +175,6 @@ void Widget::populateComboboxWithNetworkInterfaces() const
                 }
             }
 
-            // TODO: Handle this if it's empty.
             ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
         }
     }
@@ -184,6 +183,13 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 void Widget::updatePatchStatus(bool patched) const
 {
     ui->pushButton_patch->setText(!patched ? tr("Install patch") : tr("Uninstall patch"));
+}
+
+void Widget::comboBox_install_directory_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
+
+    updatePatchStatus(Patcher::isPatched(getInstallDirectory(false)));
 }
 
 void Widget::pushButton_install_directory_clicked()
