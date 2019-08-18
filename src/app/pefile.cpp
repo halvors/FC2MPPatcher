@@ -42,7 +42,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, const QString &libraryPeSection, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -71,7 +71,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryPeSection, 
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(libraryPeSection.toStdString()); // Section Name.
+    importSection.set_name(libraryFile.toStdString()); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
     // Add a section and get a link to the added section with calculated dimensions.
@@ -161,8 +161,13 @@ bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libra
                 unsigned int address = addresses[i];
                 unsigned int functionAddress = functionAddresses[i];
 
+                // If address is zero, that means this function is not use for this file.
+                if (address == 0) {
+                    continue;
+                }
+
                 // Verify to some degree addresses to be patched.
-                if (address == 0 || functionAddress == 0) {
+                if (functionAddress == 0) {
                     qDebug() << QT_TR_NOOP(QString("Error: An address is zero, something went wrong! Aborting."));
 
                     return false;

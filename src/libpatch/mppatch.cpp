@@ -4,32 +4,34 @@
 void MPPatch::readSettings()
 {
     if (!settings) {
-        settings = new QSettings(patch_network_configuration_file, QSettings::IniFormat);
-        settings->beginGroup(patch_library_name);
-            address = settings->value(patch_network_configuration_address).toString();
-            broadcast = settings->value(patch_network_configuration_broadcast).toString();
+        settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
+        settings->beginGroup(patch_configuration_network);
+            address = settings->value(patch_configuration_network_address).toString();
+            broadcast = settings->value(patch_configuration_network_broadcast).toString();
         settings->endGroup();
     }
+
+    // TODO. Delete settings?
 }
 
-unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* AdapterInfo, unsigned long* SizePointer)
+unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
 {
-    unsigned long result = GetAdaptersInfo(AdapterInfo, SizePointer);
+    unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
     if (result == ERROR_BUFFER_OVERFLOW) {
         return result;
     }
 
-    readSettings();
+    IP_ADAPTER_INFO* adapter = adapterInfo;
 
-    IP_ADAPTER_INFO* adapter = AdapterInfo;
+    readSettings();
 
     while (strcmp(adapter->IpAddressList.IpAddress.String, address.toStdString().c_str()) != 0) {
         adapter = adapter->Next;
     }
 
     adapter->Next = nullptr;
-    memcpy(AdapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
+    memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
 
     return result;
 }
@@ -43,15 +45,28 @@ hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET socket, const char* buffer, int length, int flags, const struct sockaddr* to, int toLength)
+int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
 {
+    sockaddr_in* to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
+
     readSettings();
 
-    sockaddr_in* toAddress = (sockaddr_in*) to;
-
-    if (toAddress->sin_addr.s_addr == 0xFFFFFFFF) {
-        toAddress->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
+    // If destination address is 255.255.255.255, use subnet broadcast address instead.
+    if (to_in->sin_addr.s_addr == inet_addr("255.255.255.255")) {
+        to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
     }
 
-    return sendto(socket, buffer, length, flags, to, toLength);
+    return sendto(s, buf, len, flags, to, tolen);
+}
+
+int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int namelen)
+{ 
+    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
+
+    // If connecting to lobbyserver on port 3100, use default lobby server port instead.
+    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100)) {
+        name_in->sin_port = htons(patch_network_lobbyserver_port);
+    }
+
+    return connect(s, name, namelen);
 }
