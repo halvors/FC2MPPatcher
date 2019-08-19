@@ -93,13 +93,15 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
         }
     }
 
+    /*
     // Something is not right, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        undoPatch(dir);
+        //undoPatch(dir);
 
         return false;
     }
+    */
 
     // Copy needed libraries.
     copyFiles(dir);
