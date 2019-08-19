@@ -37,7 +37,7 @@ QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, con
 bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
 {
     QFile file = dir.filePath(fileEntry.getName());
-    QFile fileCopy = appendToName(dir, fileEntry, game_backup_file_suffix);
+    QFile fileCopy = appendToName(dir, fileEntry, game_backup_suffix);
 
     if (backup) {
         if (!fileCopy.exists()) {

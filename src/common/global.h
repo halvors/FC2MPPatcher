@@ -24,7 +24,7 @@ constexpr char settings_group_window_isMaximized[] = "isMaximized";
 constexpr char game_name[] = "Far Cry 2";
 constexpr char game_publisher[] = "Ubisoft";
 constexpr char game_executable_directory[] = "bin";
-constexpr char game_backup_file_suffix[] = "_Original";
+constexpr char game_backup_suffix[] = "_original";
 
 constexpr char game_steam_name[] = "Steam";
 constexpr char game_steam_publisher[] = "Valve";

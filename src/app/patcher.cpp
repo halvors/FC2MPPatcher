@@ -115,7 +115,7 @@ void Patcher::undoPatch(const QDir &dir) {
 
     // Delete backed up game files.
     for (const FileEntry &fileEntry : files) {
-        QFile::remove(dir.filePath(FileUtils::appendToName(dir, fileEntry, game_backup_file_suffix)));
+        QFile::remove(dir.filePath(FileUtils::appendToName(dir, fileEntry, game_backup_suffix)));
     }
 
     // Delete patch library file.
