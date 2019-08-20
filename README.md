@@ -1,6 +1,6 @@
 # FC2MPPatcher
 An utility for patching your Far Cry 2 installation to support multiplayer agian. 
-Currently fixes Unranked online multiplayer, LAN multiplayer (also over various VPN services).
+Currently fixes Ranked (see install instructions) and Unranked online multiplayer, LAN multiplayer (also over various VPN services).
 
 This resolves for Game and dedicated server:
  * Binding to the wrong network interface, resolving issues with unranked online multiplayer. 
@@ -14,6 +14,9 @@ The reason for this being necessary is due to changes in the Windows API on newe
 
 ## Installation
 <b>NOTE:</b> As mentioned in license, we're not responsible for breaking your game or getting you banned.
+
+You will be able to play on ranked servers if you manually update your PunkBuster files.
+To do so follow the instructions at: http://ned.theoldergamers.com/static.php?page=farcry2-punkbuster
 
 ### Requirements
  * The game files itself. (We do not ship any game files as they are copyrighted by Ubisoft). 
