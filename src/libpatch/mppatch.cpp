@@ -68,5 +68,9 @@ int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int 
         name_in->sin_port = htons(patch_network_lobbyserver_port);
     }
 
+    if (name_in->sin_addr.s_addr == inet_addr("10.130.16.133")) {
+        name_in->sin_addr.s_addr = inet_addr("128.39.166.52");
+    }
+
     return connect(s, name, namelen);
 }
