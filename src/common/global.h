@@ -11,7 +11,7 @@ constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
 constexpr int app_version_major = 0;
 constexpr int app_version_minor = 1;
-constexpr int app_version_micro = 1;
+constexpr int app_version_micro = 2;
 const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
 constexpr char settings_install_directory[] = "installDirectory";
@@ -85,16 +85,6 @@ const QList<FileEntry> files = {
                     0x10c6a692, // getAdapersInfo()
                     0x100141fc, // getHostByName()
                     0x10013f33, // sendTo()
-                    0           // connect()
-                }
-            },
-            { // Redux mod.
-                "533bf9bebcc88a62e55b663ebdcc502fcd389867d74ec069de249edef13d1c23",
-                "25f62eeaee141a3e156edc5f7a79fe7a5973313db01cbb3f54ffd91dd60a6345",
-                {
-                    0x10c6a692, // getAdapersInfo()
-                    0x100141fc, // getHostByName() // No jump table?
-                    0x10013f33, // sendTo() // CHeck this.
                     0           // connect()
                 }
             }
