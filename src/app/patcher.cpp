@@ -132,15 +132,17 @@ void Patcher::undoPatch(const QDir &dir) {
     QFile::remove(dir.filePath(patch_configuration_file));
 }
 
-void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address)
-{
+void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkInterface &interface)
+{    
     QFile file = dir.filePath(patch_configuration_file);
     QSettings settings(file.fileName(), QSettings::IniFormat);
 
     settings.beginGroup(patch_configuration_network);
-        settings.setValue(patch_configuration_network_address, address.ip().toString());
-        settings.setValue(patch_configuration_network_broadcast, address.broadcast().toString());
-        settings.setValue(patch_configuration_network_netmask, address.netmask().toString());
+        settings.setValue(patch_configuration_network_interface_index, interface.index());
+
+        //settings.setValue(patch_configuration_network_address, address.ip().toString());
+        //settings.setValue(patch_configuration_network_broadcast, address.broadcast().toString());
+        //settings.setValue(patch_configuration_network_netmask, address.netmask().toString());
     settings.endGroup();
 
     qDebug() << QT_TR_NOOP(QString("Generated network configuration, saved to: %1").arg(file.fileName()));

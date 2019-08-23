@@ -56,9 +56,10 @@ const QStringList patch_library_runtime_dependencies = {
 
 const QString patch_configuration_file = QString(patch_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";
-constexpr char patch_configuration_network_address[] = "Address";
-constexpr char patch_configuration_network_broadcast[] = "Broadcast";
-constexpr char patch_configuration_network_netmask[] = "Netmask";
+constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
+//constexpr char patch_configuration_network_address[] = "Address";
+//constexpr char patch_configuration_network_broadcast[] = "Broadcast";
+//constexpr char patch_configuration_network_netmask[] = "Netmask";
 
 // Currently only applies for dedicated server.
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";

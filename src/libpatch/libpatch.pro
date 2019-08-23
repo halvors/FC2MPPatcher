@@ -1,5 +1,7 @@
 QT -= gui
 
+QT += network
+
 TARGET = mppatch
 TEMPLATE = lib
 
