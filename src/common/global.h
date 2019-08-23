@@ -51,7 +51,8 @@ const QStringList patch_library_runtime_dependencies = {
     "libgcc_s_dw2-1.dll",
     "libstdc++-6.dll",
     "libwinpthread-1.dll",
-    "Qt5Core.dll"
+    "Qt5Core.dll",
+    "Qt5Network.dll"
 };
 
 const QString patch_configuration_file = QString(patch_name).toLower() + ".cfg";
