@@ -18,9 +18,6 @@ void MPPatch::readSettings()
                     broadcast = addressEntry.broadcast().toString();
                 }
             }
-
-            //address = settings->value(patch_configuration_network_address).toString();
-            //broadcast = settings->value(patch_configuration_network_broadcast).toString();
         settings->endGroup();
     }
 

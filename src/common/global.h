@@ -11,7 +11,7 @@ constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
 constexpr int app_version_major = 0;
 constexpr int app_version_minor = 1;
-constexpr int app_version_micro = 3;
+constexpr int app_version_micro = 4;
 const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
 constexpr char settings_install_directory[] = "installDirectory";
@@ -36,10 +36,10 @@ constexpr char game_steam_app_manifest_suffix[] = "acf";
 constexpr char game_steam_app_manifest_key[] = "installdir";
 constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 
-constexpr char patch_name[] = "MPPatch";
 constexpr char patch_pe_section[] = ".text";
-const QString patch_library_file = QString(patch_name).toLower() + ".dll";
-const QString patch_library_pe_section = QString(patch_name).toLower();
+constexpr char patch_library_name[] = "MPPatch";
+const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
+const QString patch_library_pe_section = QString(patch_library_name).toLower();
 const QStringList patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
@@ -55,12 +55,9 @@ const QStringList patch_library_runtime_dependencies = {
     "Qt5Network.dll"
 };
 
-const QString patch_configuration_file = QString(patch_name).toLower() + ".cfg";
+const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";
 constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
-//constexpr char patch_configuration_network_address[] = "Address";
-//constexpr char patch_configuration_network_broadcast[] = "Broadcast";
-//constexpr char patch_configuration_network_netmask[] = "Netmask";
 
 // Currently only applies for dedicated server.
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
@@ -72,7 +69,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                "1fc060b4c1abd28a91d8b9442aa46b72aa28433f6c02611c9ee9d520024bce0b",
+                "f2e5201eb929deabfe6aa7e198bfe6515651bf2c31d30abd93516607ddcf1478",
                 {
                     0x10c5bde2, // getAdapersInfo()
                     0x1001431c, // getHostByName()
@@ -82,7 +79,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "64c82e039ab72b30563d94e2d8072a946ef9733302c99c8cf20e3b8503fbafec",
+                "2ffe4b12b92315e2a25b11399302cb4314bd6e6df8e99155a6612031e5aa2f87",
                 {
                     0x10c6a692, // getAdapersInfo()
                     0x100141fc, // getHostByName()
@@ -98,7 +95,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                "3ced2ee5188b05e4554fec738bb833d639698b1c3473008c8da2678ac66c4433",
+                "55d98ca0237d4170002204f37bf5637098560e799dd05fdd066a7bda88d44970",
                 {
                     0x00c444a6, // getAdapersInfo()
                     0x00ba4cfc, // getHostByName()
@@ -106,9 +103,9 @@ const QList<FileEntry> files = {
                     0x00c43ffd  // connect()
                 }
             },
-            { // Steam.
+            { // Steam (R2 is identical).
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "2db5a3c609410eae86b6d6c0fb33f4cbb65196b4fc1915d2a19f150cde238252",
+                "7136edec90591299125814e7625d0b938559da925046a6162a36c545efdfbdcc",
                 {
                     0x00c46a66, // getAdapersInfo()
                     0x00ba714c, // getHostByName()

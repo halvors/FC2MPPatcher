@@ -54,7 +54,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
 
     // Create a new library from which we will import functions.
     import_library importLibrary;
-    importLibrary.set_name(libraryName.toStdString());
+    importLibrary.set_name(libraryFile.toStdString());
 
     // Add a new import functions to library.
     for (const QString &functionName : libraryFunctions) {
@@ -71,7 +71,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(libraryFile.toStdString()); // Section Name.
+    importSection.set_name(libraryName.toStdString()); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
     // Add a section and get a link to the added section with calculated dimensions.

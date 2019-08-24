@@ -13,7 +13,7 @@ public:
     static bool isPatched(QDir dir);
     static bool patch(QWidget* parent, const QDir &dir);
     static void undoPatch(const QDir &dir);
-    static void generateNetworkConfigFile(const QDir &dir, const QNetworkInterface &interface);
+    static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);
 
 private:
     static void copyFiles(const QDir &dir);
