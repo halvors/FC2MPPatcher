@@ -69,7 +69,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                "f2e5201eb929deabfe6aa7e198bfe6515651bf2c31d30abd93516607ddcf1478",
+                "9d32381e05449c845e5fa28245f38ee40ea8154c050dcaee45014547a7703921",
                 {
                     0x10c5bde2, // getAdapersInfo()
                     0x1001431c, // getHostByName()
@@ -79,7 +79,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "2ffe4b12b92315e2a25b11399302cb4314bd6e6df8e99155a6612031e5aa2f87",
+                "f28878931b7d6c804647545377b064ccf560ee0c6f38cfaf9668373f851114c7",
                 {
                     0x10c6a692, // getAdapersInfo()
                     0x100141fc, // getHostByName()
@@ -95,7 +95,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                "55d98ca0237d4170002204f37bf5637098560e799dd05fdd066a7bda88d44970",
+                "6ea189c2a6c0834ace7314457d485c4e610ab74ee7335fbc24d55560865b36c4",
                 {
                     0x00c444a6, // getAdapersInfo()
                     0x00ba4cfc, // getHostByName()
@@ -105,7 +105,7 @@ const QList<FileEntry> files = {
             },
             { // Steam (R2 is identical).
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "7136edec90591299125814e7625d0b938559da925046a6162a36c545efdfbdcc",
+                "a0b5ec1dce04094e821d466185efc11716198f24d965222a3fe4a0c3f3f6471b",
                 {
                     0x00c46a66, // getAdapersInfo()
                     0x00ba714c, // getHostByName()

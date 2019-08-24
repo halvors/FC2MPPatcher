@@ -29,8 +29,8 @@ private:
     pe_base* image = nullptr;
 
     bool read();
-    QList<unsigned int> getFunctionAddresses(const QString &libraryName) const;
-    bool patchFunctions(const QString &libraryName, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
+    QList<unsigned int> getFunctionAddresses(const QString &libraryFile) const;
+    bool patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
 };
 
 #endif // PEFILE_H

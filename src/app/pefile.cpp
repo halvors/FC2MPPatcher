@@ -85,7 +85,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Patch code.
-    patchFunctions(libraryName, libraryFunctions, addresses, sectionName);
+    patchFunctions(libraryFile, libraryFunctions, addresses, sectionName);
 
     return true;
 }
@@ -120,14 +120,14 @@ bool PeFile::write() const
     return true;
 }
 
-QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) const
+QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) const
 {
     QList<unsigned int> addresses;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() == libraryName.toStdString()) {
+        if (library.get_name() == libraryFile.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
             for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
@@ -142,7 +142,7 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryName) con
     return addresses;
 }
 
-bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
+bool PeFile::patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const
 {
     for (section &section : image->get_image_sections()) {
         // Only patch our specified section specified.
@@ -154,7 +154,7 @@ bool PeFile::patchFunctions(const QString &libraryName, const QStringList &libra
             unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
 
             // Get a compiled list of all functiona addreses.
-            const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryName);
+            const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryFile);
 
             // Patching all addresses specified for this target.
             for (int i = 0; i < addresses.length(); i++) {
