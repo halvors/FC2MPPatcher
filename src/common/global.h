@@ -7,6 +7,9 @@
 
 #include "entry.h"
 
+// Set true for debugging mode without checksum verification.
+#define DEBUG false
+
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
 constexpr int app_version_major = 0;
@@ -44,7 +47,8 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12"                 // connect()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12"                    // bind()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
@@ -71,24 +75,35 @@ const QList<FileEntry> files = {
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
                 "9d32381e05449c845e5fa28245f38ee40ea8154c050dcaee45014547a7703921",
                 {
-                    0x10c5bde2, // getAdapersInfo()
-                    0x1001431c, // getHostByName()
-                    0x10014053, // sendTo()
-                    0           // connect()
+                    //{ 0x10c5bde2, 0 }, // getAdapersInfo()
+                    //{ 0x1001431c, 1 }, // getHostByName()
+                    { 0x10014053, 2 }, // sendTo()
+                    { 0x1001088e, 4 }, // bind() // 0x10010892
+                    { 0x10213d18, 4 }, // bind() // 0x10213d1c
+                    { 0x10c4e97a, 4 }, // bind() // 0x10c4e97e
+                    { 0x10cb9a8c, 4 }, // bind() // 0x10cb9a90
+                    { 0x10cb9ad4, 4 }  // bind() // 0x10cb9ad8
                 }
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
                 "f28878931b7d6c804647545377b064ccf560ee0c6f38cfaf9668373f851114c7",
                 {
-                    0x10c6a692, // getAdapersInfo()
-                    0x100141fc, // getHostByName()
-                    0x10013f33, // sendTo()
-                    0x10216648  // connect()
+
+
+                    //{ 0x10c6a692, 0 }, // getAdapersInfo()
+                    //{ 0x100141fc, 1 }, // getHostByName()
+                    { 0x10013f33, 2 }, // sendTo()
+                    { 0x1001076e, 4 }, // bind() // 0x10010772
+                    { 0x102161a8, 4 }, // bind() // 0x102161ac
+                    { 0x10c5d10a, 4 }, // bind() // 0x10c5d10e
+                    { 0x10cf289c, 4 }, // bind() // 0x10cf28a0
+                    { 0x10cf28e4, 4 }, // bind() // 0x10cf28e8
+
+                    { 0x10216648, 3 }  // connect()
                 }
             }
         }
-
     },
     {
         "FC2ServerLauncher.exe",
@@ -97,20 +112,20 @@ const QList<FileEntry> files = {
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
                 "6ea189c2a6c0834ace7314457d485c4e610ab74ee7335fbc24d55560865b36c4",
                 {
-                    0x00c444a6, // getAdapersInfo()
-                    0x00ba4cfc, // getHostByName()
-                    0x00ba4a33, // sendTo()
-                    0x00c43ffd  // connect()
+                    { 0x00c444a6, 0 }, // getAdapersInfo()
+                    { 0x00ba4cfc, 1 }, // getHostByName()
+                    { 0x00ba4a33, 2 }, // sendTo()
+                    { 0x00c43ffd, 3 }  // connect()
                 }
             },
             { // Steam (R2 is identical).
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
                 "a0b5ec1dce04094e821d466185efc11716198f24d965222a3fe4a0c3f3f6471b",
                 {
-                    0x00c46a66, // getAdapersInfo()
-                    0x00ba714c, // getHostByName()
-                    0x00ba6e83, // sendTo()
-                    0x00c465bd  // connect()
+                    { 0x00c46a66, 0 }, // getAdapersInfo()
+                    { 0x00ba714c, 1 }, // getHostByName()
+                    { 0x00ba6e83, 2 }, // sendTo()
+                    { 0x00c465bd, 3 }  // connect()
                 }
             }
         }

@@ -21,6 +21,15 @@ bool Patcher::isPatched(QDir dir)
 
                     break;
                 }
+
+                QFile backupFile = FileUtils::appendToName(dir, file, game_backup_suffix);
+
+                // Detect old installations of the patch.
+                if (backupFile.exists()) {
+                    count++;
+
+                    break;
+                }
             }
         }
     }
@@ -81,11 +90,11 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
                 FileUtils::backup(dir, file);
 
                 // Patch target file.
-                if (!patchFile(dir, file, target)) {
-                    //QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
-                    //undoPatch(dir);
+                if (!DEBUG & !patchFile(dir, file, target)) {
+                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
+                    undoPatch(dir);
 
-                    //return false;
+                    return false;
                 }
 
                 count++;
@@ -94,10 +103,10 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     }
 
     /*
-    // Something is not right, reverting back to backup files.
+    // Something went wrong, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        //undoPatch(dir);
+        undoPatch(dir);
 
         return false;
     }

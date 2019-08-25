@@ -3,12 +3,37 @@
 
 #include <QList>
 
+class AddressEntry {
+public:
+    AddressEntry(unsigned int address, unsigned int code, bool function = true) :
+        address(address),
+        value(code),
+        function(function) {}
+
+    unsigned int getAddress() const {
+        return address;
+    }
+
+    unsigned int getValue() const {
+        return value;
+    }
+
+    bool isFunction() const {
+        return function;
+    }
+
+private:
+    unsigned int address;
+    unsigned int value;
+    bool function;
+};
+
 class TargetEntry {
 public:
-    TargetEntry(const char* checkSum, const char* checkSumPatched, const QList<unsigned int> &addresses) :
+    TargetEntry(const char* checkSum, const char* checkSumPatched, const QList<AddressEntry> &functions) :
         checkSum(checkSum),
         checkSumPatched(checkSumPatched),
-        addresses(addresses) {}
+        addresses(functions) {}
 
     const char* getCheckSum() const {
         return checkSum;
@@ -18,14 +43,14 @@ public:
         return checkSumPatched;
     }
 
-    QList<unsigned int> getAddresses() const {
+    QList<AddressEntry> getAddresses() const {
         return addresses;
     }
 
 private:
     const char* checkSum;
     const char* checkSumPatched;
-    QList<unsigned int> addresses;
+    QList<AddressEntry> addresses;
 };
 
 class FileEntry {
