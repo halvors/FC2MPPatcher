@@ -14,7 +14,7 @@ constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
 constexpr int app_version_major = 0;
 constexpr int app_version_minor = 1;
-constexpr int app_version_micro = 4;
+constexpr int app_version_micro = 5;
 const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
 constexpr char settings_install_directory[] = "installDirectory";
