@@ -28,7 +28,7 @@ If you are upgrading from an old version of the patch uninstall the old one and 
 
 ### Antivirus
 This patch will probably trigger a false positive in your antivirus software because it alters the game files of Far Cry 2, this is normal.  
-The patch contains to virueses, you're also welcome to read throught our code!
+The patch contains no malware or virueses, you're also welcome to read throught our code!
 
 ### Technical information
 The reason for this being necessary is due to changes in the Windows API on newer versions, that is not compatible with Ubisoft's somewhat strange implementation.
