@@ -1,3 +1,5 @@
+#include <QNetworkInterface>
+
 #include "mppatch.h"
 #include "global.h"
 
@@ -6,12 +8,20 @@ void MPPatch::readSettings()
     if (!settings) {
         settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
         settings->beginGroup(patch_configuration_network);
-            address = settings->value(patch_configuration_network_address).toString();
-            broadcast = settings->value(patch_configuration_network_broadcast).toString();
+            QNetworkInterface networkInterface = QNetworkInterface::interfaceFromIndex(settings->value(patch_configuration_network_interface_index).toInt());
+
+            // Scan thru addresses for this interface.
+            for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
+                // We're onlt looking for IPv4 addresses.
+                if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                    address = addressEntry.ip().toString();
+                    broadcast = addressEntry.broadcast().toString();
+                }
+            }
         settings->endGroup();
     }
 
-    // TODO. Delete settings?
+    // TODO: Delete settings?
 }
 
 unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)

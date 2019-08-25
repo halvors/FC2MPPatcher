@@ -175,7 +175,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
                 }
             }
 
-            ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkAddressEntry>(selectedAddressEntry));
+            ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
         }
     }
 }
@@ -212,7 +212,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
     // Only update network configuration if game is patched.
     if (Patcher::isPatched(dir)) {
         // Generate network configuration.
-        Patcher::generateNetworkConfigFile(dir, ui->comboBox_network_interface->itemData(index).value<QNetworkAddressEntry>());
+        Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->itemData(index).value<QNetworkInterface>());
     }
 }
 
@@ -231,7 +231,7 @@ void Widget::pushButton_patch_clicked()
         // Apply patch to files, if successful continue.
         if (Patcher::patch(this, dir)) {
             // Generate network configuration.
-            Patcher::generateNetworkConfigFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkAddressEntry>());
+            Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
 
             updatePatchStatus(true);
         }

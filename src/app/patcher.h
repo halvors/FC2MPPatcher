@@ -3,7 +3,7 @@
 
 #include <QDir>
 #include <QWidget>
-#include <QNetworkAddressEntry>
+#include <QNetworkInterface>
 
 #include "entry.h"
 
@@ -13,7 +13,7 @@ public:
     static bool isPatched(QDir dir);
     static bool patch(QWidget* parent, const QDir &dir);
     static void undoPatch(const QDir &dir);
-    static void generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address);
+    static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);
 
 private:
     static void copyFiles(const QDir &dir);

@@ -58,7 +58,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile* peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_name, patch_library_file, patch_library_functions, target.getAddresses(), patch_pe_section);
+    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getAddresses(), patch_pe_section);
 
     // Write PE to file.
     peFile->write();
@@ -132,16 +132,14 @@ void Patcher::undoPatch(const QDir &dir) {
     QFile::remove(dir.filePath(patch_configuration_file));
 }
 
-void Patcher::generateNetworkConfigFile(const QDir &dir, const QNetworkAddressEntry &address)
-{
+void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface)
+{    
     QFile file = dir.filePath(patch_configuration_file);
     QSettings settings(file.fileName(), QSettings::IniFormat);
 
     settings.beginGroup(patch_configuration_network);
-        settings.setValue(patch_configuration_network_address, address.ip().toString());
-        settings.setValue(patch_configuration_network_broadcast, address.broadcast().toString());
-        settings.setValue(patch_configuration_network_netmask, address.netmask().toString());
+        settings.setValue(patch_configuration_network_interface_index, interface.index());
     settings.endGroup();
 
-    qDebug() << QT_TR_NOOP(QString("Generated network configuration, saved to: %1").arg(file.fileName()));
+    qDebug() << QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName()));
 }
