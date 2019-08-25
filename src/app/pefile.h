@@ -21,7 +21,7 @@ public:
     explicit PeFile(const QFile &file, QObject* parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
+    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<FunctionEntry> &functions, const QString &sectionName) const;
     bool write() const;
 
 private:
@@ -30,7 +30,7 @@ private:
 
     bool read();
     QList<unsigned int> getFunctionAddresses(const QString &libraryFile) const;
-    bool patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<unsigned int> &addresses, const QString &sectionName) const;
+    bool patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<FunctionEntry> &functions, const QString &sectionName) const;
 };
 
 #endif // PEFILE_H
