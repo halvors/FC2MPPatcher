@@ -84,7 +84,18 @@ const QList<FileEntry> files = {
                     //{ 0x10c6a692, 0 }, // getAdapersInfo()
                     //{ 0x100141fc, 1 }, // getHostByName()
                     { 0x10013f33, 2 }, // sendTo()
-                    { 0x1003c7ec, 4 }  // bind()
+
+                    { 0x10cf289c, 4 }, // bind() // 0x10cf28a0
+                    { 0x10cf28e4, 4 }, // bind() // 0x10cf28e8
+                    { 0x10c5d10a, 4 }, // bind() // 0x10c5d10e
+                    { 0x102161a8, 4 }, // bind() // 0x102161ac
+
+                    // ???
+                    // 0x10010772
+                    // 0x10c31019
+                    // 0x10c28235
+                    // 0x10c258d6
+                    // 0x10300cd2
                 }
             }
         }
