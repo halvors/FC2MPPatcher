@@ -47,8 +47,7 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12"                    // bind()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12"                 // connect()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
@@ -108,8 +107,8 @@ const QList<FileEntry> files = {
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
                 "6ea189c2a6c0834ace7314457d485c4e610ab74ee7335fbc24d55560865b36c4",
                 {
-                    //{ 0x00c444a6, 0 }, // getAdapersInfo()
-                    //{ 0x00ba4cfc, 1 }, // getHostByName()
+                    { 0x00c444a6, 0 }, // getAdapersInfo()
+                    { 0x00ba4cfc, 1 }, // getHostByName()
                     { 0x00ba4a33, 2 }, // sendTo()
                     { 0x00c43ffd, 3 }  // connect()
                 }
@@ -118,8 +117,8 @@ const QList<FileEntry> files = {
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
                 "a0b5ec1dce04094e821d466185efc11716198f24d965222a3fe4a0c3f3f6471b",
                 {
-                    //{ 0x00c46a66, 0 }, // getAdapersInfo()
-                    //{ 0x00ba714c, 1 }, // getHostByName()
+                    { 0x00c46a66, 0 }, // getAdapersInfo()
+                    { 0x00ba714c, 1 }, // getHostByName()
                     { 0x00ba6e83, 2 }, // sendTo()
                     { 0x00c465bd, 3 }  // connect()
                 }

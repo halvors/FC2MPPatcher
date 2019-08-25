@@ -21,6 +21,15 @@ bool Patcher::isPatched(QDir dir)
 
                     break;
                 }
+
+                QFile backupFile = FileUtils::appendToName(dir, file, game_backup_suffix);
+
+                // Detect old installations of the patch.
+                if (backupFile.exists()) {
+                    count++;
+
+                    break;
+                }
             }
         }
     }
@@ -58,7 +67,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile* peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getFunctions(), patch_pe_section);
+    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getAddresses(), patch_pe_section);
 
     // Write PE to file.
     peFile->write();
@@ -94,10 +103,10 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     }
 
     /*
-    // Something is not right, reverting back to backup files.
+    // Something went wrong, reverting back to backup files.
     if (count < files.length()) {
         QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        //undoPatch(dir);
+        undoPatch(dir);
 
         return false;
     }
