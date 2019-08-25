@@ -47,7 +47,8 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12"                 // connect()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12"                    // bind()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
