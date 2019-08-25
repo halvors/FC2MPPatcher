@@ -7,6 +7,9 @@
 
 #include "entry.h"
 
+// Set true for debugging mode without checksum verification.
+#define DEBUG false
+
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
 constexpr int app_version_major = 0;
@@ -74,7 +77,12 @@ const QList<FileEntry> files = {
                 {
                     //{ 0x10c5bde2, 0 }, // getAdapersInfo()
                     //{ 0x1001431c, 1 }, // getHostByName()
-                    { 0x10014053, 2 }  // sendTo()
+                    { 0x10014053, 2 }, // sendTo()
+                    { 0x1001088e, 4 }, // bind() // 0x10010892
+                    { 0x10213d18, 4 }, // bind() // 0x10213d1c
+                    { 0x10c4e97a, 4 }, // bind() // 0x10c4e97e
+                    { 0x10cb9a8c, 4 }, // bind() // 0x10cb9a90
+                    { 0x10cb9ad4, 4 }  // bind() // 0x10cb9ad8
                 }
             },
             { // Steam.
@@ -84,18 +92,11 @@ const QList<FileEntry> files = {
                     //{ 0x10c6a692, 0 }, // getAdapersInfo()
                     //{ 0x100141fc, 1 }, // getHostByName()
                     { 0x10013f33, 2 }, // sendTo()
-
-                    { 0x10cf289c, 4 }, // bind() // 0x10cf28a0
-                    { 0x10cf28e4, 4 }, // bind() // 0x10cf28e8
-                    { 0x10c5d10a, 4 }, // bind() // 0x10c5d10e
+                    { 0x1001076e, 4 }, // bind() // 0x10010772
                     { 0x102161a8, 4 }, // bind() // 0x102161ac
-
-                    // ???
-                    // 0x10010772
-                    // 0x10c31019
-                    // 0x10c28235
-                    // 0x10c258d6
-                    // 0x10300cd2
+                    { 0x10c5d10a, 4 }, // bind() // 0x10c5d10e
+                    { 0x10cf289c, 4 }, // bind() // 0x10cf28a0
+                    { 0x10cf28e4, 4 }  // bind() // 0x10cf28e8
                 }
             }
         }
