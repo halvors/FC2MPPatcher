@@ -87,8 +87,8 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
 
         // If file is not writable, show error and return early.
         if (!file.isWritable()) {
-            QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("File %1 is not writable, aborting!").arg(file.fileName())));
             undoPatch(dir);
+            QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("File %1 is not writable, aborting!").arg(file.fileName())));
 
             return false;
         }
