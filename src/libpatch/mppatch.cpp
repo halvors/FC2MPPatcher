@@ -60,18 +60,6 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, i
     return sendto(s, buf, len, flags, to, tolen);
 }
 
-sockaddr* __thiscall MPPatch::getSockAddr_patch(void* param_1)
-{
-    Q_UNUSED(param_1);
-
-    sockaddr_in* addr = new sockaddr_in();
-    addr->sin_family = AF_INET;
-    addr->sin_addr.s_addr = inet_addr("10.130.16.65");
-    addr->sin_port = htons(9000);
-
-    return (sockaddr*) addr;
-}
-
 unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
