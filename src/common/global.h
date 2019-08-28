@@ -8,7 +8,7 @@
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
@@ -46,7 +46,7 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch17GetSockAddr_patchEP8sockaddr"                   // GetSockAddr()
+    "_ZN7MPPatch17GetSockAddr_patchEPv"                           // GetSockAddr()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,

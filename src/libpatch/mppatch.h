@@ -18,7 +18,7 @@ public:
     static MPPATCHSHARED_EXPORT unsigned long __stdcall getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer);
     static MPPATCHSHARED_EXPORT hostent* WSAAPI __stdcall getHostByName_patch(const char* name);
 
-    static MPPATCHSHARED_EXPORT sockaddr* __thiscall GetSockAddr_patch(sockaddr* addr);
+    static MPPATCHSHARED_EXPORT sockaddr* __thiscall GetSockAddr_patch(void* param_1);
 
 private:
     static QSettings* settings;
