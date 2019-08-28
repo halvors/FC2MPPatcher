@@ -100,9 +100,9 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
                 FileUtils::backup(dir, fileEntry);
 
                 // Patch target file.
-                if (!DEBUG & !patchFile(dir, fileEntry, target)) {
-                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(fileEntry.getName())));
+                if (!DEBUG_MODE & !patchFile(dir, fileEntry, target)) {
                     undoPatch(dir);
+                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(fileEntry.getName())));
 
                     return false;
                 }
