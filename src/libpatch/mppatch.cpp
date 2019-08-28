@@ -21,7 +21,43 @@ void MPPatch::readSettings()
         settings->endGroup();
     }
 
-    // TODO: Delete settings?
+    // TODO: Delete settings? Memory leak.
+}
+
+int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int namelen)
+{
+    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
+
+    // Change address to bind to any.
+    name_in->sin_addr.s_addr = inet_addr("0.0.0.0");
+
+    return bind(s, name, namelen);
+}
+
+int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int namelen)
+{
+    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
+
+    // If connecting to lobbyserver on port 3100, use default lobby server port instead.
+    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100)) {
+        name_in->sin_port = htons(patch_network_lobbyserver_port);
+    }
+
+    return connect(s, name, namelen);
+}
+
+int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
+{
+    sockaddr_in* to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
+
+    readSettings();
+
+    // If destination address is 255.255.255.255, use subnet broadcast address instead.
+    if (to_in->sin_addr.s_addr == inet_addr("255.255.255.255")) {
+        to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
+    }
+
+    return sendto(s, buf, len, flags, to, tolen);
 }
 
 unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
@@ -44,50 +80,6 @@ unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterI
     memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
 
     return result;
-}
-
-int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int namelen)
-{
-    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
-    name_in->sin_addr.s_addr = inet_addr("0.0.0.0");
-
-    return bind(s, name, namelen);
-}
-
-int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int namelen)
-{
-    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
-
-    // If connecting to lobbyserver on port 3100, use default lobby server port instead.
-    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100)) {
-        name_in->sin_port = htons(patch_network_lobbyserver_port);
-    }
-
-    return connect(s, name, namelen);
-}
-
-int WSAAPI __stdcall MPPatch::recv_patch(SOCKET s, char* buf, int len, int flags)
-{
-    return recv(s, buf, len, flags);
-}
-
-int WSAAPI __stdcall MPPatch::recvFrom_patch(SOCKET s, char* buf, int len, int flags, sockaddr* from, int* fromlen)
-{
-    return recvfrom(s, buf, len, flags, from, fromlen);
-}
-
-int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
-{
-    sockaddr_in* to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
-
-    readSettings();
-
-    // If destination address is 255.255.255.255, use subnet broadcast address instead.
-    if (to_in->sin_addr.s_addr == inet_addr("255.255.255.255")) {
-        to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
-    }
-
-    return sendto(s, buf, len, flags, to, tolen);
 }
 
 hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)

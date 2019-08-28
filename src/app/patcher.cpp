@@ -37,7 +37,7 @@ bool Patcher::isPatched(QDir dir)
     return count == files.length();
 }
 
-void Patcher::copyFiles(const QDir &dir)
+bool Patcher::copyFiles(const QDir &dir)
 {
     bool success = false;
 
@@ -55,6 +55,8 @@ void Patcher::copyFiles(const QDir &dir)
     } else {
         qDebug() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
     }
+
+    return success;
 }
 
 bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target)
@@ -82,17 +84,31 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     int count = 0;
 
     // Scanning for valid files to start patching.
-    for (const FileEntry &file : files) {
-        for (const TargetEntry &target : file.getTargets()) {
+    for (const FileEntry &fileEntry : files) {
+        QFile file = dir.filePath(fileEntry.getName());
+
+        // If file is not writable, set proper permissions.
+        if (!file.isWritable()) {
+            file.setPermissions(QFileDevice::WriteOther |
+                                QFileDevice::ReadOther |
+                                QFileDevice::WriteGroup |
+                                QFileDevice::ReadGroup |
+                                QFileDevice::WriteUser |
+                                QFileDevice::ReadUser |
+                                QFileDevice::WriteOwner |
+                                QFileDevice::ReadOwner);
+        }
+
+        for (const TargetEntry &target : fileEntry.getTargets()) {
             // Validate target file against stored checksum.
-            if (FileUtils::isValid(dir, file, target, false)) {
+            if (FileUtils::isValid(dir, fileEntry, target, false)) {
                 // Backup original file.
-                FileUtils::backup(dir, file);
+                FileUtils::backup(dir, fileEntry);
 
                 // Patch target file.
-                if (!DEBUG & !patchFile(dir, file, target)) {
-                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(file.getName())));
+                if (!DEBUG_MODE & !patchFile(dir, fileEntry, target)) {
                     undoPatch(dir);
+                    QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(fileEntry.getName())));
 
                     return false;
                 }
@@ -113,7 +129,12 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     */
 
     // Copy needed libraries.
-    copyFiles(dir);
+    if (!DEBUG_MODE & !copyFiles(dir)) {
+        undoPatch(dir);
+        QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Missing patch files, make sure you unzipped the compressed file, aborting!")));
+
+        return false;
+    }
 
     return true;
 }

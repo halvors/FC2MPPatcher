@@ -21,7 +21,7 @@ Widget::Widget(QWidget* parent) :
     ui->setupUi(this);
 
     // Set window title.
-    setWindowTitle(QString("%1 %2").arg(app_name, QVersionNumber(app_version_major, app_version_minor, app_version_micro).toString()));
+    setWindowTitle(QString("%1 %2").arg(app_name).arg(APP_VERSION));
 
     // Set label text.
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
