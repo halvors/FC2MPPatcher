@@ -14,6 +14,7 @@ void MPPatch::readSettings()
             for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
                 // We're onlt looking for IPv4 addresses.
                 if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                    address = addressEntry.ip().toString();
                     broadcast = addressEntry.broadcast().toString();
                 }
             }
@@ -57,4 +58,47 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, i
     }
 
     return sendto(s, buf, len, flags, to, tolen);
+}
+
+sockaddr* __thiscall MPPatch::getSockAddr_patch(void* param_1)
+{
+    Q_UNUSED(param_1);
+
+    sockaddr_in* addr = new sockaddr_in();
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = inet_addr("10.130.16.65");
+    addr->sin_port = htons(9000);
+
+    return (sockaddr*) addr;
+}
+
+unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
+{
+    unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
+
+    if (result == ERROR_BUFFER_OVERFLOW) {
+        return result;
+    }
+
+    IP_ADAPTER_INFO* adapter = adapterInfo;
+
+    readSettings();
+
+    while (strcmp(adapter->IpAddressList.IpAddress.String, address.toStdString().c_str()) != 0) {
+        adapter = adapter->Next;
+    }
+
+    adapter->Next = nullptr;
+    memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
+
+    return result;
+}
+
+hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
+{
+    Q_UNUSED(name);
+
+    readSettings();
+
+    return gethostbyname(address.toStdString().c_str());
 }
