@@ -8,13 +8,10 @@
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG false
+#define DEBUG true
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
-constexpr int app_version_major = 0;
-constexpr int app_version_minor = 1;
-constexpr int app_version_micro = 5;
 const QString app_configuration_file = QString(app_name).toLower() + ".ini";
 
 constexpr char settings_install_directory[] = "installDirectory";
@@ -44,9 +41,11 @@ constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
 const QString patch_library_pe_section = QString(patch_library_name).toLower();
 const QStringList patch_library_functions = {
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",       // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",    // connect()
-    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24" // sendTo()
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
+    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
+    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
+    "_ZN7MPPatch19getHostByName_patchEPKc@4"                      // getHostByName()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
@@ -90,7 +89,9 @@ const QList<FileEntry> files = {
                     { 0x10c5d10a, 0 }, // bind()
                     { 0x10cf289c, 0 }, // bind()
                     { 0x10cf28e4, 0 }, // bind()
-                    { 0x10013f33, 2 }  // sendTo()
+                    { 0x10013f33, 2 }, // sendTo()
+                    { 0x10c6a692, 3 }, // getAdapersInfo()
+                    //{ 0x100141fc, 4 }  // getHostByName()
                 }
             }
         }
