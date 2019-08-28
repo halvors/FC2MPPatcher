@@ -16,7 +16,7 @@ public:
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);
 
 private:
-    static void copyFiles(const QDir &dir);
+    static bool copyFiles(const QDir &dir);
     static bool patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target);
 };
 

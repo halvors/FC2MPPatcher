@@ -37,7 +37,7 @@ bool Patcher::isPatched(QDir dir)
     return count == files.length();
 }
 
-void Patcher::copyFiles(const QDir &dir)
+bool Patcher::copyFiles(const QDir &dir)
 {
     bool success = false;
 
@@ -55,6 +55,8 @@ void Patcher::copyFiles(const QDir &dir)
     } else {
         qDebug() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
     }
+
+    return success;
 }
 
 bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target)
@@ -85,12 +87,16 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     for (const FileEntry &fileEntry : files) {
         QFile file = dir.filePath(fileEntry.getName());
 
-        // If file is not writable, show error and return early.
+        // If file is not writable, set proper permissions.
         if (!file.isWritable()) {
-            undoPatch(dir);
-            QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("File %1 is not writable, aborting!").arg(file.fileName())));
-
-            return false;
+            file.setPermissions(QFileDevice::WriteOther |
+                                QFileDevice::ReadOther |
+                                QFileDevice::WriteGroup |
+                                QFileDevice::ReadGroup |
+                                QFileDevice::WriteUser |
+                                QFileDevice::ReadUser |
+                                QFileDevice::WriteOwner |
+                                QFileDevice::ReadOwner);
         }
 
         for (const TargetEntry &target : fileEntry.getTargets()) {
@@ -123,7 +129,12 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     */
 
     // Copy needed libraries.
-    copyFiles(dir);
+    if (!DEBUG_MODE & !copyFiles(dir)) {
+        undoPatch(dir);
+        QMessageBox::warning(parent, "Warning", QT_TR_NOOP(QString("Missing patch files, make sure you unzipped the compressed file, aborting!")));
+
+        return false;
+    }
 
     return true;
 }
