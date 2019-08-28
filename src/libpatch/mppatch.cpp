@@ -90,3 +90,11 @@ hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 
     return gethostbyname(address.toStdString().c_str());
 }
+
+sockaddr* __thiscall MPPatch::GetSockAddr_patch(sockaddr* addr)
+{
+    sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(addr);
+    addr_in->sin_addr.s_addr = inet_addr("128.39.166.52");
+
+    return addr;
+}

@@ -45,7 +45,8 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
-    "_ZN7MPPatch19getHostByName_patchEPKc@4"                      // getHostByName()
+    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+    "_ZN7MPPatch17GetSockAddr_patchEP8sockaddr"                   // GetSockAddr()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
@@ -93,7 +94,9 @@ const QList<FileEntry> files = {
                     { 0x10cf28e4, 0 }, // bind()
                     { 0x10013f33, 2 }, // sendTo()
                     { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 }  // getHostByName()
+                    { 0x100141fc, 4 }, // getHostByName()
+
+                    { 0x1021663d, 5 }  // GetSockAddr()
                 }
             }
         }
