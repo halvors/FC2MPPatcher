@@ -130,9 +130,26 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) con
         if (library.get_name() == libraryFile.toStdString()) {
             unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
+            int i = 0;
+            unsigned int lastAddress = 0;
+
+            for (const imported_function &function : library.get_imported_functions()) {
+                if (i > 0) {
+                    qDebug() << QString("Difference: 0x%1").arg(function.get_iat_va() - lastAddress, 0, 16);
+                }
+
+                //qDebug() << QString::fromStdString(function.get_name());
+                //qDebug() << QString("0x%1 + 0x%2 + 0x%3").arg(image->get_image_base_32(), 0, 16).arg(library.get_rva_to_iat(), 0, 16).arg(function.get_iat_va(), 0, 16);
+                //qDebug() << QString("Is it? 0x%1").arg(function.get_iat_va() - library.get_rva_to_iat(), 0, 16);
+                //qDebug() << QString("Or? 0x%1").arg(function.get_iat_va() - library.get_rva_to_iat(), 0, 16);
+
+                i++;
+                lastAddress = function.get_iat_va();
+            }
+
             for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
-                addresses.append(address);
-                address += 4; // Offset is 4 between entries.
+                //addresses.append(address);
+                //address += 4; // Offset is 4 between entries.
             }
 
             break;
