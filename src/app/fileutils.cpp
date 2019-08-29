@@ -5,30 +5,30 @@
 #include "fileutils.h"
 #include "global.h"
 
-QString FileUtils::checkSum(QFile file)
+const char* FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha256);
         hash.addData(&file);
         file.close();
 
-        return hash.result().toHex();
+        return hash.result().toHex().constData();
     }
 
-    return QString();
+    return nullptr;
 }
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target, bool patched)
 {
-    QString fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
+    const char* fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
     const char* targetCheckSum = patched ? target.getCheckSumPatched() : target.getCheckSum();
 
-    return fileCheckSum == targetCheckSum;
+    return strcmp(fileCheckSum, targetCheckSum) == 0;
 }
 
 QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append)
 {
-    QStringList split = QString(fileEntry.getName()).split(".");
+    QStringList split = QString(fileEntry.getName()).split('.');
     QString suffix = '.' + split.takeLast();
 
     return dir.filePath(split.join(QString()) + append + suffix);
