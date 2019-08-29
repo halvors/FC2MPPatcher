@@ -16,7 +16,7 @@ public:
     static bool restore(const QDir &dir, const FileEntry &fileEntry);
 
 private:
-    static QString checkSum(QFile file);
+    static const char *checkSum(QFile file);
     static bool copy(const QDir &dir, const FileEntry &fileEntry, bool backup);
 };
 

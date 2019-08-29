@@ -86,17 +86,23 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
         QFile file = dir.filePath(fileEntry.getName());
+        QFileInfo fileInfo = file;
+
+        // What permissions should be set for files.
+        QFileDevice::Permissions permissions = QFileDevice::WriteOther |
+                QFileDevice::ReadOther |
+                QFileDevice::WriteGroup |
+                QFileDevice::ReadGroup |
+                QFileDevice::WriteUser |
+                QFileDevice::ReadUser |
+                QFileDevice::WriteOwner |
+                QFileDevice::ReadOwner;
 
         // If file is not writable, set proper permissions.
-        if (!file.isWritable()) {
-            file.setPermissions(QFileDevice::WriteOther |
-                                QFileDevice::ReadOther |
-                                QFileDevice::WriteGroup |
-                                QFileDevice::ReadGroup |
-                                QFileDevice::WriteUser |
-                                QFileDevice::ReadUser |
-                                QFileDevice::WriteOwner |
-                                QFileDevice::ReadOwner);
+        if (!fileInfo.permission(permissions)) {
+            qDebug() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
+
+            file.setPermissions(permissions);
         }
 
         for (const TargetEntry &target : fileEntry.getTargets()) {
