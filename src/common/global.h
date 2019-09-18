@@ -95,6 +95,20 @@ const QList<FileEntry> files = {
                     { 0x10c6a692, 3 }, // getAdapersInfo()
                     { 0x100141fc, 4 }  // getHostByName()
                 }
+            },
+            { // Uplay
+                "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
+                "", // TODO: Recalc
+                {
+                  { 0x00000000, 0 }, // bind()
+                  { 0x00000000, 0 }, // bind()
+                  { 0x00000000, 0 }, // bind()
+                  { 0x00000000, 0 }, // bind()
+                  { 0x00000000, 0 }, // bind()
+                  { 0x00000000, 2 }, // sendTo()
+                  { 0x00000000, 3 }, // getAdapersInfo()
+                  { 0x00000000, 4 }  // getHostByName()
+                }
             }
         }
     },
@@ -129,6 +143,21 @@ const QList<FileEntry> files = {
                     { 0x00ba6e83, 2 }, // sendTo()
                     { 0x00c46a66, 3 }, // getAdapersInfo()
                     { 0x00ba714c, 4 }  // getHostByName()
+                }
+            },
+            { // Uplay
+                "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
+                "", // TODO: Recalc
+                {
+                    { 0x00000000, 0 }, // bind()
+                    { 0x00000000, 0 }, // bind()
+                    { 0x00000000, 0 }, // bind()
+                    { 0x00000000, 0 }, // bind()
+                    { 0x00000000, 0 }, // bind()
+                    { 0x00000000, 1 }, // connect()
+                    { 0x00000000, 2 }, // sendTo()
+                    { 0x00000000, 3 }, // getAdapersInfo()
+                    { 0x00000000, 4 }  // getHostByName()
                 }
             }
         }
