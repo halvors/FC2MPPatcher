@@ -40,4 +40,13 @@ private:
     static QString getJsonFromAcf(const QStringList &lines);
 };
 
+class UplayUtils
+{
+public:
+    static QString getGameDirectory();
+
+private:
+    static QString installDirectory;
+};
+
 #endif // DIRUTILS_H

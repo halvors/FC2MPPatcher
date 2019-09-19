@@ -45,6 +45,7 @@ QStringList& DirUtils::findInstallDirectories()
 
     append(RetailUtils::getGameDirectory());
     append(SteamUtils::getGameDirectory(game_steam_app_id));
+    append(UplayUtils::getGameDirectory());
 
     return installDirectories;
 }
@@ -256,4 +257,34 @@ QString SteamUtils::getJsonFromAcf(const QStringList &lines)
     }
 
     return json;
+}
+
+QString UplayUtils::installDirectory;
+
+QString UplayUtils::getGameDirectory()
+{
+    // If install directory already detected, return early.
+    if (!installDirectory.isEmpty()) {
+        return installDirectory;
+    }
+
+#ifdef Q_OS_WIN
+    // Look for Far Cry 2 install directory in registry.
+    QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
+    registry.beginGroup(game_publisher);
+        registry.beginGroup(game_uplay_registry_path);
+            registry.beginGroup(QString::number(game_uplay_app_id));
+                QDir dir = registry.value("InstallDir").toString();
+            registry.endGroup();
+        registry.endGroup();
+    registry.endGroup();
+
+    if (DirUtils::isGameDirectory(dir.absolutePath())) {
+        qDebug() << QT_TR_NOOP(QString("Found installation directory: %1").arg(dir.absolutePath()));
+
+        return dir.absolutePath();
+    }
+#endif
+
+    return QString();
 }
