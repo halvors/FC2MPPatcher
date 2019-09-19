@@ -98,16 +98,16 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                "", // TODO: Recalc
+                "04ca4e9e4e9e76563aabf8d5a3d81184aa64dcb63af6c95a2ab89d45cf2549d6",
                 {
-                  { 0x00000000, 0 }, // bind()
-                  { 0x00000000, 0 }, // bind()
-                  { 0x00000000, 0 }, // bind()
-                  { 0x00000000, 0 }, // bind()
-                  { 0x00000000, 0 }, // bind()
-                  { 0x00000000, 2 }, // sendTo()
-                  { 0x00000000, 3 }, // getAdapersInfo()
-                  { 0x00000000, 4 }  // getHostByName()
+                    { 0x1001076e, 0 }, // bind()
+                    { 0x102161a8, 0 }, // bind()
+                    { 0x10c5d10a, 0 }, // bind()
+                    { 0x10cf289c, 0 }, // bind()
+                    { 0x10cf28e4, 0 }, // bind()
+                    { 0x10013f33, 2 }, // sendTo() // verify
+                    { 0x10c6a692, 3 }, // getAdapersInfo()
+                    { 0x100141fc, 4 }  // getHostByName() // verify
                 }
             }
         }
@@ -147,17 +147,17 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                "", // TODO: Recalc
+                "bf97b551b3219d5223dd9fdab961a3821edb2e3fbc759857695f661ebca0a1d7",
                 {
-                    { 0x00000000, 0 }, // bind()
-                    { 0x00000000, 0 }, // bind()
-                    { 0x00000000, 0 }, // bind()
-                    { 0x00000000, 0 }, // bind()
-                    { 0x00000000, 0 }, // bind()
-                    { 0x00000000, 1 }, // connect()
-                    { 0x00000000, 2 }, // sendTo()
-                    { 0x00000000, 3 }, // getAdapersInfo()
-                    { 0x00000000, 4 }  // getHostByName()
+                    { 0x004263d4, 0 }, // bind()
+                    { 0x0042641b, 0 }, // bind()
+                    { 0x004c9d2a, 0 }, // bind()
+                    { 0x00ba36be, 0 }, // bind()
+                    { 0x00e85ffa, 0 }, // bind()
+                    { 0x00c465bd, 1 }, // connect()
+                    { 0x00ba6e83, 2 }, // sendTo() // verify
+                    { 0x00c46a66, 3 }, // getAdapersInfo()
+                    { 0x00ba714c, 4 }  // getHostByName()
                 }
             }
         }
