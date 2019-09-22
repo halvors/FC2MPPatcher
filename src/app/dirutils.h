@@ -28,7 +28,7 @@ private:
 class SteamUtils
 {
 public:
-    static QString getGameDirectory(int appId);
+    static QString getGameDirectory();
 
 private:
     static QString installDirectory;
@@ -38,15 +38,6 @@ private:
     static QStringList& findLibraries(QDir &dir);
     static QJsonObject getJsonFromFile(QFile &file);
     static QString getJsonFromAcf(const QStringList &lines);
-};
-
-class UplayUtils
-{
-public:
-    static QString getGameDirectory();
-
-private:
-    static QString installDirectory;
 };
 
 #endif // DIRUTILS_H

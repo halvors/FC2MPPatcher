@@ -36,11 +36,6 @@ constexpr char game_steam_app_manifest_suffix[] = "acf";
 constexpr char game_steam_app_manifest_key[] = "installdir";
 constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 
-
-constexpr char game_uplay_registry_path[] = "Launcher/Installs";
-constexpr int game_uplay_app_id = 85;
-constexpr char game_steam_app_install_key[] = "InstallDir";
-
 constexpr char patch_pe_section[] = ".text";
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
