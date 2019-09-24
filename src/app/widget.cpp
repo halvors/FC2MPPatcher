@@ -212,7 +212,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
     QDir dir = getInstallDirectory();
 
     // Only update network configuration if game is patched.
-    if (Patcher::isPatched(dir)) {
+    if (Patcher::isPatched(dir.absolutePath())) {
         // Generate network configuration.
         Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->itemData(index).value<QNetworkInterface>());
     }
@@ -231,7 +231,7 @@ void Widget::pushButton_patch_clicked()
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir)) {
+    if (Patcher::isPatched(dir.absolutePath())) {
         Patcher::undoPatch(dir);
 
         updatePatchStatus(false);

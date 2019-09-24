@@ -7,12 +7,13 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(QDir dir)
+bool Patcher::isPatched(QString path)
 {
-    if (!dir.isEmpty()) {
+    if (path.isEmpty()) {
         return false;
     }
 
+    QDir dir = path;
     int count = 0;
 
     // Should we be looking in executable directory instead?
