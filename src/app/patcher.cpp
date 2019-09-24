@@ -9,6 +9,10 @@
 
 bool Patcher::isPatched(QDir dir)
 {
+    if (!dir.isEmpty()) {
+        return false;
+    }
+
     int count = 0;
 
     // Should we be looking in executable directory instead?
@@ -124,16 +128,6 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
         }
     }
 
-    /*
-    // Something went wrong, reverting back to backup files.
-    if (count < files.length()) {
-        QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        undoPatch(dir);
-
-        return false;
-    }
-    */
-
     // Copy needed libraries.
     if (!DEBUG_MODE & !copyFiles(dir)) {
         undoPatch(dir);
@@ -169,7 +163,7 @@ void Patcher::undoPatch(const QDir &dir) {
 }
 
 void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface)
-{    
+{
     QFile file = dir.filePath(patch_configuration_file);
     QSettings settings(file.fileName(), QSettings::IniFormat);
 
