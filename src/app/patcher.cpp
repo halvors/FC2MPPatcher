@@ -7,8 +7,13 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(QDir dir)
+bool Patcher::isPatched(QString path)
 {
+    if (path.isEmpty()) {
+        return false;
+    }
+
+    QDir dir = path;
     int count = 0;
 
     // Should we be looking in executable directory instead?
@@ -86,17 +91,23 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
         QFile file = dir.filePath(fileEntry.getName());
+        QFileInfo fileInfo = file;
+
+        // What permissions should be set for files.
+        QFileDevice::Permissions permissions = QFileDevice::WriteOther |
+                QFileDevice::ReadOther |
+                QFileDevice::WriteGroup |
+                QFileDevice::ReadGroup |
+                QFileDevice::WriteUser |
+                QFileDevice::ReadUser |
+                QFileDevice::WriteOwner |
+                QFileDevice::ReadOwner;
 
         // If file is not writable, set proper permissions.
-        if (!file.isWritable()) {
-            file.setPermissions(QFileDevice::WriteOther |
-                                QFileDevice::ReadOther |
-                                QFileDevice::WriteGroup |
-                                QFileDevice::ReadGroup |
-                                QFileDevice::WriteUser |
-                                QFileDevice::ReadUser |
-                                QFileDevice::WriteOwner |
-                                QFileDevice::ReadOwner);
+        if (!fileInfo.permission(permissions)) {
+            qDebug() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
+
+            file.setPermissions(permissions);
         }
 
         for (const TargetEntry &target : fileEntry.getTargets()) {
@@ -117,16 +128,6 @@ bool Patcher::patch(QWidget* parent, const QDir &dir)
             }
         }
     }
-
-    /*
-    // Something went wrong, reverting back to backup files.
-    if (count < files.length()) {
-        QMessageBox::warning(parent, "Warning", QT_TR_NOOP("Not all files where patched, files have been restored, please try patching again."));
-        undoPatch(dir);
-
-        return false;
-    }
-    */
 
     // Copy needed libraries.
     if (!DEBUG_MODE & !copyFiles(dir)) {
@@ -163,7 +164,7 @@ void Patcher::undoPatch(const QDir &dir) {
 }
 
 void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface)
-{    
+{
     QFile file = dir.filePath(patch_configuration_file);
     QSettings settings(file.fileName(), QSettings::IniFormat);
 

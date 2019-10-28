@@ -28,7 +28,7 @@ private:
 class SteamUtils
 {
 public:
-    static QString getGameDirectory(int appId);
+    static QString getGameDirectory();
 
 private:
     static QString installDirectory;

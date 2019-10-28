@@ -44,7 +44,7 @@ QStringList& DirUtils::findInstallDirectories()
     };
 
     append(RetailUtils::getGameDirectory());
-    append(SteamUtils::getGameDirectory(game_steam_app_id));
+    append(SteamUtils::getGameDirectory());
 
     return installDirectories;
 }
@@ -54,10 +54,7 @@ QString RetailUtils::installDirectory;
 QString RetailUtils::getGameDirectory()
 {
     // If install directory already detected, return early.
-    if (!installDirectory.isEmpty()) {
-        return installDirectory;
-    }
-
+    if (installDirectory.isEmpty()) {
 #ifdef Q_OS_WIN
     // Look for Far Cry 2 install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
@@ -68,19 +65,20 @@ QString RetailUtils::getGameDirectory()
     registry.endGroup();
 
     if (DirUtils::isGameDirectory(dir.absolutePath())) {
-        qDebug() << QT_TR_NOOP(QString("Found installation directory: %1").arg(dir.absolutePath()));
+        qDebug() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
 
-        return dir.absolutePath();
+        installDirectory = dir.absolutePath();
     }
 #endif
+    }
 
-    return QString();
+    return installDirectory;
 }
 
 QString SteamUtils::installDirectory;
 QStringList SteamUtils::libraries;
 
-QString SteamUtils::getGameDirectory(int appId)
+QString SteamUtils::getGameDirectory()
 {
     QDir dir = getInstallDirectory();
 
@@ -94,7 +92,7 @@ QString SteamUtils::getGameDirectory(int appId)
         }
 
         // Assemble manifest file using provided appId.
-        QFile manifestFile = dir.filePath(QString("%1_%2.%3").arg(game_steam_app_manifest_name).arg(appId).arg(game_steam_app_manifest_suffix));
+        QFile manifestFile = dir.filePath(QString("%1_%2.%3").arg(game_steam_app_manifest_name).arg(game_steam_app_id).arg(game_steam_app_manifest_suffix));
 
         if (!manifestFile.exists()) {
             continue;

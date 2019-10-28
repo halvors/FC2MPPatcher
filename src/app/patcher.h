@@ -1,8 +1,9 @@
 #ifndef PATCHER_H
 #define PATCHER_H
 
-#include <QDir>
+#include <QString>
 #include <QWidget>
+#include <QDir>
 #include <QNetworkInterface>
 
 #include "entry.h"
@@ -10,7 +11,7 @@
 class Patcher
 {
 public:
-    static bool isPatched(QDir dir);
+    static bool isPatched(QString path);
     static bool patch(QWidget* parent, const QDir &dir);
     static void undoPatch(const QDir &dir);
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);

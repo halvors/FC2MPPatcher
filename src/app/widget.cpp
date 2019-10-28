@@ -27,7 +27,7 @@ Widget::Widget(QWidget* parent) :
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
 
     // Add placeholder text to lineEdit.
-    QLineEdit *lineEdit_install_directory = ui->comboBox_install_directory->lineEdit();
+    QLineEdit* lineEdit_install_directory = ui->comboBox_install_directory->lineEdit();
     lineEdit_install_directory->setPlaceholderText(tr("Enter path to install directory..."));
 
     // Populate comboBox with found install directories.
@@ -41,7 +41,8 @@ Widget::Widget(QWidget* parent) :
     loadSettings();
 
     // Update patch button according to patch status.
-    bool patched = Patcher::isPatched(getInstallDirectory(false));
+    QString path = getInstallDirectory(false);
+    bool patched = Patcher::isPatched(path);
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
@@ -187,9 +188,10 @@ void Widget::updatePatchStatus(bool patched) const
 
 void Widget::comboBox_install_directory_currentIndexChanged(int index)
 {
-    Q_UNUSED(index);
+    Q_UNUSED(index)
 
-    updatePatchStatus(Patcher::isPatched(getInstallDirectory(false)));
+    QString path = getInstallDirectory(false);
+    updatePatchStatus(Patcher::isPatched(path));
 }
 
 void Widget::pushButton_install_directory_clicked()
@@ -210,7 +212,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
     QDir dir = getInstallDirectory();
 
     // Only update network configuration if game is patched.
-    if (Patcher::isPatched(dir)) {
+    if (Patcher::isPatched(dir.absolutePath())) {
         // Generate network configuration.
         Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->itemData(index).value<QNetworkInterface>());
     }
@@ -219,11 +221,17 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QDir dir = getInstallDirectory();
+    QString path = getInstallDirectory();
+
+    if (path.isEmpty()) {
+        return;
+    }
+
+    QDir dir = path;
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir)) {
+    if (Patcher::isPatched(dir.absolutePath())) {
         Patcher::undoPatch(dir);
 
         updatePatchStatus(false);
