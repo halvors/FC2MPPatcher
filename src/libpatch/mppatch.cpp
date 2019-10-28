@@ -29,7 +29,7 @@ int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int nam
     sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
 
     // Change address to bind to any.
-    name_in->sin_addr.s_addr = inet_addr("0.0.0.0");
+    name_in->sin_addr.s_addr = INADDR_ANY;
 
     return bind(s, name, namelen);
 }
@@ -53,7 +53,7 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, i
     readSettings();
 
     // If destination address is 255.255.255.255, use subnet broadcast address instead.
-    if (to_in->sin_addr.s_addr == inet_addr("255.255.255.255")) {
+    if (to_in->sin_addr.s_addr == INADDR_BROADCAST) {
         to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
     }
 
