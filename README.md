@@ -30,6 +30,11 @@ If you are upgrading from an old version of the patch uninstall the old one and 
 This patch will probably trigger a false positive in your antivirus software because it alters the game files of Far Cry 2, this is normal.  
 The patch contains no malware or virueses, you're also welcome to read throught our code!
 
+### Dedicated Server
+If hosting a server to be used by players thruy VPN, you have to select your VPN adapter before patching!
+
+Also please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server always listens on 0.0.0.0 (any), which means it's reachable on any network adapter.
+
 ### Technical information
 The reason for this being necessary is due to changes in the Windows API on newer versions, that is not compatible with Ubisoft's somewhat strange implementation.
 
