@@ -12,7 +12,7 @@ class Patcher
 {
 public:
     static bool isPatched(QString path);
-    static bool patch(QWidget* parent, const QDir &dir);
+    static bool patch(QWidget *parent, const QDir &dir);
     static void undoPatch(const QDir &dir);
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);
 

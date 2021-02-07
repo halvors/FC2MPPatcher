@@ -18,19 +18,19 @@ class PeFile : public QObject
     Q_OBJECT
 
 public:
-    explicit PeFile(const QFile &file, QObject* parent = nullptr);
+    explicit PeFile(const QFile &file, QObject *parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses, const QString &sectionName) const;
+    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const;
     bool write() const;
 
 private:
     const QFile &file;
-    pe_base* image = nullptr;
+    pe_base *image = nullptr;
 
     bool read();
     QList<unsigned int> getFunctionAddresses(const QString &libraryFile) const;
-    bool patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses, const QString &sectionName) const;
+    bool patchAddresses(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const;
 };
 
 #endif // PEFILE_H

@@ -5,7 +5,7 @@
 #include "fileutils.h"
 #include "global.h"
 
-const char* FileUtils::checkSum(QFile file)
+const char *FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
         QCryptographicHash hash(QCryptographicHash::Sha256);
@@ -20,8 +20,8 @@ const char* FileUtils::checkSum(QFile file)
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target, bool patched)
 {
-    const char* fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
-    const char* targetCheckSum = patched ? target.getCheckSumPatched() : target.getCheckSum();
+    const char *fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
+    const char *targetCheckSum = patched ? target.getCheckSumPatched() : target.getCheckSum();
 
     return strcmp(fileCheckSum, targetCheckSum) == 0;
 }

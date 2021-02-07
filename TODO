@@ -1,7 +1,9 @@
 - Use regex to validate input?
-- Properly detect UPlay version.
-- Support FC2 Redux mod's custom Dunia.dll.
 
+Networking:
+- Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces?
+
+Compiling:
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.
 - Workaround for Windows:
 	Download: https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dev.tar.lzma/download

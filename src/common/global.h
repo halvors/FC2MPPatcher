@@ -36,7 +36,6 @@ constexpr char game_steam_app_manifest_suffix[] = "acf";
 constexpr char game_steam_app_manifest_key[] = "installdir";
 constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 
-constexpr char patch_pe_section[] = ".text";
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
 const QString patch_library_pe_section = QString(patch_library_name).toLower();
@@ -64,6 +63,9 @@ constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
 constexpr unsigned short patch_network_lobbyserver_port = 3035;
 
+// Change game_id sent to ubisoft for Steam and Uplay editions.
+constexpr char patch_game_id[] = "2c66b725e7fb0697c0595397a14b0bc8";
+
 const QList<FileEntry> files = {
     {
         "Dunia.dll",
@@ -84,7 +86,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "11e413d632ec52ae01fdc07accc8dca792c44c5cf6e285863ee74f8a82d23062",
+                "9eec1b6b2eee87da3a6ec97760359e9afb58fadad506fffbe0db8fea7849d511",
                 {
                     { 0x1001076e, 0 }, // bind()
                     { 0x102161a8, 0 }, // bind()
@@ -93,12 +95,13 @@ const QList<FileEntry> files = {
                     { 0x10cf28e4, 0 }, // bind()
                     { 0x10013f33, 2 }, // sendTo()
                     { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 }  // getHostByName()
+                    { 0x100141fc, 4 }, // getHostByName()
+                    { 0x10e420c0, patch_game_id } // game_id
                 }
             },
             { // Uplay
                 "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                "04ca4e9e4e9e76563aabf8d5a3d81184aa64dcb63af6c95a2ab89d45cf2549d6",
+                "0dd4f7074debda053b655b6ecde3785bd4e228a2ff15e35836aa300e89258916",
                 {
                     { 0x1001076e, 0 }, // bind()
                     { 0x102161a8, 0 }, // bind()
@@ -107,7 +110,8 @@ const QList<FileEntry> files = {
                     { 0x10cf28e4, 0 }, // bind()
                     { 0x10013f33, 2 }, // sendTo() // verify
                     { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 }  // getHostByName() // verify
+                    { 0x100141fc, 4 },  // getHostByName() // verify
+                    { 0x10e420c0, patch_game_id } // game_id
                 }
             }
         }
@@ -142,7 +146,7 @@ const QList<FileEntry> files = {
                     { 0x00c465bd, 1 }, // connect()
                     { 0x00ba6e83, 2 }, // sendTo()
                     { 0x00c46a66, 3 }, // getAdapersInfo()
-                    { 0x00ba714c, 4 }  // getHostByName()
+                    { 0x00ba714c, 4 }, // getHostByName()
                 }
             },
             { // Uplay

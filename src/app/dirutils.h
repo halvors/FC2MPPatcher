@@ -10,7 +10,7 @@ class DirUtils
 public:
     static bool isGameDirectory(QDir dir);
     static bool isGameDirectory(const QString &path);
-    static QStringList& findInstallDirectories();
+    static QStringList &findInstallDirectories();
 
 private:
     static QStringList installDirectories;

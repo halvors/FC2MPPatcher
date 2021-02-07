@@ -152,7 +152,7 @@ QString SteamUtils::getInstallDirectory()
     return installDirectory;
 }
 
-QStringList& SteamUtils::findLibraries(QDir &dir)
+QStringList &SteamUtils::findLibraries(QDir &dir)
 {
     // If libraries already found, return early.
     if (!libraries.isEmpty()) {

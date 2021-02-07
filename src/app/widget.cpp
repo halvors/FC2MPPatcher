@@ -14,7 +14,7 @@
 #include "fileutils.h"
 #include "patcher.h"
 
-Widget::Widget(QWidget* parent) :
+Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
@@ -27,7 +27,7 @@ Widget::Widget(QWidget* parent) :
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
 
     // Add placeholder text to lineEdit.
-    QLineEdit* lineEdit_install_directory = ui->comboBox_install_directory->lineEdit();
+    QLineEdit *lineEdit_install_directory = ui->comboBox_install_directory->lineEdit();
     lineEdit_install_directory->setPlaceholderText(tr("Enter path to install directory..."));
 
     // Populate comboBox with found install directories.
@@ -62,7 +62,7 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::closeEvent(QCloseEvent* event)
+void Widget::closeEvent(QCloseEvent *event)
 {
     saveSettings();
 

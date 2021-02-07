@@ -1,10 +1,11 @@
 #include <QDebug>
 
 #include <fstream>
+#include <cstring>
 
 #include "pefile.h"
 
-PeFile::PeFile(const QFile &file, QObject* parent) :
+PeFile::PeFile(const QFile &file, QObject *parent) :
     QObject(parent),
     file(file)
 {    
@@ -42,7 +43,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses, const QString &sectionName) const
+bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const
 {
     // Check that image is loaded.
     if (!image) {
@@ -85,7 +86,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Patch code.
-    patchFunctions(libraryFile, libraryFunctions, addresses, sectionName);
+    patchAddresses(libraryFile, libraryFunctions, addresses);
 
     return true;
 }
@@ -142,58 +143,70 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) con
     return addresses;
 }
 
-bool PeFile::patchFunctions(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses, const QString &sectionName) const
+bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const
 {
+    // Get a compiled list of all functiona addreses.
+    const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryFile);
+
     for (section &section : image->get_image_sections()) {
-        // Only patch our specified section specified.
-        if (section.get_name() == sectionName.toStdString()) {
-            // Getting the base image address for later use.
-            unsigned int baseImageAddress = image->get_image_base_32() + section.get_virtual_address();
+        qDebug() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(QString::fromStdString(section.get_name())));
 
-            // Read raw data of section as byte array.
-            unsigned char* data = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]);
+        // Getting the base image address for later use.
+        unsigned int sectionAddress = image->get_image_base_32() + section.get_virtual_address();
 
-            // Get a compiled list of all functiona addreses.
-            const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryFile);
+        // Read raw data of section as byte array.
+        unsigned char *rawDataPtr = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
 
-            // Patching all addresses specified for this target.
-            for (const AddressEntry &addressEntry : addresses) {
-                unsigned int address = addressEntry.getAddress();
+        // Patching all addresses specified for this target.
+        for (const AddressEntry &addressEntry : addresses) {
+            // Only patch addresses in their specified section.
+            if (section.get_name() != addressEntry.getSection().toStdString())
+                continue;
 
-                // If address is zero, that means this function is not use for this file.
-                if (address == 0) {
-                    continue;
+            unsigned int address = addressEntry.getAddress();
+            QByteArray data = addressEntry.getValue();
+
+            // If address is zero, that means this function is not use for this file.
+            if (address == 0)
+                continue;
+
+            // Creating pointer to the data that is to be updated (aka. does pointer yoga).
+            unsigned int *basePtr = reinterpret_cast<unsigned int*>(rawDataPtr + address - sectionAddress);
+
+            // Handle symbols differently from data.
+            if (addressEntry.isSymbol()) {
+                int index = data.toInt();
+                unsigned int functionAddress = functionAddresses[index];
+
+                // Verify to some degree addresses to be patched.
+                if (functionAddress == 0) {
+                    qDebug() << QT_TR_NOOP(QString("Error: Address is zero, something went wrong! Aborting."));
+
+                    return false;
                 }
 
-                // Creating pointer to the data that is to be updated (aka. does pointer yoga).
-                unsigned int* dataPtr = reinterpret_cast<unsigned int*>(data + address - baseImageAddress);
+                qDebug() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16).arg(libraryFunctions[index]).arg(functionAddress, 0, 16));
 
-                if (addressEntry.isFunction()) {
-                    int index = static_cast<int>(addressEntry.getValue());
-                    unsigned int functionAddress = functionAddresses[index];
+                // Change the old address to point to new function instead.
+                unsigned int *dataPtr = reinterpret_cast<unsigned int*>(basePtr);
+                *dataPtr = functionAddress;
+            } else {
+                // Change the value at the address to the gived code.
+                char *dataPtr = reinterpret_cast<char*>(basePtr);
 
-                    // Verify to some degree addresses to be patched.
-                    if (functionAddress == 0) {
-                        qDebug() << QT_TR_NOOP(QString("Error: An address is zero, something went wrong! Aborting."));
+                if (data.length() <= 0) {
+                    qDebug() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));
 
-                        return false;
-                    }
-
-                    // Change the old address to point to new function instead.
-                    *dataPtr = functionAddress;
-
-                    qDebug() << QT_TR_NOOP(QString("Patched function call to %1, address changed from 0x%2 to 0x%3").arg(libraryFunctions[index]).arg(address, 0, 16).arg(functionAddress, 0, 16));
-                } else {
-                    // Change the value at the address to the gived code.
-                    *dataPtr = addressEntry.getValue();
-
-                    qDebug() << QT_TR_NOOP(QString("Patched code at address %1, code changed to 0x%3").arg(address, 0, 16).arg(addressEntry.getValue(), 0, 16));
+                    return false;
                 }
+
+                qDebug() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(data.constData()).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.length()));
+
+                // Copy data
+                std::memcpy(dataPtr, data.constData(), data.length());
             }
-
-            return true;
         }
     }
 
-    return false;
+    return true;
 }

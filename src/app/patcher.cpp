@@ -71,10 +71,10 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     qDebug() << QT_TR_NOOP(QString("Patching: %1").arg(file.fileName()));
 
     // Create PeFile instance for this particular target.
-    PeFile* peFile = new PeFile(file);
+    PeFile *peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getAddresses(), patch_pe_section);
+    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getAddresses());
 
     // Write PE to file.
     peFile->write();
@@ -84,7 +84,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     return FileUtils::isValid(dir, fileEntry, target, true);
 }
 
-bool Patcher::patch(QWidget* parent, const QDir &dir)
+bool Patcher::patch(QWidget *parent, const QDir &dir)
 {
     int count = 0;
 

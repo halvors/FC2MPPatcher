@@ -2,44 +2,57 @@
 #define ENTRY_H
 
 #include <QList>
+#include <QByteArray>
 
 class AddressEntry {
 public:
-    AddressEntry(unsigned int address, unsigned int code, bool function = true) :
+    AddressEntry(unsigned int address, unsigned int word) :
+        AddressEntry(address, QByteArray::number(word), ".text", true) {}
+
+    AddressEntry(unsigned int address, const QString &data) :
+        AddressEntry(address, data.toUtf8(), ".rdata", false) {}
+
+    AddressEntry(unsigned int address, const QByteArray &value, const QString &section, bool symbol) :
         address(address),
-        value(code),
-        function(function) {}
+        value(value),
+        section(section),
+        symbol(symbol) {}
 
     unsigned int getAddress() const {
         return address;
     }
 
-    unsigned int getValue() const {
+    QByteArray getValue() const {
         return value;
     }
 
-    bool isFunction() const {
-        return function;
+    QString getSection() const {
+        return section;
+    }
+
+    bool isSymbol() const {
+        return symbol;
     }
 
 private:
     unsigned int address;
-    unsigned int value;
-    bool function;
+    QByteArray value;
+    QString section;
+    bool symbol;
 };
 
 class TargetEntry {
 public:
-    TargetEntry(const char* checkSum, const char* checkSumPatched, const QList<AddressEntry> &functions) :
+    TargetEntry(const char *checkSum, const char *checkSumPatched, const QList<AddressEntry> &functions) :
         checkSum(checkSum),
         checkSumPatched(checkSumPatched),
         addresses(functions) {}
 
-    const char* getCheckSum() const {
+    const char *getCheckSum() const {
         return checkSum;
     }
 
-    const char* getCheckSumPatched() const {
+    const char *getCheckSumPatched() const {
         return checkSumPatched;
     }
 
@@ -55,11 +68,11 @@ private:
 
 class FileEntry {
 public:
-    FileEntry(const char* name, const QList<TargetEntry> &targets) :
+    FileEntry(const char *name, const QList<TargetEntry> &targets) :
         name(name),
         targets(targets) {}
 
-    const char* getName() const {
+    const char *getName() const {
         return name;
     }
 
@@ -68,7 +81,7 @@ public:
     }
 
 private:
-    const char* name;
+    const char *name;
     QList<TargetEntry> targets;
 };
 

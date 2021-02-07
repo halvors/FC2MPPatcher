@@ -17,14 +17,14 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget* parent = nullptr);
+    explicit Widget(QWidget *parent = nullptr);
     ~Widget();
 
 private:
-    Ui::Widget* ui;
-    QSettings* settings;
+    Ui::Widget *ui;
+    QSettings *settings;
 
-    void closeEvent(QCloseEvent* event);
+    void closeEvent(QCloseEvent *event);
     void loadSettings();
 
     QString getInstallDirectory(bool warning = true);
