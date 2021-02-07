@@ -1,11 +1,12 @@
 # FC2MPPatcher
 An utility for patching your Far Cry 2 installation to support multiplayer agian. 
 
-This resolves for Game and dedicated server:
+This resolves the following issues for the game and dedicated server:
  * Binding to the wrong network interface, resolving issues with online multiplayer. 
  * Annoncing wrong IP address in multiplayer, showing 9999 ping for mathces in lobby. 
  * Broadcasting to wrong address, causing issues with LAN multiplayer (including over VPN).
  * Joining matches hosted ingame.
+ * Steam and Uplay version being unable to login to online accounts.
 
 If you experience diffculties patching the game, first make sure you got the 1.03 patch installed, if your version of the game isn't supported (only Retail, Steam and GOG is tested), please report on the issue tracker, it's a quick fix.
 
@@ -31,7 +32,7 @@ This patch will probably trigger a false positive in your antivirus software bec
 The patch contains no malware or virueses, you're also welcome to read throught our code!
 
 ### Dedicated Server
-If hosting a server to be used by players thruy VPN, you have to select your VPN adapter before patching!
+If hosting a server to be used by players thru VPN, you have to select your VPN adapter before patching!
 
 Also please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server always listens on 0.0.0.0 (any), which means it's reachable on any network adapter.
 
