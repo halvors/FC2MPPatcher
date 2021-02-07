@@ -12,7 +12,7 @@ void MPPatch::readSettings()
 
             // Scan thru addresses for this interface.
             for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-                // We're onlt looking for IPv4 addresses.
+                // We're only looking for IPv4 addresses.
                 if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
                     address = addressEntry.ip().toString();
                     broadcast = addressEntry.broadcast().toString();
@@ -54,28 +54,7 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, i
 
     // If destination address is 255.255.255.255, use subnet broadcast address instead.
     if (to_in->sin_addr.s_addr == INADDR_BROADCAST) {
-        // TODO: Test this experimental feature supporting multiple network interfaces even when doing broadcasts.
-        // Loop thru all of the systems network interfaces.
-        for (const QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
-            const QNetworkInterface::InterfaceFlags &flags = interface.flags();
-
-            // Only show active network interfaces and not loopback interfaces.
-            if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack) && !flags.testFlag(QNetworkInterface::CanBroadcast)) { // TODO: OR these together somehow?
-                // Scan thru addresses for this interface.
-                for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
-                    // Only select first IPv4 address found.
-                    if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                        to_in->sin_addr.s_addr = inet_addr(addressEntry.broadcast().toStdString().c_str());
-                        sendto(s, buf, len, flags, to, tolen);
-
-                        break;
-                    }
-                }
-
-                ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
-            }
-        }
-    }
+        to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
 
     return sendto(s, buf, len, flags, to, tolen);
 }
