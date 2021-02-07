@@ -149,7 +149,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
     const QList<unsigned int> &functionAddresses = getFunctionAddresses(libraryFile);
 
     for (section &section : image->get_image_sections()) {
-        qDebug() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(QString::fromStdString(section.get_name())));
+        qDebug().noquote() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(QString::fromStdString(section.get_name())));
 
         // Getting the base image address for later use.
         unsigned int sectionAddress = image->get_image_base_32() + section.get_virtual_address();
@@ -185,7 +185,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
                     return false;
                 }
 
-                qDebug() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16).arg(libraryFunctions[index]).arg(functionAddress, 0, 16));
+                qDebug().noquote() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16).arg(libraryFunctions[index]).arg(functionAddress, 0, 16));
 
                 // Change the old address to point to new function instead.
                 unsigned int *dataPtr = reinterpret_cast<unsigned int*>(basePtr);
@@ -200,7 +200,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
                     return false;
                 }
 
-                qDebug() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(data.constData()).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.length()));
+                qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from %2 to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(data.constData()).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.length()));
 
                 // Copy data
                 std::memcpy(dataPtr, data.constData(), data.length());
