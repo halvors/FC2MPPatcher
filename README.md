@@ -45,8 +45,10 @@ https://discord.gg/82G9Fh5
 
 ## Thanks to
 ### Contributors
-<i>zenoy</i> - Patching the assembly code, the time "wasted" figuring out.  
+<i>zenoy</i> - Patching the assembly code, and the time "wasted" figuring it out.  
 <i>halvors</i> - For patcher implementation, and the interface to support it.  
+<i>FEARIV, Gabor and Lasercar</i> - For testing and community support.
+
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
