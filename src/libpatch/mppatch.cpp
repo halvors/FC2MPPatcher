@@ -39,9 +39,8 @@ int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int 
     sockaddr_in *name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
 
     // If connecting to lobbyserver on port 3100, use default lobby server port instead.
-    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100)) {
+    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100))
         name_in->sin_port = htons(patch_network_lobbyserver_port);
-    }
 
     return connect(s, name, namelen);
 }
@@ -53,7 +52,7 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, i
     readSettings();
 
     // If destination address is 255.255.255.255, use subnet broadcast address instead.
-    if (to_in->sin_addr.s_addr == INADDR_BROADCAST) {
+    if (to_in->sin_addr.s_addr == INADDR_BROADCAST)
         to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
 
     return sendto(s, buf, len, flags, to, tolen);
@@ -71,9 +70,8 @@ unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterI
 
     readSettings();
 
-    while (strcmp(adapter->IpAddressList.IpAddress.String, address.toStdString().c_str()) != 0) {
+    while (strcmp(adapter->IpAddressList.IpAddress.String, address.toStdString().c_str()) != 0)
         adapter = adapter->Next;
-    }
 
     adapter->Next = nullptr;
     memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
