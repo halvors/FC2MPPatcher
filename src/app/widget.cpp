@@ -205,6 +205,7 @@ void Widget::pushButton_install_directory_clicked()
     }
 
     ui->comboBox_install_directory->setCurrentText(path);
+    updatePatchStatus(Patcher::isPatched(path));
 }
 
 void Widget::comboBox_network_interface_currentIndexChanged(int index)

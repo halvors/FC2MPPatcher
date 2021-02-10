@@ -62,9 +62,8 @@ unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterI
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
-    if (result == ERROR_BUFFER_OVERFLOW) {
+    if (result == ERROR_BUFFER_OVERFLOW)
         return result;
-    }
 
     IP_ADAPTER_INFO *adapter = adapterInfo;
 
