@@ -8,7 +8,7 @@
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;

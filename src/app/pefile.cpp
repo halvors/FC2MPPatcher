@@ -85,6 +85,20 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     // Rebuild imports.
     rebuild_imports(*image, imports, attachedSection, settings);
 
+    //// New section -------------------------------------------
+    // Create custom sections.
+    section textSection;
+    textSection.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
+    textSection.set_name(".text_mp"); // Section Name.
+    textSection.readable(true).writeable(true).executable(true); // Available for read, write and execute.
+    textSection.set_raw_data("Tralala"); // TODO: Insert relevant assembly code here...
+
+    // Add a section and get a link to the added section with calculated dimensions.
+    image->add_section(textSection);
+    std::ofstream new_pe_file(file.fileName().toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
+    rebuild_pe(*image, new_pe_file);
+    //// New section -------------------------------------------
+
     // Patch code.
     patchAddresses(libraryFile, libraryFunctions, addresses);
 
