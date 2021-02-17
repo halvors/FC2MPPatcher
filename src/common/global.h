@@ -4,11 +4,12 @@
 #include <QString>
 #include <QStringList>
 #include <QList>
+#include <QByteArray>
 
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
@@ -73,7 +74,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                "dde6c2bcd9e333ca68a6c40ab6da8446a53b0721a03700b7302c3d40054cac8a",
+                "020ba8709ba7090fa9e29c77f26a66ea230aef92677fe93560d97e391be43c97",
                 {
                     // Common
                     { 0x1001088e, 0 }, // bind()
@@ -129,7 +130,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical).
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                "64c07c4d04d1180f3ff497a6ecc1ce8a48b021e201c640242db32e9a98cb5d1a",
+                "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
                 {
                     // Common
                     { 0x00425fc4, 0 }, // bind()
