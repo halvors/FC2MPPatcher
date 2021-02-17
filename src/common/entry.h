@@ -9,10 +9,7 @@ public:
     AddressEntry(unsigned int address, unsigned int word, const QString &section = ".text") :
         AddressEntry(address, QByteArray::number(word), section, true) {}
 
-    AddressEntry(unsigned int address, const QString &data, const QString &section = ".text") :
-        AddressEntry(address, data.toUtf8(), section, false) {}
-
-    AddressEntry(unsigned int address, const QByteArray &value, const QString &section, bool symbol) :
+    AddressEntry(unsigned int address, const QByteArray &value, const QString &section = ".text", bool symbol = false) :
         address(address),
         value(value),
         section(section),

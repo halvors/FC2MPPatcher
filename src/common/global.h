@@ -64,7 +64,7 @@ constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
 constexpr unsigned short patch_network_lobbyserver_port = 3035;
 
 // Change game_id sent to ubisoft for Steam and Uplay editions.
-constexpr char patch_game_id[] = "2c66b725e7fb0697c0595397a14b0bc8";
+const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
 
 const QList<FileEntry> files = {
     {
@@ -134,7 +134,7 @@ const QList<FileEntry> files = {
                     { 0x00425fc4, 0 }, // bind()
                     { 0x0042600b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
-                    { 0x00ba126e, 0 }, // bind()
+                    { 0x00ba126e, 0 }, // bind()eca
                     { 0x00e83eda, 0 }, // bind()
                     { 0x00ba4a33, 2 }, // sendTo()
                     { 0x00c444a6, 3 }, // getAdapersInfo()
@@ -160,7 +160,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c465bd, 1 }, // connect()
-                    { 0x004eca95, "EB" } // change JZ (74) to JMP (EB)
+                    { 0x004eca95, QByteArray("\xEB") } // change JZ (74) to JMP (EB)
                 }
             },
             { // Uplay
