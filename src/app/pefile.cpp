@@ -80,24 +80,13 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
 
     // Structure responsible for import reassembler settings
     import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
-    settings.fill_missing_original_iats(true); // Needed to preserve original IAT.
+    settings.fill_missing_original_iats(true); // Needed in order to preserve original IAT.
 
     // Rebuild imports.
     rebuild_imports(*image, imports, attachedSection, settings);
 
-    //// New section -------------------------------------------
-    // Create custom sections.
-    section textSection;
-    textSection.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
-    textSection.set_name(".text_mp"); // Section Name.
-    textSection.readable(true).writeable(true).executable(true); // Available for read, write and execute.
-    textSection.set_raw_data("Tralala"); // TODO: Insert relevant assembly code here...
-
-    // Add a section and get a link to the added section with calculated dimensions.
-    image->add_section(textSection);
-    std::ofstream new_pe_file(file.fileName().toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
-    rebuild_pe(*image, new_pe_file);
-    //// New section -------------------------------------------
+    // Add extra .text section.
+    buildTextSection();
 
     // Patch code.
     patchAddresses(libraryFile, libraryFunctions, addresses);
@@ -135,6 +124,20 @@ bool PeFile::write() const
     return true;
 }
 
+void PeFile::buildTextSection() const
+{
+    section section;
+    section.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
+    section.set_name(".text_mp"); // Section Name.
+    section.readable(true).writeable(true).executable(true);
+
+    std::string text = "testest";
+
+    section.set_raw_data(text);
+
+    image->add_section(section);
+}
+
 QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) const
 {
     QList<unsigned int> addresses;
@@ -143,11 +146,11 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) con
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
         if (library.get_name() == libraryFile.toStdString()) {
-            unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
+            unsigned int baseAddress = image->get_image_base_32() + library.get_rva_to_iat();
+            unsigned int addressSize = 4; // Offset is 4 between entries.
 
-            for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
+            for (unsigned int address = baseAddress; address < library.get_imported_functions().size() * addressSize; address += addressSize) {
                 addresses.append(address);
-                address += 4; // Offset is 4 between entries.
             }
 
             break;

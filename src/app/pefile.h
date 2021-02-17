@@ -29,6 +29,7 @@ private:
     pe_base *image = nullptr;
 
     bool read();
+    void buildTextSection() const;
     QList<unsigned int> getFunctionAddresses(const QString &libraryFile) const;
     bool patchAddresses(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const;
 };
