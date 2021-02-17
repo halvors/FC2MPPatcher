@@ -135,7 +135,7 @@ const QList<FileEntry> files = {
                     { 0x00425fc4, 0 }, // bind()
                     { 0x0042600b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
-                    { 0x00ba126e, 0 }, // bind()eca
+                    { 0x00ba126e, 0 }, // bind()
                     { 0x00e83eda, 0 }, // bind()
                     { 0x00ba4a33, 2 }, // sendTo()
                     { 0x00c444a6, 3 }, // getAdapersInfo()
@@ -162,7 +162,7 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
-                    { 0x00AB3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_mp section.
                 }
             },
             { // Uplay
@@ -180,7 +180,9 @@ const QList<FileEntry> files = {
                     { 0x00ba714c, 4 }, // getHostByName()
 
                     // Server
-                    { 0x00c465bd, 1 }  // connect()
+                    { 0x00c465bd, 1 },  // connect()
+                    { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_mp section.
                 }
             }
         }

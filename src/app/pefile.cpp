@@ -125,8 +125,9 @@ void PeFile::buildTextSection() const
 {
     section section;
     section.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
-    section.set_name(".text_mp"); // Section Name.
+    section.set_name(".text_mp");
     section.readable(true).writeable(true).executable(true);
+
     /*
     unsigned char[17] text = {
         0xe8, 0x4b, 0xcb, 0x2f, 0xff,             // call 0x00AAEB50
@@ -135,8 +136,8 @@ void PeFile::buildTextSection() const
 
     };
     */
-    //E8 4B CB 2F FF 51 50 FF 15 A4 0D 7B 01 8B C8 58 89 48 08 59 E9 EC 10 30 FF
 
+    // E8 4B CB 2F FF 51 50 FF 15 A4 0D 7B 01 8B C8 58 89 48 08 59 E9 EC 10 30 FF
     section.set_raw_data("\xE8\x4B\xCB\x2F\xFF\x51\x50\xFF\x15\xA4\x0D\x7B\x01\x8B\xC8\x58\x89\x48\x08\x59\xE9\xEC\x10\x30\xFF");
 
     image->add_section(section);

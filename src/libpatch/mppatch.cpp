@@ -1,12 +1,11 @@
 #include <QNetworkInterface>
+#include <QHostAddress>
+
+#include <iostream>
 
 #include "mppatch.h"
 #include "global.h"
-
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QEventLoop>
-#include <QHostAddress>
+#include "HTTPRequest.h"
 
 void MPPatch::readSettings()
 {
@@ -98,6 +97,19 @@ unsigned int __stdcall MPPatch::getPublicIPAddress()
     if (publicAddress != 0)
         return publicAddress;
 
+    try {
+        // you can pass http::InternetProtocol::V6 to Request to make an IPv6 request
+        http::Request request("http://api.ipify.org");
+
+        // send a get request
+        const http::Response response = request.send("GET");
+
+        publicAddress = htonl(QHostAddress(QString::fromStdString(std::string(response.body.begin(), response.body.end()))).toIPv4Address());
+    } catch (const std::exception &e) {
+
+    }
+
+    /*
     // Query for public ip address.
     QNetworkAccessManager *con = new QNetworkAccessManager();
     QNetworkReply *reply = con->get(QNetworkRequest(QUrl("http://api.ipify.org")));
@@ -110,8 +122,9 @@ unsigned int __stdcall MPPatch::getPublicIPAddress()
     if (reply->error() == QNetworkReply::NoError)
         publicAddress = QHostAddress(reply->readAll().constData()).toIPv4Address();
 
-    delete con;
     delete reply;
+    delete con;
+    */
 
     return publicAddress;
 }
