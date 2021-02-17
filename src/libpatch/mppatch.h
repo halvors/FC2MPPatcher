@@ -18,12 +18,13 @@ public:
     static MPPATCHSHARED_EXPORT unsigned long __stdcall getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, unsigned long *sizePointer);
     static MPPATCHSHARED_EXPORT hostent *WSAAPI __stdcall getHostByName_patch(const char *name);
 
-    static MPPATCHSHARED_EXPORT DWORD __stdcall getPublicIPAddress();
+    static MPPATCHSHARED_EXPORT unsigned int __stdcall getPublicIPAddress();
 
 private:
     static QSettings *settings;
     static QString address;
     static QString broadcast;
+    static unsigned int publicAddress;
 
     static void readSettings();
 };
@@ -31,5 +32,6 @@ private:
 QSettings *MPPatch::settings = nullptr;
 QString MPPatch::address = QString();
 QString MPPatch::broadcast = QString();
+unsigned int MPPatch::publicAddress = 0;
 
 #endif // MPPATCH_H

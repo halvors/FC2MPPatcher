@@ -3,8 +3,10 @@
 #include "mppatch.h"
 #include "global.h"
 
+#include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QNetworkRequest>
+#include <QEventLoop>
+#include <QHostAddress>
 
 void MPPatch::readSettings()
 {
@@ -90,7 +92,26 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-DWORD __stdcall MPPatch::getPublicIPAddress()
+unsigned int __stdcall MPPatch::getPublicIPAddress()
 {
-    return 0;
+    // Return cached address if it exists.
+    if (publicAddress != 0)
+        return publicAddress;
+
+    // Query for public ip address.
+    QNetworkAccessManager *con = new QNetworkAccessManager();
+    QNetworkReply *reply = con->get(QNetworkRequest(QUrl("http://api.ipify.org")));
+
+    // Trick to do this synchronously.
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() == QNetworkReply::NoError)
+        publicAddress = QHostAddress(reply->readAll().constData()).toIPv4Address();
+
+    delete con;
+    delete reply;
+
+    return publicAddress;
 }
