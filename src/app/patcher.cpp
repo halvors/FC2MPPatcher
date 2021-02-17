@@ -56,9 +56,9 @@ bool Patcher::copyFiles(const QDir &dir)
     }
 
     if (success) {
-        qDebug() << QT_TR_NOOP(QString("Copying runtime dependencies."));
+        qDebug().noquote() << QT_TR_NOOP(QString("Copying runtime dependencies."));
     } else {
-        qDebug() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
+        qDebug().noquote() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
     }
 
     return success;
@@ -68,7 +68,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
 {
     QFile file = dir.filePath(fileEntry.getName());
 
-    qDebug() << QT_TR_NOOP(QString("Patching: %1").arg(file.fileName()));
+    qDebug().noquote() << QT_TR_NOOP(QString("Patching file %1").arg(file.fileName()));
 
     // Create PeFile instance for this particular target.
     PeFile *peFile = new PeFile(file);
@@ -81,12 +81,15 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
 
     delete peFile;
 
+    if (DEBUG_MODE)
+        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.getName()).arg(FileUtils::checkSum(dir.filePath(fileEntry.getName()))));
+
     return FileUtils::isValid(dir, fileEntry, target, true);
 }
 
 bool Patcher::patch(QWidget *parent, const QDir &dir)
 {
-    int count = 0;
+    unsigned int count = 0;
 
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
@@ -106,7 +109,7 @@ bool Patcher::patch(QWidget *parent, const QDir &dir)
 
         // If file is not writable, set proper permissions.
         if (!fileInfo.permission(permissions)) {
-            qDebug() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
+            qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
 
             file.setPermissions(permissions);
         }
@@ -173,5 +176,5 @@ void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface
         settings.setValue(patch_configuration_network_interface_index, interface.index());
     settings.endGroup();
 
-    qDebug() << QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName()));
+    qDebug().noquote() << QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName()));
 }

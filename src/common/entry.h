@@ -9,9 +9,9 @@ public:
     AddressEntry(unsigned int address, unsigned int word, const QString &section = ".text") :
         AddressEntry(address, QByteArray::number(word), section, true) {}
 
-    AddressEntry(unsigned int address, const QByteArray &value, const QString &section = ".text", bool symbol = false) :
+    AddressEntry(unsigned int address, const QByteArray &data, const QString &section = ".text", bool symbol = false) :
         address(address),
-        value(value),
+        data(data),
         section(section),
         symbol(symbol) {}
 
@@ -19,8 +19,8 @@ public:
         return address;
     }
 
-    QByteArray getValue() const {
-        return value;
+    QByteArray getData() const {
+        return data;
     }
 
     QString getSection() const {
@@ -33,7 +33,7 @@ public:
 
 private:
     unsigned int address;
-    QByteArray value;
+    QByteArray data;
     QString section;
     bool symbol;
 };

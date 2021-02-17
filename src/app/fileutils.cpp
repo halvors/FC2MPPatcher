@@ -59,7 +59,7 @@ bool FileUtils::backup(const QDir &dir, const FileEntry &fileEntry)
     bool result = copy(dir, fileEntry, true);
 
     if (result) {
-        qDebug() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileEntry.getName()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileEntry.getName()));
     }
 
     return result;
@@ -70,7 +70,7 @@ bool FileUtils::restore(const QDir &dir, const FileEntry &fileEntry)
     bool result = copy(dir, fileEntry, false);
 
     if (result) {
-        qDebug() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileEntry.getName()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileEntry.getName()));
     }
 
     return result;

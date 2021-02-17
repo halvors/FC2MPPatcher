@@ -25,7 +25,7 @@ bool PeFile::read()
     std::ifstream inputStream(file.fileName().toStdString(), std::ios::in | std::ios::binary);
 
     if (!inputStream) {
-        qDebug() << QT_TR_NOOP(QString("Cannot open: %1").arg(file.fileName()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Cannot open: %1").arg(file.fileName()));
 
         return false;
     }
@@ -34,7 +34,7 @@ bool PeFile::read()
         // Create an instance of a PE or PE + class using a factory
         image = new pe_base(pe_factory::create_pe(inputStream));
     } catch (const pe_exception &exception) {
-        qDebug() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
 
         return false;
     }
@@ -103,7 +103,7 @@ bool PeFile::write() const
         std::ofstream outputStream(file.fileName().toStdString(), std::ios::out | std::ios::binary | std::ios::trunc);
 
         if (!outputStream) {
-            qDebug() << QT_TR_NOOP(QString("Cannot create: %1").arg(file.fileName()));
+            qDebug().noquote() << QT_TR_NOOP(QString("Cannot create: %1").arg(file.fileName()));
 
             return false;
         }
@@ -111,9 +111,9 @@ bool PeFile::write() const
         // Rebuild PE file.
         rebuild_pe(*image, outputStream);
 
-        qDebug() << QT_TR_NOOP(QString("PE was rebuilt and saved to: %1").arg(file.fileName()));
+        qDebug().noquote() << QT_TR_NOOP(QString("PE was rebuilt and saved to: %1").arg(file.fileName()));
     } catch (const pe_exception &exception) {
-        qDebug() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Error: %1").arg(exception.what()));
 
         return false;
     }
@@ -178,7 +178,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
                 continue;
 
             unsigned int address = addressEntry.getAddress();
-            QByteArray data = addressEntry.getValue();
+            QByteArray data = addressEntry.getData();
 
             // If address is zero, that means this function is not use for this file.
             if (address == 0)
@@ -194,7 +194,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
 
                 // Verify to some degree addresses to be patched.
                 if (functionAddress == 0) {
-                    qDebug() << QT_TR_NOOP(QString("Error: Address is zero, something went wrong! Aborting."));
+                    qDebug().noquote() << QT_TR_NOOP(QString("Error: Address is zero, something went wrong! Aborting."));
 
                     return false;
                 }
@@ -209,12 +209,12 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
                 char *dataPtr = reinterpret_cast<char*>(basePtr);
 
                 if (data.length() <= 0) {
-                    qDebug() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));
+                    qDebug().noquote() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));
 
                     return false;
                 }
 
-                qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.constData()).arg(data.length()));
+                qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(QByteArray(dataPtr, data.length()).toHex().constData()).arg(data.toHex().constData()).arg(data.length()));
 
                 // Copy data
                 std::memcpy(dataPtr, data.constData(), data.length());

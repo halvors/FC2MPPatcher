@@ -144,9 +144,9 @@ const QList<FileEntry> files = {
                     { 0x00c43ffd, 1 }  // connect()
                 }
             },
-            { // Steam (R2 Server is identical).
+            { // Steam (R2 Server is identical)
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "1c8152bfa04283b699acfe81d09a023fd19b0c2c73fe20e6d83b15e24c946653",
+                "e025464e0a824689e6f73bcdc87939413f1d39b0f3a271689c0d0340c2296a77",
                 {
                     // Common
                     { 0x004263d4, 0 }, // bind()
