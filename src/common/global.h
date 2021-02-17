@@ -88,7 +88,7 @@ const QList<FileEntry> files = {
             },
             { // Steam.
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "9eec1b6b2eee87da3a6ec97760359e9afb58fadad506fffbe0db8fea7849d511",
+                "40f4d55fe0ac6b370798983de2ca1dd09ef0423a7c523b7c424cadddbd894a25",
                 {
                     // Common
                     { 0x1001076e, 0 }, // bind()
@@ -106,7 +106,7 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                "0dd4f7074debda053b655b6ecde3785bd4e228a2ff15e35836aa300e89258916",
+                "c7674c14bad4214e547da3d60ccb14225665394f75b941b10c33362b206575c5",
                 {
                     // Common
                     { 0x1001076e, 0 }, // bind()
@@ -147,7 +147,7 @@ const QList<FileEntry> files = {
             },
             { // Steam (R2 Server is identical)
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "e025464e0a824689e6f73bcdc87939413f1d39b0f3a271689c0d0340c2296a77",
+                "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
                 {
                     // Common
                     { 0x004263d4, 0 }, // bind()
@@ -167,7 +167,7 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                "bf97b551b3219d5223dd9fdab961a3821edb2e3fbc759857695f661ebca0a1d7",
+                "38f33dfd74b9483fb7db7703dffe61d61fa51444730d38ed2b61fc6e20855d9a",
                 {
                     // Common
                     { 0x004263d4, 0 }, // bind()
