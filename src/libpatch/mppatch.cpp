@@ -3,6 +3,9 @@
 #include "mppatch.h"
 #include "global.h"
 
+#include <QNetworkReply>
+#include <QNetworkRequest>
+
 void MPPatch::readSettings()
 {
     if (!settings) {
@@ -85,4 +88,9 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     readSettings();
 
     return gethostbyname(address.toStdString().c_str());
+}
+
+DWORD __stdcall MPPatch::getPublicIPAddress()
+{
+    return 0;
 }

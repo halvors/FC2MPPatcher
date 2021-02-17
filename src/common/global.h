@@ -40,11 +40,12 @@ constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
 const QString patch_library_pe_section = QString(patch_library_name).toLower();
 const QStringList patch_library_functions = {
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
-    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
-    "_ZN7MPPatch19getHostByName_patchEPKc@4"                      // getHostByName()
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                     // bind()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                  // connect()
+    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",              // sendTo()
+    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8",   // getAdapersInfo()
+    "_ZN7MPPatch19getHostByName_patchEPKc@4",                       // getHostByName()
+    "_ZN7MPPatch18getPublicIPAddressEv@0"                           // getPublicIpAddress()
 };
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
@@ -160,7 +161,8 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c465bd, 1 }, // connect()
-                    { 0x004eca95, QByteArray("\xEB") } // change JZ (74) to JMP (EB)
+                    { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
+                    { 0x00AB3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }
                 }
             },
             { // Uplay
