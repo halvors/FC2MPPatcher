@@ -94,7 +94,8 @@ bool Patcher::patch(QWidget *parent, const QDir &dir)
         QFileInfo fileInfo = file;
 
         // What permissions should be set for files.
-        QFileDevice::Permissions permissions = QFileDevice::WriteOther |
+        QFileDevice::Permissions permissions =
+                QFileDevice::WriteOther |
                 QFileDevice::ReadOther |
                 QFileDevice::WriteGroup |
                 QFileDevice::ReadGroup |

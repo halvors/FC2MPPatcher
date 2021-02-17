@@ -15,9 +15,8 @@ PeFile::PeFile(const QFile &file, QObject *parent) :
 
 PeFile::~PeFile()
 {
-    if (image) {
+    if (image)
         delete image;
-    }
 }
 
 bool PeFile::read()
@@ -46,9 +45,8 @@ bool PeFile::read()
 bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const
 {
     // Check that image is loaded.
-    if (!image) {
+    if (!image)
         return false;
-    }
 
     // Get the list of imported libraries and functions.
     imported_functions_list imports = get_imported_functions(*image);
@@ -97,9 +95,8 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
 bool PeFile::write() const
 {
     // Check that image is loaded.
-    if (!image) {
+    if (!image)
         return false;
-    }
 
     try {
         // Create a new PE file.
@@ -131,8 +128,8 @@ void PeFile::buildTextSection() const
     section.set_name(".text_mp"); // Section Name.
     section.readable(true).writeable(true).executable(true);
 
-    std::string text = "testest";
-
+    // Test demonstrating building a char array.
+    char text[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
     section.set_raw_data(text);
 
     image->add_section(section);
@@ -146,11 +143,11 @@ QList<unsigned int> PeFile::getFunctionAddresses(const QString &libraryFile) con
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
         if (library.get_name() == libraryFile.toStdString()) {
-            unsigned int baseAddress = image->get_image_base_32() + library.get_rva_to_iat();
-            unsigned int addressSize = 4; // Offset is 4 between entries.
+            unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
 
-            for (unsigned int address = baseAddress; address < library.get_imported_functions().size() * addressSize; address += addressSize) {
+            for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
                 addresses.append(address);
+                address += 4; // Size of one address entry.
             }
 
             break;
@@ -217,7 +214,7 @@ bool PeFile::patchAddresses(const QString &libraryFile, const QStringList &libra
                     return false;
                 }
 
-                qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from %2 to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(data.constData()).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.length()));
+                qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(QByteArray(dataPtr, data.length()).constData()).arg(data.constData()).arg(data.length()));
 
                 // Copy data
                 std::memcpy(dataPtr, data.constData(), data.length());

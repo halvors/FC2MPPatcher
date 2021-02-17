@@ -74,6 +74,7 @@ const QList<FileEntry> files = {
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
                 "dde6c2bcd9e333ca68a6c40ab6da8446a53b0721a03700b7302c3d40054cac8a",
                 {
+                    // Common
                     { 0x1001088e, 0 }, // bind()
                     { 0x10213d18, 0 }, // bind()
                     { 0x10c4e97a, 0 }, // bind()
@@ -88,6 +89,7 @@ const QList<FileEntry> files = {
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
                 "9eec1b6b2eee87da3a6ec97760359e9afb58fadad506fffbe0db8fea7849d511",
                 {
+                    // Common
                     { 0x1001076e, 0 }, // bind()
                     { 0x102161a8, 0 }, // bind()
                     { 0x10c5d10a, 0 }, // bind()
@@ -96,22 +98,27 @@ const QList<FileEntry> files = {
                     { 0x10013f33, 2 }, // sendTo()
                     { 0x10c6a692, 3 }, // getAdapersInfo()
                     { 0x100141fc, 4 }, // getHostByName()
-                    { 0x10e420c0, patch_game_id } // game_id
+
+                    // Client
+                    { 0x10e420c0, patch_game_id, ".rdata" } // game_id
                 }
             },
             { // Uplay
                 "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
                 "0dd4f7074debda053b655b6ecde3785bd4e228a2ff15e35836aa300e89258916",
                 {
+                    // Common
                     { 0x1001076e, 0 }, // bind()
                     { 0x102161a8, 0 }, // bind()
                     { 0x10c5d10a, 0 }, // bind()
                     { 0x10cf289c, 0 }, // bind()
                     { 0x10cf28e4, 0 }, // bind()
-                    { 0x10013f33, 2 }, // sendTo() // verify
+                    { 0x10013f33, 2 }, // sendTo()
                     { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 },  // getHostByName() // verify
-                    { 0x10e420c0, patch_game_id } // game_id
+                    { 0x100141fc, 4 }, // getHostByName()
+
+                    // Client
+                    { 0x10e420c0, patch_game_id, ".rdata" } // game_id
                 }
             }
         }
@@ -123,45 +130,55 @@ const QList<FileEntry> files = {
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
                 "64c07c4d04d1180f3ff497a6ecc1ce8a48b021e201c640242db32e9a98cb5d1a",
                 {
+                    // Common
                     { 0x00425fc4, 0 }, // bind()
                     { 0x0042600b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba126e, 0 }, // bind()
                     { 0x00e83eda, 0 }, // bind()
-                    { 0x00c43ffd, 1 }, // connect()
                     { 0x00ba4a33, 2 }, // sendTo()
                     { 0x00c444a6, 3 }, // getAdapersInfo()
-                    { 0x00ba4cfc, 4 }  // getHostByName()
+                    { 0x00ba4cfc, 4 }, // getHostByName()
+
+                    // Server
+                    { 0x00c43ffd, 1 }  // connect()
                 }
             },
             { // Steam (R2 Server is identical).
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
                 "1c8152bfa04283b699acfe81d09a023fd19b0c2c73fe20e6d83b15e24c946653",
                 {
+                    // Common
                     { 0x004263d4, 0 }, // bind()
                     { 0x0042641b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba36be, 0 }, // bind()
                     { 0x00e85ffa, 0 }, // bind()
-                    { 0x00c465bd, 1 }, // connect()
                     { 0x00ba6e83, 2 }, // sendTo()
                     { 0x00c46a66, 3 }, // getAdapersInfo()
                     { 0x00ba714c, 4 }, // getHostByName()
+
+                    // Server
+                    { 0x00c465bd, 1 }, // connect()
+                    { 0x004eca95, "EB" } // change JZ (74) to JMP (EB)
                 }
             },
             { // Uplay
                 "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
                 "bf97b551b3219d5223dd9fdab961a3821edb2e3fbc759857695f661ebca0a1d7",
                 {
+                    // Common
                     { 0x004263d4, 0 }, // bind()
                     { 0x0042641b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba36be, 0 }, // bind()
                     { 0x00e85ffa, 0 }, // bind()
-                    { 0x00c465bd, 1 }, // connect()
-                    { 0x00ba6e83, 2 }, // sendTo() // verify
+                    { 0x00ba6e83, 2 }, // sendTo()
                     { 0x00c46a66, 3 }, // getAdapersInfo()
-                    { 0x00ba714c, 4 }  // getHostByName()
+                    { 0x00ba714c, 4 }, // getHostByName()
+
+                    // Server
+                    { 0x00c465bd, 1 }  // connect()
                 }
             }
         }
