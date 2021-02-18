@@ -74,7 +74,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile *peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_pe_section, patch_library_file, patch_library_functions, target.getAddresses());
+    peFile->apply(patch_library_pe_import_section, patch_library_file, patch_library_functions, target.getAddresses());
 
     // Write PE to file.
     peFile->write();

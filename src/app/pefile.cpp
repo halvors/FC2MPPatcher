@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "pefile.h"
+#include "global.h"
 
 PeFile::PeFile(const QFile &file, QObject *parent) :
     QObject(parent),
@@ -125,8 +126,8 @@ void PeFile::buildTextSection() const
 {
     section section;
     section.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
-    section.set_name(".text_mp");
-    section.readable(true).writeable(true).executable(true);
+    section.set_name(patch_library_pe_text_section);
+    section.readable(true).executable(true);
 
     /*
     unsigned char[17] text = {

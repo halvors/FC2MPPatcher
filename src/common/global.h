@@ -3,13 +3,13 @@
 
 #include <QString>
 #include <QStringList>
-#include <QList>
 #include <QByteArray>
+#include <QList>
 
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
@@ -31,7 +31,7 @@ constexpr char game_steam_name[] = "Steam";
 constexpr char game_steam_publisher[] = "Valve";
 constexpr char game_steam_app_directory[] = "steamapps";
 constexpr char game_steam_app_directory_common[] = "common";
-constexpr int game_steam_app_id = 19900;
+constexpr unsigned short game_steam_app_id = 19900;
 constexpr char game_steam_app_manifest_name[] = "appmanifest";
 constexpr char game_steam_app_manifest_suffix[] = "acf";
 constexpr char game_steam_app_manifest_key[] = "installdir";
@@ -39,7 +39,8 @@ constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
-const QString patch_library_pe_section = QString(patch_library_name).toLower();
+const QString patch_library_pe_import_section = QString(patch_library_name).toLower();
+constexpr char patch_library_pe_text_section[] = ".text_mp";
 const QStringList patch_library_functions = {
     "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                     // bind()
     "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                  // connect()
@@ -48,6 +49,9 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                       // getHostByName()
     "_ZN7MPPatch18getPublicIPAddressEv@0"                           // getPublicIpAddress()
 };
+const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
+constexpr char patch_configuration_network[] = "Network";
+constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
     "libgcc_s_dw2-1.dll",
@@ -57,15 +61,11 @@ const QStringList patch_library_runtime_dependencies = {
     "Qt5Network.dll"
 };
 
-const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
-constexpr char patch_configuration_network[] = "Network";
-constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
-
-// Currently only applies for dedicated server.
+// Currently only applies for dedicated server, changes lobby server to that of game clients because server endpoint is down.
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
 constexpr unsigned short patch_network_lobbyserver_port = 3035;
 
-// Change game_id sent to ubisoft for Steam and Uplay editions.
+// Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
 
 const QList<FileEntry> files = {
@@ -163,7 +163,10 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_mp section.
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to .text_mp section.
+
+                    { 0x01043f88, QString("s").toUtf8(), ".rdata" }, // replace %S with valid printf() format %s for client join message.
+                    { 0x01043fe6, QString("s").toUtf8(), ".rdata" } // replace %S with valid printf() format %s for client left message.
                 }
             },
             { // Uplay
