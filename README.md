@@ -45,7 +45,7 @@ https://discord.gg/82G9Fh5
 
 ## Thanks to
 ### Contributors
-<i>zenoy and halvors</i> - for patching the assembly code and creating the patcher application.
+<i>zenoy and halvors</i> - for patching the assembly code and creating the patcher application.  
 <i>FEARIV, Gabor and Lasercar</i> - For testing and community support.
 
 ### Others
