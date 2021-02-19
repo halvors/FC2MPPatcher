@@ -22,6 +22,8 @@ If you experience diffculties patching the game, first make sure you got the 1.0
 * Run the patcher and make sure to select the network interface that your internet connection is on (Usually Ethernet or Wifi).
 * Press the patch button and you are good to go!
 
+To play ranked matches you need PunkBuster which does no longer work out-of-the-box, you can follow these instructions to manually update your PunkBuster files: http://ned.theoldergamers.com/static.php?page=farcry2-punkbuster
+
 ### Upgrading
 If you are upgrading from an old version of the patch uninstall the old one and install the new version of the patch.
 
