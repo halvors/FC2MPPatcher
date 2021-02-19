@@ -13,7 +13,7 @@ If you experience diffculties patching the game, first make sure you got the 1.0
 
 ### Requirements
  * The game files itself. (We do not ship any game files as they are copyrighted by Ubisoft). 
- * The newest version of the game from Steam, GOG, Uplay or the Retail edition (CD), your game be version 1.03.
+ * The newest version of the game from either Steam, Uplay, GOG or the Retail edition (Disc), your game needs to be version 1.03.
 
 ### Installation
 <b>NOTE:</b> As mentioned in license, we're not responsible for breaking your game or getting you banned.
