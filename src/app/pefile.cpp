@@ -44,7 +44,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
+bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
 {
     // Check that image is loaded.
     if (!image)
@@ -72,7 +72,7 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(libraryName.toStdString()); // Section Name.
+    importSection.set_name(pe_patch_rdata_section); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
     section &attachedSection = image->add_section(importSection);
@@ -83,30 +83,20 @@ bool PeFile::apply(const QString &libraryName, const QString &libraryFile, const
     rebuild_imports(*image, imports, attachedSection, settings);
 
     // Add extra .text section.
+    section textSection;
+    textSection.get_raw_data().resize(1024); // We cannot add empty sections, so let it be the initial data size 1.
+    textSection.set_name(pe_patch_text_section);
+    textSection.set_virtual_address(pe_patch_text_section_virtual_address);
+    textSection.readable(true).executable(true);
+    image->add_section(textSection);
+
     QByteArray textData;
 
     for (const CodeEntry &codeEntry : codeEntries)
         if (codeEntry.getType() == CodeEntry::NEW_DATA)
             textData.append(codeEntry.getData());
 
-    if (!textData.isEmpty()) {
-        section textSection;
-        textSection.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
-        textSection.set_name(patch_library_pe_text_section);
-        textSection.readable(true).executable(true);
-        textSection.set_raw_data(textData.toStdString());
-        section &attachedSection1 = image->add_section(textSection);
-
-        //e9 fb ee cf 00          jmp    0xcfef00
-        unsigned int address = attachedSection1.get_virtual_address();
-        qDebug().noquote() << QString("Address is: 0x%1").arg(address, 0, 16);
-
-        // Debug information.
-        qDebug().noquote() << "Stored: " << textData.toHex();
-        qDebug().noquote() << "Static: " << QByteArray("\xE8\x4B\xCB\x2F\xFF\x51\x50\xFF\x15\xA4\x0D\x7B\x01\x8B\xC8\x58\x89\x48\x08\x59\xE9\xEC\x10\x30\xFF").toHex();
-
-
-    }
+    textSection.set_raw_data(textData.toStdString());
 
     // Patch code.
     patchCode(libraryFile, libraryFunctions, codeEntries);
@@ -212,8 +202,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                     qDebug().noquote() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16).arg(libraryFunctions[index]).arg(functionAddress, 0, 16));
 
                     // Change the old address to point to new function instead.
-                    unsigned int *dataPtr = reinterpret_cast<unsigned int*>(basePtr);
-                    *dataPtr = functionAddress;
+                    *basePtr = functionAddress;
                 }
                 break;
 
