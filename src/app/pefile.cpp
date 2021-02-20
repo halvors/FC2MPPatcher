@@ -75,28 +75,28 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     importSection.set_name(pe_patch_rdata_section); // Section Name.
     importSection.readable(true).writeable(true); // Available for read and write.
 
-    section &attachedSection = image->add_section(importSection);
+    section &attachedImportSection = image->add_section(importSection);
 
     // Rebuild imports.
     import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
     settings.fill_missing_original_iats(true); // Needed in order to preserve original IAT.
-    rebuild_imports(*image, imports, attachedSection, settings);
+    rebuild_imports(*image, imports, attachedImportSection, settings);
 
     // Add extra .text section.
-    section textSection;
-    textSection.get_raw_data().resize(1024); // We cannot add empty sections, so let it be the initial data size 1.
-    textSection.set_name(pe_patch_text_section);
-    textSection.set_virtual_address(pe_patch_text_section_virtual_address);
-    textSection.readable(true).executable(true);
-    image->add_section(textSection);
-
     QByteArray textData;
 
     for (const CodeEntry &codeEntry : codeEntries)
         if (codeEntry.getType() == CodeEntry::NEW_DATA)
             textData.append(codeEntry.getData());
 
-    textSection.set_raw_data(textData.toStdString());
+    if (!textData.isEmpty()) {
+        section textSection;
+        textSection.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
+        textSection.set_name(pe_patch_text_section);
+        textSection.readable(true).executable(true);
+        textSection.set_raw_data(textData.toStdString());
+        image->add_section(textSection);
+    }
 
     // Patch code.
     patchCode(libraryFile, libraryFunctions, codeEntries);

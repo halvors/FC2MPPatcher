@@ -40,10 +40,8 @@ constexpr char game_steam_app_manifest_suffix[] = "acf";
 constexpr char game_steam_app_manifest_key[] = "installdir";
 constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 
-constexpr uint32_t pe_base_address = 0x400000;
 constexpr char pe_patch_rdata_section[] = ".rdata_p";
 constexpr char pe_patch_text_section[] = ".text_p";
-constexpr uint32_t pe_patch_text_section_virtual_address = 0x13b2000; // Pre-defined place to insert section.
 
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
@@ -74,57 +72,6 @@ constexpr uint16_t patch_network_lobbyserver_port = 3035;
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
-
-static const QByteArray buildIPAddressPatchFuncCall(uint32_t origin, uint32_t callerAddr, uint32_t oldFuncAddr, uint32_t patchFuncPtr) {
-    origin += pe_base_address;
-
-    //origin = //017b2000 //0x13b2000
-    //callerAddr = 0x00ab3100;
-    //oldFuncAddr = 0x00aaeb50; // GetNetFileServerAddress
-    //patchFuncPtr = 0x6d242068
-
-    // relative oldFuncAddr = oldFuncAddr - (origin + 5) = 0xff2fcb50
-    // patchFuncPtr = 0x6D242068
-    // relative callerAddr = callerAddr - (origin + 20)
-
-    uint32_t relOldFuncAddr = oldFuncAddr - (origin + 5);
-    uint32_t relCallerAddr = callerAddr - (origin + 20);
-
-    uint32_t revRelOldFuncAddr = qFromBigEndian(relOldFuncAddr);
-
-    qDebug() << QString("OldFuncAddr is: 0x%1, should be 0x%2").arg(relOldFuncAddr, 0, 16).arg(0xff2fcb50, 0, 16);
-    qDebug() << QString("OldFuncAddr is: 0x%1 (rev)").arg(revRelOldFuncAddr, 0, 16);
-
-    qDebug() << QString("CallerAddr is: 0x%1, should be 0x%2").arg(relCallerAddr, 0, 16).arg(0xff301105, 0, 16);
-
-    QByteArray ba = QString("\xE8%1"                     // call   0xff2fcb50 // oldFunc
-                            "\x51"                       // push   ecx
-                            "\x50"                       // push   eax
-                            "\xFF\x15\xA4\x0D\x7B\x01"   // call   [0x6D242068] // patchFunc
-                            "\x8B\xC8"                   // mov    ecx,eax
-                            "\x58"                       // pop    eax
-                            "\x89\x48\x08"               // mov    DWORD PTR [eax+0x8],ecx
-                            "\x59"                       // pop    ecx
-                            "\xE9%3") // jmp    0xff301105 // origin + 5
-                    .arg(qFromBigEndian(relOldFuncAddr))
-                    .arg(patchFuncPtr)
-                    .arg(qFromBigEndian(relCallerAddr))
-                    .toUtf8();
-
-    /*
-    return QByteArray("\xE8\x4B\xCB\x2F\xFF"       // call   0xff2fcb50 // oldFunc
-                      "\x51"                       // push   ecx
-                      "\x50"                       // push   eax
-                      "\xFF\x15\xA4\x0D\x7B\x01"   // call   [0x6D242068] // patchFunc
-                      "\x8B\xC8"                   // mov    ecx,eax
-                      "\x58"                       // pop    eax
-                      "\x89\x48\x08"               // mov    DWORD PTR [eax+0x8],ecx
-                      "\x59"                       // pop    ecx
-                      "\xE9\xEC\x10\x30\xFF", 25); // jmp    0xff301105 // origin + 5
-    */
-
-    return ba;
-}
 
 const QList<CodeEntry> steamEntry = {
     // Common
@@ -239,24 +186,16 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    {
-                        QByteArray("\xE8\x4B\xCB\x2F\xFF"      // call   0xff2fcb50
-                                   "\x51"                      // push   ecx
-                                   "\x50"                      // push   eax
-                                   "\xFF\x15\xA4\x0D\x7B\x01"  // call   DWORD PTR ds:0x17b0da4
-                                   "\x8B\xC8"                  // mov    ecx,eax
-                                   "\x58"                      // pop    eax
-                                   "\x89\x48\x08"              // mov    DWORD PTR [eax+0x8],ecx
-                                   "\x59"                      // pop    ecx
-                                   "\xE9\xEC\x10\x30\xFF", 25) // jmp    0xff301105
-                    },
-                    { 0x00ab3100,
-                      buildIPAddressPatchFuncCall(pe_patch_text_section_virtual_address,
-                                                  0x00ab3100,
-                                                  0x00aaeb50, // GetNetFileServerAddress
-                                                  0x6d242068)
-                    }
-                    //{ 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   0x00aaeb50
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   [0x6d242068]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    DWORD PTR [eax+0x8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    @retur
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Uplay
@@ -274,9 +213,18 @@ const QList<FileEntry> files = {
                     { 0x00ba714c, 4 }, // getHostByName()
 
                     // Server
-                    { 0x00c465bd, 1 },  // connect()
+                    { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_p section.
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   0x00aaeb50
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   [0x6d242068]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    DWORD PTR [eax+0x8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    @retur
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             }
         }

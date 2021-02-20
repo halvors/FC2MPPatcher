@@ -44,7 +44,7 @@ public:
 
 private:
     unsigned int address = 0;
-    const QByteArray &data;
+    QByteArray data;
     QString section;
     Type type;
 };
