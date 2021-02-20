@@ -42,12 +42,12 @@ const QString patch_library_file = QString(patch_library_name).toLower() + ".dll
 const QString patch_library_pe_import_section = QString(patch_library_name).toLower();
 constexpr char patch_library_pe_text_section[] = ".text_mp";
 const QStringList patch_library_functions = {
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                     // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                  // connect()
-    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",              // sendTo()
-    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8",   // getAdapersInfo()
-    "_ZN7MPPatch19getHostByName_patchEPKc@4",                       // getHostByName()
-    "_ZN7MPPatch18getPublicIPAddressEv@0"                           // getPublicIpAddress()
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
+    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
+    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
+    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+    "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
 };
 const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";
@@ -143,10 +143,11 @@ const QList<FileEntry> files = {
                     { 0x00ba4cfc, 4 }, // getHostByName()
 
                     // Server
-                    { 0x00c43ffd, 1 }  // connect()
+                    { 0x00c43ffd, 1 },  // connect()
+                    { 0x004ecda5, QByteArray("\xEB") } // change JZ (74) to JMP (EB)
                 }
             },
-            { // Steam (R2 Server is identical)
+            { // Steam (R2 is identical)
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
                 "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
                 {
@@ -163,10 +164,17 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to .text_mp section.
-
-                    { 0x01043f88, QString("s").toUtf8(), ".rdata" }, // replace %S with valid printf() format %s for client join message.
-                    { 0x01043fe6, QString("s").toUtf8(), ".rdata" } // replace %S with valid printf() format %s for client left message.
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_mp section.
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"      // call   0xff2fcb50
+                                 "\x51"                      // push   ecx
+                                 "\x50"                      // push   eax
+                                 "\xFF\x15\xA4\x0D\x7B\x01"  // call   DWORD PTR ds:0x17b0da4
+                                 "\x8B\xC8"                  // mov    ecx,eax
+                                 "\x58"                      // pop    eax
+                                 "\x89\x48\x08"              // mov    DWORD PTR [eax+0x8],ecx
+                                 "\x59"                      // pop    ecx
+                                 "\xE9\xEC\x10\x30\xFF", 25) // jmp    0xff301105
+                    }
                 }
             },
             { // Uplay

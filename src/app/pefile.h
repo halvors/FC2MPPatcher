@@ -21,7 +21,7 @@ public:
     explicit PeFile(const QFile &file, QObject *parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const;
+    bool apply(const QString &libraryName, const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const;
     bool write() const;
 
 private:
@@ -29,9 +29,8 @@ private:
     pe_base *image = nullptr;
 
     bool read();
-    void buildTextSection() const;
-    QList<unsigned int> getFunctionAddresses(const QString &libraryFile) const;
-    bool patchAddresses(const QString &libraryFile, const QStringList &libraryFunctions, const QList<AddressEntry> &addresses) const;
+    QList<unsigned int> buildSymbolAddressList(const QString &libraryFile) const;
+    bool patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const;
 };
 
 #endif // PEFILE_H

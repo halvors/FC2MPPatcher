@@ -4,16 +4,27 @@
 #include <QList>
 #include <QByteArray>
 
-class AddressEntry {
+class CodeEntry {
 public:
-    AddressEntry(unsigned int address, unsigned int word, const QString &section = ".text") :
-        AddressEntry(address, QByteArray::number(word), section, true) {}
+    enum Type {
+        INJECT_DATA,
+        INJECT_SYMBOL,
+        NEW_DATA
+    };
 
-    AddressEntry(unsigned int address, const QByteArray &data, const QString &section = ".text", bool symbol = false) :
+    CodeEntry(unsigned int address, unsigned int word, const QString &section = ".text", Type type = INJECT_SYMBOL) :
+        CodeEntry(address, QByteArray::number(word), section, type) {}
+
+    CodeEntry(unsigned int address, const QByteArray &data, const QString &section = ".text", Type type = INJECT_DATA) :
         address(address),
         data(data),
         section(section),
-        symbol(symbol) {}
+        type(type) {}
+
+    CodeEntry(const QByteArray &data, const QString &section = ".text_mp", Type type = NEW_DATA) :
+        data(data),
+        section(section),
+        type(type) {}
 
     unsigned int getAddress() const {
         return address;
@@ -27,20 +38,20 @@ public:
         return section;
     }
 
-    bool isSymbol() const {
-        return symbol;
+    Type getType() const {
+        return type;
     }
 
 private:
-    unsigned int address;
+    unsigned int address = 0;
     QByteArray data;
     QString section;
-    bool symbol;
+    Type type;
 };
 
 class TargetEntry {
 public:
-    TargetEntry(const char *checkSum, const char *checkSumPatched, const QList<AddressEntry> &functions) :
+    TargetEntry(const char *checkSum, const char *checkSumPatched, const QList<CodeEntry> &functions) :
         checkSum(checkSum),
         checkSumPatched(checkSumPatched),
         addresses(functions) {}
@@ -53,14 +64,14 @@ public:
         return checkSumPatched;
     }
 
-    QList<AddressEntry> getAddresses() const {
+    QList<CodeEntry> getCodeEntries() const {
         return addresses;
     }
 
 private:
     const char* checkSum;
     const char* checkSumPatched;
-    QList<AddressEntry> addresses;
+    QList<CodeEntry> addresses;
 };
 
 class FileEntry {
