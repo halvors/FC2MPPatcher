@@ -72,7 +72,7 @@ const QList<FileEntry> files = {
     {
         "Dunia.dll",
         {
-            { // Retail (GOG is identical).
+            { // Retail (GOG is identical)
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
                 "020ba8709ba7090fa9e29c77f26a66ea230aef92677fe93560d97e391be43c97",
                 {
@@ -87,7 +87,7 @@ const QList<FileEntry> files = {
                     { 0x1001431c, 4 }  // getHostByName()
                 }
             },
-            { // Steam.
+            { // Steam
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
                 "40f4d55fe0ac6b370798983de2ca1dd09ef0423a7c523b7c424cadddbd894a25",
                 {
@@ -128,7 +128,7 @@ const QList<FileEntry> files = {
     {
         "FC2ServerLauncher.exe",
         {
-            { // Retail (GOG is identical).
+            { // Retail (GOG is identical)
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
                 "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
                 {
@@ -144,7 +144,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c43ffd, 1 },  // connect()
-                    { 0x004ecda5, QByteArray("\xEB") } // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, QByteArray("\xEB", 1) } // change JZ (74) to JMP (EB)
                 }
             },
             { // Steam (R2 is identical)
@@ -163,7 +163,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c465bd, 1 }, // connect()
-                    { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_mp section.
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"      // call   0xff2fcb50
                                  "\x51"                      // push   ecx
@@ -193,7 +193,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c465bd, 1 },  // connect()
-                    { 0x004eca95, QByteArray("\xEB") }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_mp section.
                 }
             }
