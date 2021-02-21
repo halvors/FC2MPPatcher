@@ -73,7 +73,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
     importSection.set_name(pe_patch_rdata_section);
-    importSection.readable(true);
+    importSection.readable(true).writeable(true);
 
     section &attachedImportSection = image->add_section(importSection);
 
@@ -83,11 +83,15 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings);
 
     // Add extra .text section.
-    QByteArray textData("\xFF");
+    QByteArray textData;
 
-    for (const CodeEntry &codeEntry : codeEntries)
-        if (codeEntry.getType() == CodeEntry::NEW_DATA)
+    for (const CodeEntry &codeEntry : codeEntries) {
+        if (codeEntry.getType() == CodeEntry::NEW_DATA) {
             textData.append(codeEntry.getData());
+
+            qDebug().noquote() << QT_TR_NOOP(QString("-----------------------------------------"));
+        }
+    }
 
     if (!textData.isEmpty()) {
         section textSection;

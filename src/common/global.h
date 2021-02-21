@@ -8,9 +8,6 @@
 
 #include "entry.h"
 
-#include <QDebug>
-#include <QtEndian>
-
 // Set true for debugging mode without checksum verification.
 #define DEBUG_MODE true
 
@@ -106,7 +103,20 @@ const QList<FileEntry> files = {
                     { 0x10cb9ad4, 0 }, // bind()
                     { 0x10014053, 2 }, // sendTo()
                     { 0x10c5bde2, 3 }, // getAdapersInfo()
-                    { 0x1001431c, 4 }  // getHostByName()
+                    { 0x1001431c, 4 }, // getHostByName()
+
+                    // Server
+                    { 0x10cb29e2, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   call dunia.10770BD0
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\x10\xD7\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\x03\x25\xE4\xFE", 25) }, // jmp    <dunia.retur>
+                    { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Steam
@@ -124,7 +134,20 @@ const QList<FileEntry> files = {
                     { 0x100141fc, 4 }, // getHostByName()
 
                     // Client
-                    { 0x10e420c0, patch_game_id, ".rdata" } // game_id
+                    { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
+
+                    // Server
+                    { 0x10cebaf2, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   call dunia.1077D600
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
+                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Uplay
@@ -170,13 +193,13 @@ const QList<FileEntry> files = {
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[17ADBEC]
+                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
-                    { 0x00ab3100, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Steam (R2 is identical)
