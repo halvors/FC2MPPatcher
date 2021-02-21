@@ -29,7 +29,7 @@ bool DirUtils::isGameDirectory(const QString &path)
     return isGameDirectory(QDir(path));
 }
 
-QStringList& DirUtils::findInstallDirectories()
+QStringList &DirUtils::findInstallDirectories()
 {
     // If install directories already detected, return early.
     if (!installDirectories.isEmpty()) {

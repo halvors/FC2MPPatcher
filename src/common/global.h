@@ -9,7 +9,7 @@
 #include "entry.h"
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE true
+#define DEBUG_MODE false
 
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
@@ -93,7 +93,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical)
                 "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                "020ba8709ba7090fa9e29c77f26a66ea230aef92677fe93560d97e391be43c97",
+                "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79",
                 {
                     // Common
                     { 0x1001088e, 0 }, // bind()
@@ -121,7 +121,7 @@ const QList<FileEntry> files = {
             },
             { // Steam
                 "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                "40f4d55fe0ac6b370798983de2ca1dd09ef0423a7c523b7c424cadddbd894a25",
+                "d4942259d5d61c2f743bed7a0b156ab8489e868aa8cfd2b20fc5e417dd52cefa",
                 {
                     // Common
                     { 0x1001076e, 0 }, // bind()
@@ -152,7 +152,7 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                "c7674c14bad4214e547da3d60ccb14225665394f75b941b10c33362b206575c5",
+                "83e2ea791c6227cc96f2515c4638b24809439944d183ad6b0117d58eb2c8869b",
                 {
                     // Common
                     { 0x1001076e, 0 }, // bind()
@@ -165,7 +165,20 @@ const QList<FileEntry> files = {
                     { 0x100141fc, 4 }, // getHostByName()
 
                     // Client
-                    { 0x10e420c0, patch_game_id, ".rdata" } // game_id
+                    { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
+
+                    // Server
+                    { 0x10cebaf2, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   call dunia.1077D600
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
+                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) } // change function call to instead jump to the .text_p section.
                 }
             }
         }
@@ -175,7 +188,7 @@ const QList<FileEntry> files = {
         {
             { // Retail (GOG is identical)
                 "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
+                "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732",
                 {
                     // Common
                     { 0x00425fc4, 0 }, // bind()
@@ -204,7 +217,7 @@ const QList<FileEntry> files = {
             },
             { // Steam (R2 is identical)
                 "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64",
+                "cb5036fccf38a2a8cb73afc36df7844e160657c7f93c35554909b0e52e09ccee",
                 {
                     // Common
                     { 0x004263d4, 0 }, // bind()
@@ -233,7 +246,7 @@ const QList<FileEntry> files = {
             },
             { // Uplay
                 "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                "38f33dfd74b9483fb7db7703dffe61d61fa51444730d38ed2b61fc6e20855d9a",
+                "346c6b3a292a352b6ca88ff563f25564d501af632fcb09a07f6a19a1415236c6",
                 {
                     // Common
                     { 0x004263d4, 0 }, // bind()

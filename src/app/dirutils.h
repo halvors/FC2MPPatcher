@@ -35,7 +35,7 @@ private:
     static QStringList libraries;
 
     static QString getInstallDirectory();
-    static QStringList& findLibraries(QDir &dir);
+    static QStringList &findLibraries(QDir &dir);
     static QJsonObject getJsonFromFile(QFile &file);
     static QString getJsonFromAcf(const QStringList &lines);
 };

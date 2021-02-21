@@ -85,13 +85,9 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     // Add extra .text section.
     QByteArray textData;
 
-    for (const CodeEntry &codeEntry : codeEntries) {
-        if (codeEntry.getType() == CodeEntry::NEW_DATA) {
+    for (const CodeEntry &codeEntry : codeEntries)
+        if (codeEntry.getType() == CodeEntry::NEW_DATA)
             textData.append(codeEntry.getData());
-
-            qDebug().noquote() << QT_TR_NOOP(QString("-----------------------------------------"));
-        }
-    }
 
     if (!textData.isEmpty()) {
         section textSection;
@@ -137,20 +133,21 @@ bool PeFile::write() const
     return true;
 }
 
-QList<unsigned int> PeFile::buildSymbolAddressList(const QString &libraryFile) const
+QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
 {
-    QList<unsigned int> addresses;
+    QList<uint32_t> addresses;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
         if (library.get_name() == libraryFile.toStdString()) {
-            unsigned int address = image->get_image_base_32() + library.get_rva_to_iat();
+            uint32_t address = image->get_image_base_32() + library.get_rva_to_iat();
 
-            for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
+            for (uint32_t i = 0; i < library.get_imported_functions().size(); i++) {
                 addresses.append(address);
 
-                qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
+                if (DEBUG_MODE)
+                    qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
 
                 address += 4; // Size of one address entry.
             }
@@ -165,16 +162,16 @@ QList<unsigned int> PeFile::buildSymbolAddressList(const QString &libraryFile) c
 bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
 {
     // Get a compiled list of all functiona addreses.
-    const QList<unsigned int> &symbolAddressList = buildSymbolAddressList(libraryFile);
+    const QList<uint32_t> &symbolAddressList = buildSymbolAddressList(libraryFile);
 
     for (section &section : image->get_image_sections()) {
-        qDebug().noquote() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(QString::fromStdString(section.get_name())));
+        qDebug().noquote() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(section.get_name().c_str()));
 
         // Getting the base image address for later use.
-        unsigned int sectionAddress = image->get_image_base_32() + section.get_virtual_address();
+        uint32_t sectionAddress = image->get_image_base_32() + section.get_virtual_address();
 
         // Read raw data of section as byte array.
-        unsigned char *rawDataPtr = reinterpret_cast<unsigned char*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
+        uint8_t *rawDataPtr = reinterpret_cast<uint8_t*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
 
         // Patching all addresses specified for this target.
         for (const CodeEntry &codeEntry : codeEntries) {
@@ -182,7 +179,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
             if (section.get_name() != codeEntry.getSection().toStdString())
                 continue;
 
-            unsigned int address = codeEntry.getAddress();
+            uint32_t address = codeEntry.getAddress();
             QByteArray data = codeEntry.getData();
 
             // If address is zero, that means this function is not use for this file.
@@ -190,14 +187,14 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                 continue;
 
             // Creating pointer to the data that is to be updated (aka. does pointer yoga).
-            unsigned int *basePtr = reinterpret_cast<unsigned int*>(rawDataPtr + address - sectionAddress);
+            uint32_t *basePtr = reinterpret_cast<uint32_t*>(rawDataPtr + address - sectionAddress);
 
             // Handle symbols differently from data.
             switch (codeEntry.getType()) {
             case CodeEntry::INJECT_SYMBOL:
                 {
                     int index = data.toInt();
-                    unsigned int functionAddress = symbolAddressList[index];
+                    uint32_t functionAddress = symbolAddressList[index];
 
                     // Verify to some degree addresses to be patched.
                     if (functionAddress == 0) {

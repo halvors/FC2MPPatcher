@@ -29,7 +29,7 @@ private:
     pe_base *image = nullptr;
 
     bool read();
-    QList<unsigned int> buildSymbolAddressList(const QString &libraryFile) const;
+    QList<uint32_t> buildSymbolAddressList(const QString &libraryFile) const;
     bool patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const;
 };
 
