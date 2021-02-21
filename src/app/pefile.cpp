@@ -72,8 +72,8 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     // (we cannot expand existing sections, unless the section is right at the end of the file).
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
-    importSection.set_name(pe_patch_rdata_section); // Section Name.
-    importSection.readable(true).writeable(true); // Available for read and write.
+    importSection.set_name(pe_patch_rdata_section);
+    importSection.readable(true);
 
     section &attachedImportSection = image->add_section(importSection);
 
@@ -83,7 +83,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings);
 
     // Add extra .text section.
-    QByteArray textData;
+    QByteArray textData("\xFF");
 
     for (const CodeEntry &codeEntry : codeEntries)
         if (codeEntry.getType() == CodeEntry::NEW_DATA)
@@ -145,6 +145,9 @@ QList<unsigned int> PeFile::buildSymbolAddressList(const QString &libraryFile) c
 
             for (unsigned int i = 0; i < library.get_imported_functions().size(); i++) {
                 addresses.append(address);
+
+                qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
+
                 address += 4; // Size of one address entry.
             }
 
