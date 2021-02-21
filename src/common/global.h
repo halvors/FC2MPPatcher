@@ -70,23 +70,6 @@ constexpr uint16_t patch_network_lobbyserver_port = 3035;
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
 
-const QList<CodeEntry> steamEntry = {
-    // Common
-    { 0x004263d4, 0 }, // bind()
-    { 0x0042641b, 0 }, // bind()
-    { 0x004c9d2a, 0 }, // bind()
-    { 0x00ba36be, 0 }, // bind()
-    { 0x00e85ffa, 0 }, // bind()
-    { 0x00ba6e83, 2 }, // sendTo()
-    { 0x00c46a66, 3 }, // getAdapersInfo()
-    { 0x00ba714c, 4 }, // getHostByName()
-
-    // Server
-    { 0x00c465bd, 1 },  // connect()
-    { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to .text_p section.
-};
-
 const QList<FileEntry> files = {
     {
         "Dunia.dll",
