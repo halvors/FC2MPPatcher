@@ -166,7 +166,17 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c43ffd, 1 },  // connect()
-                    { 0x004ecda5, QByteArray("\xEB", 1) } // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
+                                 "\x51"                         // push   ecx
+                                 "\x50"                         // push   eax
+                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[17ADBEC]
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
+                    { 0x00ab3100, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Steam (R2 is identical)
@@ -186,15 +196,15 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   0x00aaeb50
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   [0x6d242068]
+                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    DWORD PTR [eax+0x8],ecx
+                                 "\x89\x48\x08"                 // mov    mov dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    @retur
+                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             },
@@ -215,15 +225,15 @@ const QList<FileEntry> files = {
                     // Server
                     { 0x00c465bd, 1 }, // connect()
                     { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   0x00aaeb50
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   [0x6d242068]
+                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    DWORD PTR [eax+0x8],ecx
+                                 "\x89\x48\x08"                 // mov    mov dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    @retur
+                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
                 }
             }
