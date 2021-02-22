@@ -18,12 +18,18 @@ const char *FileUtils::checkSum(QFile file)
     return nullptr;
 }
 
-bool FileUtils::isValid(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target, bool patched)
+bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched)
 {
-    const char *fileCheckSum = checkSum(dir.filePath(fileEntry.getName()));
-    const char *targetCheckSum = patched ? target.getCheckSumPatched() : target.getCheckSum();
+    const char *fileCheckSum = checkSum(dir.filePath(file.getName()));
 
-    return strcmp(fileCheckSum, targetCheckSum) == 0;
+    for (const HashEntry &entry : target.getHashEntries()) {
+        const char *targetCheckSum = patched ? entry.result : entry.original;
+
+        if (strcmp(fileCheckSum, targetCheckSum) == 0)
+            return true;
+    }
+
+    return false;
 }
 
 QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append)

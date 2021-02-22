@@ -176,7 +176,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
         // Patching all addresses specified for this target.
         for (const CodeEntry &codeEntry : codeEntries) {
             // Only patch addresses in their specified section.
-            if (section.get_name() != codeEntry.getSection().toStdString())
+            if (section.get_name() != std::string(codeEntry.getSection()))
                 continue;
 
             uint32_t address = codeEntry.getAddress();

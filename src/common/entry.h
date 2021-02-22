@@ -12,21 +12,21 @@ public:
         NEW_DATA
     };
 
-    CodeEntry(unsigned int address, unsigned int word, const QString &section = ".text", Type type = INJECT_SYMBOL) :
+    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", Type type = INJECT_SYMBOL) :
         CodeEntry(address, QByteArray::number(word), section, type) {}
 
-    CodeEntry(unsigned int address, const QByteArray &data, const QString &section = ".text", Type type = INJECT_DATA) :
+    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", Type type = INJECT_DATA) :
         address(address),
         data(data),
         section(section),
         type(type) {}
 
-    CodeEntry(const QByteArray &data, const QString &section = ".text_mp", Type type = NEW_DATA) :
+    CodeEntry(const QByteArray &data, const char *section = ".text_mp", Type type = NEW_DATA) :
         data(data),
         section(section),
         type(type) {}
 
-    unsigned int getAddress() const {
+    uint32_t getAddress() const {
         return address;
     }
 
@@ -34,7 +34,7 @@ public:
         return data;
     }
 
-    QString getSection() const {
+    const char *getSection() const {
         return section;
     }
 
@@ -43,35 +43,34 @@ public:
     }
 
 private:
-    unsigned int address = 0;
+    uint32_t address = 0;
     QByteArray data;
-    QString section;
+    const char *section;
     Type type;
+};
+
+struct HashEntry {
+    const char *original;
+    const char *result;
 };
 
 class TargetEntry {
 public:
-    TargetEntry(const char *checkSum, const char *checkSumPatched, const QList<CodeEntry> &functions) :
-        checkSum(checkSum),
-        checkSumPatched(checkSumPatched),
-        addresses(functions) {}
+    TargetEntry(const QList<HashEntry> &hashentries, const QList<CodeEntry> &codeentries) :
+        hashentries(hashentries),
+        codeentries(codeentries) {}
 
-    const char *getCheckSum() const {
-        return checkSum;
+    const QList<HashEntry> &getHashEntries() const {
+        return hashentries;
     }
 
-    const char *getCheckSumPatched() const {
-        return checkSumPatched;
-    }
-
-    QList<CodeEntry> getCodeEntries() const {
-        return addresses;
+    const QList<CodeEntry> getCodeEntries() const {
+        return codeentries;
     }
 
 private:
-    const char* checkSum;
-    const char* checkSumPatched;
-    QList<CodeEntry> addresses;
+    const QList<HashEntry> hashentries;
+    const QList<CodeEntry> codeentries;
 };
 
 class FileEntry {
@@ -84,13 +83,13 @@ public:
         return name;
     }
 
-    QList<TargetEntry> getTargets() const {
+    const QList<TargetEntry> &getTargets() const {
         return targets;
     }
 
 private:
     const char *name;
-    QList<TargetEntry> targets;
+    const QList<TargetEntry> targets;
 };
 
 #endif // ENTRY_H

@@ -107,7 +107,7 @@ bool Patcher::patch(QWidget *parent, const QDir &dir)
                 QFileDevice::WriteOwner |
                 QFileDevice::ReadOwner;
 
-        // If file is not writable, set proper permissions.
+        // If file is not writable, set the proper permissions.
         if (!fileInfo.permission(permissions)) {
             qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
 
