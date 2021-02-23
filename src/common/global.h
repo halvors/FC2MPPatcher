@@ -162,6 +162,9 @@ const QList<FileEntry> files = {
                     { 0x00c444a6, 3 }, // getAdapersInfo()
                     { 0x00ba4cfc, 4 }, // getHostByName()
 
+                    { 0x00c40120, QByteArray("\x73", 1) }, // Change %S ti %s for "Client joined"
+                    { 0x00c4017e, QByteArray("\x73", 1) }, // Change %S ti %s for "Client left"
+
                     // Server
                     { 0x00c43ffd, 1 },  // connect()
                     { 0x004ecda5, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
