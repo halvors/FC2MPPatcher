@@ -64,6 +64,7 @@ Widget::Widget(const QString &installDir, QWidget *parent) :
 Widget::~Widget()
 {
     delete ui;
+    delete settings;
 }
 
 void Widget::closeEvent(QCloseEvent *event)

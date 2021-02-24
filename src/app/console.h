@@ -2,6 +2,8 @@
 #define CONSOLE_H
 
 #include <QObject>
+#include <QString>
+#include <QSettings>
 
 class Console : public QObject
 {
@@ -11,7 +13,15 @@ public:
     explicit Console(QObject *parent = nullptr);
     ~Console();
 
-    int exec(const QString &path);
+    bool exec(const QString &path);
+
+private:
+    QSettings *settings;
+    QString installDir;
+
+    void loadSettings();
+    void saveSettings();
+
 };
 
 #endif // CONSOLE_H

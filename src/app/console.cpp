@@ -9,24 +9,25 @@
 Console::Console(QObject *parent) :
     QObject(parent)
 {
-
+    settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
+    loadSettings();
 }
 
 Console::~Console()
 {
-
+    delete settings;
 }
 
-int Console::exec(const QString &path)
+bool Console::exec(const QString &path)
 {
     if (path.isEmpty()) {
         qDebug().noquote() << QString("Error: No %1 installation directory specified, aborting!").arg(game_name);
-        return EXIT_FAILURE;
+        return false;
     }
 
     if (!DirUtils::isGameDirectory(path)) {
         qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(path, game_name);
-        return EXIT_FAILURE;
+        return false;
     }
 
     QDir dir = path;
@@ -47,5 +48,28 @@ int Console::exec(const QString &path)
         qDebug().noquote() << QString("Successfully installed patch.");
     }
 
-    return EXIT_SUCCESS;
+    saveSettings();
+
+    return true;
+}
+
+void Console::loadSettings()
+{
+    QDir dir = settings->value(settings_install_directory).toString();
+
+    if (DirUtils::isGameDirectory(dir)) {
+        // If we're in executable directory, cd up to install directory.
+        if (dir.dirName() == game_executable_directory) {
+            dir.cdUp();
+        }
+
+        installDir = dir.absolutePath();
+    }
+}
+
+void Console::saveSettings()
+{
+    if (DirUtils::isGameDirectory(installDir)) {
+        settings->setValue(settings_install_directory, installDir);
+    }
 }
