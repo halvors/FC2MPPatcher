@@ -6,11 +6,13 @@
 #include "global.h"
 #include "patcher.h"
 
-Console::Console(QObject *parent) :
+Console::Console(const QString &installPath, QObject *parent) :
     QObject(parent)
 {
     settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
-    loadSettings();
+
+    if (installPath.isEmpty())
+        loadSettings();
 }
 
 Console::~Console()
@@ -18,19 +20,19 @@ Console::~Console()
     delete settings;
 }
 
-bool Console::exec(const QString &path)
+bool Console::exec()
 {
-    if (path.isEmpty()) {
+    if (installDir.isEmpty()) {
         qDebug().noquote() << QString("Error: No %1 installation directory specified, aborting!").arg(game_name);
         return false;
     }
 
-    if (!DirUtils::isGameDirectory(path)) {
-        qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(path, game_name);
+    if (!DirUtils::isGameDirectory(installDir)) {
+        qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(installDir, game_name);
         return false;
     }
 
-    QDir dir = path;
+    QDir dir = installDir;
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.

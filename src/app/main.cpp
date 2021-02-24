@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
     QString installDir = parser.value(installDirectoryOption);
 
     if (cliMode) {
-        Console console;
+        Console console(installDir);
 
-        return !console.exec(installDir);
+        return !console.exec();
     } else {
         // Display the GUI widget.
         Widget widget(installDir);

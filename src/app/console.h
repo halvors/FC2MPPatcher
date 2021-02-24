@@ -10,10 +10,10 @@ class Console : public QObject
     Q_OBJECT
 
 public:
-    explicit Console(QObject *parent = nullptr);
+    explicit Console(const QString &installDir = QString(), QObject *parent = nullptr);
     ~Console();
 
-    bool exec(const QString &path);
+    bool exec();
 
 private:
     QSettings *settings;
