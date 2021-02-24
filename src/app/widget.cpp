@@ -199,7 +199,7 @@ void Widget::pushButton_install_directory_clicked()
     QString path = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(game_name), ui->comboBox_install_directory->currentText(), QFileDialog::ReadOnly);
 
     if (!DirUtils::isGameDirectory(path)) {
-        QMessageBox::information(this, "Information", tr("Selected directory is not an %1 installation directory, please try again.").arg(game_name));
+        QMessageBox::information(this, tr("Information"), tr("Selected directory is not an %1 installation directory, please try again.").arg(game_name));
 
         return;
     }
@@ -238,7 +238,7 @@ void Widget::pushButton_patch_clicked()
         updatePatchStatus(false);
     } else {
         // Apply patch to files, if successful continue.
-        if (Patcher::patch(this, dir)) {
+        if (Patcher::patch(dir, this)) {
             // Generate network configuration.
             Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
 

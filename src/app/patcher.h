@@ -12,13 +12,14 @@ class Patcher
 {
 public:
     static bool isPatched(QString path);
-    static bool patch(QWidget *parent, const QDir &dir);
+    static bool patch(const QDir &dir, QWidget *widget = nullptr);
     static void undoPatch(const QDir &dir);
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);
 
 private:
     static bool copyFiles(const QDir &dir);
     static bool patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target);
+    static void log(const QString &text, QWidget *widget = nullptr);
 };
 
 #endif // PATCHER_H

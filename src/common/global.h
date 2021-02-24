@@ -199,7 +199,11 @@ const QList<FileEntry> files = {
 
                     // PunkBuster
                     { 0x0094d3a3, QByteArray("\xEB", 1) }, // change JNZ (75) to JMP (EB)
-                    { 0x00675575, QByteArray("\x77", 1) }, // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
+
+                    { 0x0094d3a3, QByteArray("\xEB", 1) }, // change JNZ (75) to JMP (EB)
+
+
+                    //{ 0x00675575, QByteArray("\x77", 1) }, // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
 
                     // Server
                     { 0x00c465bd, 1 }, // connect()
