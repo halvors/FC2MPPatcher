@@ -14,15 +14,13 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(APP_VERSION);
 
     QCommandLineParser parser;
-    //parser.setApplicationDescription("Test helper");
     parser.addHelpOption();
     parser.addVersionOption();
 
-    // A boolean option with multiple names (-n, --no-gui)
-    QCommandLineOption cliOption({{ "n", "no-gui" }, "Overwrite existing files." });
+    QCommandLineOption cliOption({{ "n", "no-gui" }, "Run the application in headless mode." });
     parser.addOption(cliOption);
 
-    QCommandLineOption installDirectoryOption({{ "d", "install-dir" }, "Copy all source files into <directory>.", "directory" });
+    QCommandLineOption installDirectoryOption({{ "d", "install-dir" }, QString("Path to the %1 installation directory.").arg(game_name), "directory" });
     parser.addOption(installDirectoryOption);
 
     // Process the actual command line arguments given by the user
@@ -31,8 +29,8 @@ int main(int argc, char *argv[])
     bool cliMode = parser.isSet(cliOption);
     QString installDir = parser.value(installDirectoryOption);
 
-    qDebug().noquote() << QString("Cli is: %1").arg(cliMode);
-    qDebug().noquote() << QString("Install directory is: %1").arg(installDir);
+    //qDebug().noquote() << QString("Cli is: %1").arg(cliMode);
+    //qDebug().noquote() << QString("Install directory is: %1").arg(installDir);
 
     if (cliMode) {
         Console console;
