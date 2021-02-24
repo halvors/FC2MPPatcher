@@ -19,13 +19,13 @@ Console::~Console()
 
 int Console::exec(const QString &path)
 {
-    if (!DirUtils::isGameDirectory(path)) {
-        qDebug().noquote() << QString("Error: Directory \"%1\" does contain a %1 installation, aborting!").arg(game_name);
+    if (path.isEmpty()) {
+        qDebug().noquote() << QString("Error: No %1 installation directory specified, aborting!").arg(game_name);
         return EXIT_FAILURE;
     }
 
-    if (path.isEmpty()) {
-        qDebug().noquote() << QString("Error: Directory \"%1\" does contain a %1 installation!").arg(game_name);
+    if (!DirUtils::isGameDirectory(path)) {
+        qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(path, game_name);
         return EXIT_FAILURE;
     }
 
@@ -36,7 +36,7 @@ int Console::exec(const QString &path)
     if (Patcher::isPatched(dir.absolutePath())) {
         Patcher::undoPatch(dir);
 
-        qDebug().noquote() << QString("Installed the patch.");
+        qDebug().noquote() << QString("Successfully unistalled patch.");
     } else {
         // Apply patch to files, if successful continue.
         if (Patcher::patch(dir)) {
@@ -44,8 +44,8 @@ int Console::exec(const QString &path)
             //Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
         }
 
-        qDebug().noquote() << QString("Unistalled the patch.");
+        qDebug().noquote() << QString("Successfully installed patch.");
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
