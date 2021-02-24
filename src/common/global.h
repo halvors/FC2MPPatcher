@@ -198,7 +198,7 @@ const QList<FileEntry> files = {
                     { 0x00ba714c, 4 }, // getHostByName()
 
                     // PunkBuster
-                    { 0x0094d3a3, QByteArray("\xEB", 1) }, // change JNZ (75) to JMP (EB)
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00", 3) }, // change JZ to JMP in order to bypass checking that PB setting and installation is enabled/exists.
                     { 0x00675575, QByteArray("\x77", 1) }, // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
 
                     // Server
