@@ -1,3 +1,4 @@
+#include <QSettings>
 #include <QNetworkInterface>
 #include <QHostAddress>
 
@@ -9,23 +10,63 @@
 
 void MPPatch::readSettings()
 {
-    if (!settings) {
-        settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
-        settings->beginGroup(patch_configuration_network);
-            QNetworkInterface networkInterface = QNetworkInterface::interfaceFromIndex(settings->value(patch_configuration_network_interface_index).toInt());
+    if (!address.isEmpty() && !broadcast.isEmpty())
+        return;
+
+    QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
+    settings->beginGroup(patch_configuration_network);
+        QNetworkInterface networkInterface = findValidInterface(settings->value(patch_configuration_network_interface_index).toInt());
+
+        // Scan thru addresses for this interface.
+        for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
+            // We're only looking for IPv4 addresses.
+            if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                address = addressEntry.ip().toString();
+                broadcast = addressEntry.broadcast().toString();
+            }
+        }
+    settings->endGroup();
+
+    delete settings;
+}
+
+QNetworkInterface MPPatch::findValidInterface(int hintIndex)
+{
+    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+
+    // Replace stored interface in list.
+    if (hintIndex > 0) {
+        const QNetworkInterface networkInterface = QNetworkInterface::interfaceFromIndex(hintIndex);
+
+        // Removed identical network interface from list.
+        if (!list.contains(networkInterface)) {
+            const QNetworkInterface interfaceToRemove = networkInterface;
+            list.removeAt(list.indexOf(interfaceToRemove));
+        }
+
+        // Insert network interface.
+        list.prepend(networkInterface);
+    }
+
+    // Loop thru all of the systems network interfaces.
+    for (const QNetworkInterface &networkInterface : list) {
+        const QNetworkInterface::InterfaceFlags &flags = networkInterface.flags();
+
+        // We only want active network interfaces and not loopback interfaces.
+        if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
+            QNetworkAddressEntry selectedAddressEntry;
 
             // Scan thru addresses for this interface.
             for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-                // We're only looking for IPv4 addresses.
+                // We're onlt looking for IPv4 addresses.
                 if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                    address = addressEntry.ip().toString();
-                    broadcast = addressEntry.broadcast().toString();
+                    return networkInterface;
                 }
             }
-        settings->endGroup();
+        }
     }
 
-    // TODO: Delete settings? Memory leak.
+    return QNetworkInterface();
 }
 
 int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int namelen)
@@ -91,7 +132,7 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-unsigned int __stdcall MPPatch::getPublicIPAddress()
+uint32_t __stdcall MPPatch::getPublicIPAddress()
 {
     // Return cached address if it exists.
     if (publicAddress != 0)

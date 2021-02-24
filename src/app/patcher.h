@@ -19,7 +19,7 @@ public:
 private:
     static bool copyFiles(const QDir &dir);
     static bool patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target);
-    static void log(const QString &text, QWidget *widget = nullptr);
+    static void log(const QString &msg, QWidget *widget = nullptr);
 };
 
 #endif // PATCHER_H

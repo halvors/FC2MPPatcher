@@ -9,9 +9,8 @@
 
 bool Patcher::isPatched(QString path)
 {
-    if (path.isEmpty()) {
+    if (path.isEmpty())
         return false;
-    }
 
     QDir dir = path;
     int count = 0;
@@ -64,9 +63,9 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
 
         // If file is not writable, set the proper permissions.
         if (!fileInfo.permission(permissions)) {
-            qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
-
             file.setPermissions(permissions);
+
+            qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
         }
 
         for (const TargetEntry &target : fileEntry.getTargets()) {
@@ -100,13 +99,11 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
 }
 
 void Patcher::undoPatch(const QDir &dir) {
-    // Restore patched files.
     for (const FileEntry &fileEntry : files) {
+        // Restore patched files.
         FileUtils::restore(dir, fileEntry);
-    }
 
-    // Delete backed up game files.
-    for (const FileEntry &fileEntry : files) {
+        // Delete backed up game files.
         QFile::remove(dir.filePath(FileUtils::appendToName(dir, fileEntry, game_backup_suffix)));
     }
 

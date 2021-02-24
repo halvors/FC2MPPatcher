@@ -1,8 +1,8 @@
 #ifndef MPPATCH_H
 #define MPPATCH_H
 
-#include <QSettings>
 #include <QString>
+#include <QNetworkInterface>
 
 #include <winsock2.h>
 #include <iphlpapi.h>
@@ -21,17 +21,16 @@ public:
     static MPPATCHSHARED_EXPORT unsigned int __stdcall getPublicIPAddress();
 
 private:
-    static QSettings *settings;
     static QString address;
     static QString broadcast;
-    static unsigned int publicAddress;
+    static uint32_t publicAddress;
 
     static void readSettings();
+    static QNetworkInterface findValidInterface(int hintIndex);
 };
 
-QSettings *MPPatch::settings = nullptr;
 QString MPPatch::address = QString();
 QString MPPatch::broadcast = QString();
-unsigned int MPPatch::publicAddress = 0;
+uint32_t MPPatch::publicAddress = 0;
 
 #endif // MPPATCH_H
