@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         return console.exec(installDir);
     } else {
         // Display the GUI widget.
-        Widget widget;
+        Widget widget(installDir);
         widget.show();
         return app.exec();
     }

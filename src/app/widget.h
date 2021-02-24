@@ -17,7 +17,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = nullptr);
+    explicit Widget(const QString &installDir = QString(), QWidget *parent = nullptr);
     ~Widget();
 
 private:
