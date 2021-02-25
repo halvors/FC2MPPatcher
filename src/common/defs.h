@@ -3,10 +3,6 @@
 
 #include <QString>
 #include <QStringList>
-#include <QByteArray>
-#include <QList>
-
-#include "entry.h"
 
 // Set true for debugging mode without checksum verification.
 #define DEBUG_MODE true
@@ -42,14 +38,6 @@ constexpr char pe_patch_text_section[] = ".text_p";
 
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";
-const QStringList patch_library_functions = {
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
-    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
-    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
-};
 
 const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";

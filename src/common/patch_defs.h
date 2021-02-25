@@ -10,6 +10,15 @@
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
 constexpr uint16_t patch_network_lobbyserver_port = 3035;
 
+const QStringList patch_library_functions = {
+    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
+    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
+    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
+    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
+    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+    "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
+};
+
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
 
