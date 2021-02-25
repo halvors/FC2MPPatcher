@@ -79,7 +79,7 @@
      <item>
       <widget class="QLabel" name="label_network_interface">
        <property name="text">
-        <string>Select network interface to be used for LAN play:</string>
+        <string>Select network interface to be used for LAN matches:</string>
        </property>
       </widget>
      </item>
