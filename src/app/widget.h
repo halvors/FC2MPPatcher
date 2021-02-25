@@ -6,7 +6,7 @@
 #include <QCloseEvent>
 #include <QString>
 
-#include "global.h"
+#include "defs.h"
 
 namespace Ui {
     class Widget;
@@ -17,7 +17,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(const QString &installDir = QString(), QWidget *parent = nullptr);
+    explicit Widget(const QString &installDir = QString(), const QString &interfaceName = QString(), QWidget *parent = nullptr);
     ~Widget();
 
 private:
@@ -25,7 +25,7 @@ private:
     QSettings *settings;
 
     void closeEvent(QCloseEvent *event);
-    void loadSettings();
+    void loadSettings(const QString &installDir, const QString &interfaceName);
 
     QString getInstallDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;

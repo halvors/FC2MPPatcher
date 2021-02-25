@@ -5,7 +5,8 @@
 #include <iostream>
 
 #include "mppatch.h"
-#include "global.h"
+#include "defs.h"
+#include "patch_defs.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
@@ -46,7 +47,7 @@ QNetworkInterface MPPatch::findValidInterface(const QString &interfaceName)
         const QNetworkInterface::InterfaceFlags &flags = networkInterface.flags();
 
         // Skip invalid interfaces and loopback interfaces.
-        if (!networkInterface.isValid() && !flags.testFlag(QNetworkInterface::IsLoopBack))
+        if (!networkInterface.isValid() || !flags.testFlag(QNetworkInterface::IsLoopBack))
             continue;
 
         // We only want active network interfaces.

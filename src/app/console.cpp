@@ -1,18 +1,25 @@
-#include "console.h"
-
 #include <QDebug>
 
+#include "console.h"
 #include "dirutils.h"
-#include "global.h"
+#include "defs.h"
 #include "patcher.h"
 
-Console::Console(const QString &installPath, QObject *parent) :
+Console::Console(const QString &installDir, const QString &interfaceName, QObject *parent) :
     QObject(parent)
 {
     settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
+    loadSettings();
 
-    if (installPath.isEmpty())
-        loadSettings();
+    if (!installDir.isEmpty())
+        this->installDir = installDir;
+
+    if (!interfaceName.isEmpty()) {
+        const QNetworkInterface &networkInterface = QNetworkInterface::interfaceFromName(interfaceName);
+
+        if (networkInterface.isValid())
+            this->networkInterface = networkInterface;
+    }
 }
 
 Console::~Console()
@@ -44,7 +51,7 @@ bool Console::exec()
         // Apply patch to files, if successful continue.
         if (Patcher::patch(dir)) {
             // Generate network configuration.
-            //Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
+            Patcher::generateConfigurationFile(dir, networkInterface);
         }
 
         qDebug().noquote() << QString("Successfully installed patch.");

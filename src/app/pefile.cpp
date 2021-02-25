@@ -5,7 +5,7 @@
 #include <QDebug>
 
 #include "pefile.h"
-#include "global.h"
+#include "defs.h"
 
 PeFile::PeFile(const QFile &file, QObject *parent) :
     QObject(parent),

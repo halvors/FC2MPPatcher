@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(APP_VERSION);
 
     QCommandLineOption cliOption({{ "n", "no-gui" }, "Run the application in headless mode." });
-    QCommandLineOption installDirectoryOption({{ "d", "install-dir" }, QString("Path to the %1 installation directory.").arg(game_name), "directory" });
+    QCommandLineOption installDirectoryOption({{ "d", "install-directory" }, QString("Path to the %1 installation directory.").arg(game_name), "directory" });
+    QCommandLineOption networkInterfaceOption({{ "i", "interface-name" }, QString("Network interface name to be used for LAN."), "name" });
 
     QCommandLineParser parser;
     parser.addHelpOption();
@@ -23,14 +24,15 @@ int main(int argc, char *argv[])
 
     bool cliMode = parser.isSet(cliOption);
     QString installDir = parser.value(installDirectoryOption);
+    QString networkInterfaceName = parser.value(networkInterfaceOption);
 
     if (cliMode) {
         // Do task in background without GUI.
-        Console console(installDir);
+        Console console(installDir, networkInterfaceName);
         return !console.exec();
     } else {
         // Display the GUI widget.
-        Widget widget(installDir);
+        Widget widget(installDir, networkInterfaceName);
         widget.show();
         return app.exec();
     }

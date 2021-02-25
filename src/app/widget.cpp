@@ -14,7 +14,7 @@
 #include "fileutils.h"
 #include "patcher.h"
 
-Widget::Widget(const QString &installDir, QWidget *parent) :
+Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
@@ -28,11 +28,7 @@ Widget::Widget(const QString &installDir, QWidget *parent) :
 
     // Add placeholder text to lineEdit.
     QLineEdit *lineEdit_install_directory = ui->comboBox_install_directory->lineEdit();
-
-    if (!installDir.isEmpty() && DirUtils::isGameDirectory(installDir))
-        lineEdit_install_directory->setText(installDir);
-    else
-        lineEdit_install_directory->setPlaceholderText(tr("Enter path to install directory..."));
+    lineEdit_install_directory->setPlaceholderText(tr("Enter path to install directory..."));
 
     // Populate comboBox with found install directories.
     populateComboboxWithInstallDirectories();
@@ -42,7 +38,7 @@ Widget::Widget(const QString &installDir, QWidget *parent) :
 
     // Load settings from configuration file.
     settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
-    loadSettings();
+    loadSettings(installDir, interfaceName);
 
     // Update patch button according to patch status.
     QString path = getInstallDirectory(false);
@@ -73,9 +69,12 @@ void Widget::closeEvent(QCloseEvent *event)
     QWidget::closeEvent(event);
 }
 
-void Widget::loadSettings()
+void Widget::loadSettings(const QString &installDir, const QString &interfaceName)
 {
     QDir dir = settings->value(settings_install_directory).toString();
+
+    if (!installDir.isEmpty())
+        dir = installDir;
 
     if (DirUtils::isGameDirectory(dir)) {
         const QStringList &installDirectories = DirUtils::findInstallDirectories();
@@ -95,12 +94,18 @@ void Widget::loadSettings()
         }
     }
 
-    int index = settings->value(settings_interface_index).toInt();
+    QNetworkInterface selectedNetworkInterface = settings->value(settings_network_interface).value<QNetworkInterface>();
 
-    // Only set valid index in UI.
-    if (index < ui->comboBox_network_interface->count()) {
-        ui->comboBox_network_interface->setCurrentIndex(index);
-    }
+    if (!interfaceName.isEmpty())
+        selectedNetworkInterface = QNetworkInterface::interfaceFromName(interfaceName);
+
+    if (selectedNetworkInterface.isValid())
+        for (int i = 0; i < ui->comboBox_network_interface->count(); i++) {
+            const QNetworkInterface &networkInterface = ui->comboBox_network_interface->itemData(i).value<QNetworkInterface>();
+
+            if (networkInterface.name() == selectedNetworkInterface.name())
+                ui->comboBox_network_interface->setCurrentIndex(i);
+        }
 
     settings->beginGroup(settings_group_window);
         resize(settings->value(settings_group_window_size, size()).toSize());
@@ -120,7 +125,7 @@ void Widget::saveSettings() const
         settings->setValue(settings_install_directory, path);
     }
 
-    settings->setValue(settings_interface_index, ui->comboBox_network_interface->currentIndex());
+    settings->setValue(settings_network_interface, ui->comboBox_network_interface->currentData().value<QNetworkInterface>().name());
     settings->beginGroup(settings_group_window);
         settings->setValue(settings_group_window_size, size());
         settings->setValue(settings_group_window_position, pos());
@@ -167,8 +172,11 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     for (const QNetworkInterface &interface : interfaces) {
         const QNetworkInterface::InterfaceFlags &flags = interface.flags();
 
+        if (!interface.isValid() || flags.testFlag(QNetworkInterface::IsLoopBack))
+            continue;
+
         // Only show active network interfaces and not loopback interfaces.
-        if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
+        if (flags.testFlag(QNetworkInterface::IsUp)) {
             QNetworkAddressEntry selectedAddressEntry;
 
             // Scan thru addresses for this interface.

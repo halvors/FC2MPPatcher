@@ -3,7 +3,7 @@
 #include <QDebug>
 
 #include "fileutils.h"
-#include "global.h"
+#include "defs.h"
 
 #if defined(Q_OS_WIN)
 #include <qt_windows.h>

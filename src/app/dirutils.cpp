@@ -5,7 +5,8 @@
 #include <QRegularExpression>
 
 #include "dirutils.h"
-#include "global.h"
+#include "defs.h"
+#include "patch_defs.h"
 
 QStringList DirUtils::installDirectories;
 

@@ -3,7 +3,8 @@
 #include <QSettings>
 
 #include "patcher.h"
-#include "global.h"
+#include "defs.h"
+#include "patch_defs.h"
 #include "fileutils.h"
 #include "pefile.h"
 
