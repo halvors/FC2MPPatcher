@@ -2,7 +2,6 @@
 #define MPPATCH_H
 
 #include <QString>
-#include <QNetworkInterface>
 
 #include <winsock2.h>
 #include <iphlpapi.h>

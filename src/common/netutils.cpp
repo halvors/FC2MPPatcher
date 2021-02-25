@@ -1,21 +1,21 @@
 #include "netutils.h"
 
-bool NetUtils::isValid(const QNetworkInterface &interface)
+bool NetUtils::isValid(const QNetworkInterface &networkInterface)
 {
-    const QNetworkInterface::InterfaceFlags &flags = interface.flags();
+    QNetworkInterface::InterfaceFlags flags = networkInterface.flags();
 
-    return interface.isValid() &&
+    return networkInterface.isValid() &&
            !flags.testFlag(QNetworkInterface::IsLoopBack) &&
            flags.testFlag(QNetworkInterface::IsUp) &&
            flags.testFlag(QNetworkInterface::CanBroadcast);
 }
 
-QNetworkInterface NetUtils::findValidInterface(const QString &interfaceName)
+QNetworkInterface NetUtils::findValidInterface(const QString &networkInterfaceName)
 {
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
 
     // Insert configured network interface.
-    const QNetworkInterface &configuredInterface = QNetworkInterface::interfaceFromName(interfaceName);
+    const QNetworkInterface &configuredInterface = QNetworkInterface::interfaceFromName(networkInterfaceName);
 
     if (configuredInterface.isValid())
         list.prepend(configuredInterface);

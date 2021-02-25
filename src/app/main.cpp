@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setOrganizationName(app_name);
     app.setApplicationName(app_organization);
-    app.setApplicationVersion(APP_VERSION);
+    app.setApplicationVersion(QString("%1%2").arg(APP_VERSION).arg(DEBUG_MODE ? "-dev" : QString()));
 
     QCommandLineOption cliOption({{ "n", "no-gui" }, "Run the application in headless mode." });
     QCommandLineOption installDirectoryOption({{ "d", "install-directory" }, QString("Path to the %1 installation directory.").arg(game_name), "directory" });

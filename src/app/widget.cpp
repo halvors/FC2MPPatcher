@@ -23,7 +23,7 @@ Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget 
     ui->setupUi(this);
 
     // Set window title.
-    setWindowTitle(QString("%1 %2").arg(app_name).arg(APP_VERSION));
+    setWindowTitle(QString("%1 %2%3").arg(app_name).arg(APP_VERSION).arg(DEBUG_MODE ? "-dev" : QString()));
 
     // Set label text.
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));

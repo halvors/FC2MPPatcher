@@ -4,11 +4,10 @@
 #include <QNetworkInterface>
 #include <QString>
 
-class NetUtils
-{
+class NetUtils {
 public:
-    static bool isValid(const QNetworkInterface &interface);
-    static QNetworkInterface findValidInterface(const QString &interfaceName);
+    static bool isValid(const QNetworkInterface &networkInterface);
+    static QNetworkInterface findValidInterface(const QString &networkInterfaceName);
 };
 
 #endif // NETUTILS_H

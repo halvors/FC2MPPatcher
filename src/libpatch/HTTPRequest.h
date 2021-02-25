@@ -1,7 +1,3 @@
-//
-//  HTTPRequest
-//
-
 #ifndef HTTPREQUEST_H
 #define HTTPREQUEST_H
 
@@ -213,7 +209,7 @@ namespace http
                 {
                     const auto e = WSAGetLastError();
 
-                    if (WSAGetLastError() == WSAEWOULDBLOCK)
+                    if (e == WSAEWOULDBLOCK)
                     {
                         select(SelectType::write, timeout);
 

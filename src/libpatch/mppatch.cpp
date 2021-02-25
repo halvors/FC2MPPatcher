@@ -18,10 +18,10 @@ void MPPatch::readSettings()
     QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
 
     settings->beginGroup(patch_configuration_network);
-        const QNetworkInterface &interface = findValidInterface(settings->value(patch_configuration_network_interface).toString());
+        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
-        for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
+        for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
             const QHostAddress &hostAddress = addressEntry.ip();
 
             // We're only looking for IPv4 addresses.
