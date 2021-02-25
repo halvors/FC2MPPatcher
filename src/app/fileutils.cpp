@@ -5,6 +5,10 @@
 #include "fileutils.h"
 #include "global.h"
 
+#if defined(Q_OS_WIN)
+#include <qt_windows.h>
+#endif
+
 const char *FileUtils::checkSum(QFile file)
 {
     if (file.open(QFile::ReadOnly)) {
@@ -32,40 +36,66 @@ bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntr
     return false;
 }
 
-QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append)
+QString FileUtils::prependToName(const QDir &dir, const FileEntry &file, const QString &head)
 {
-    QStringList split = QString(fileEntry.getName()).split('.');
+    QStringList split = QString(file.getName()).split('.');
     QString suffix = '.' + split.takeLast();
 
-    return dir.filePath(split.join(QString()) + append + suffix);
+    return dir.filePath(head + split.join(QString()) + suffix);
+}
+
+QString FileUtils::appendToName(const QDir &dir, const FileEntry &file, const QString &tail)
+{
+    QStringList split = QString(file.getName()).split('.');
+    QString suffix = '.' + split.takeLast();
+
+    return dir.filePath(split.join(QString()) + tail + suffix);
+}
+
+bool FileUtils::setHidden(const QString &fileName, bool hidden)
+{
+#if defined(Q_OS_LINUX)
+    return fileName.startsWith('.') == hidden;
+#elif defined(Q_OS_WIN)
+    std::wstring fileNameW = fileName.toStdWString();
+    DWORD attributes = GetFileAttributesW(fileNameW.c_str());
+
+    if (hidden)
+        attributes |= FILE_ATTRIBUTE_HIDDEN;
+    else
+        attributes &= ~FILE_ATTRIBUTE_HIDDEN;
+
+    return SetFileAttributesW(fileNameW.c_str(), attributes);
+#endif
+
+    return false;
 }
 
 bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
 {
     QString fileName = dir.filePath(fileEntry.getName());
-    QString fileCopyName = appendToName(dir, fileEntry, game_backup_suffix);
+    QString fileCopyName = prependToName(dir, fileEntry, game_backup_prefix);
     QFile file = fileName;
     QFile fileCopy = fileCopyName;
 
-    if (backup) {
-        if (!fileCopy.exists()) {
-            return file.rename(fileCopyName) & file.copy(fileName);
-        }
-    } else {
-        if (fileCopy.exists()) {
-            return file.remove() & fileCopy.rename(fileName);
-        }
-    }
-
-    return false;
+    if (backup)
+        return !fileCopy.exists() &&
+               (file.rename(fileCopyName) &
+               file.copy(fileName) &
+               setHidden(fileCopyName, backup));
+    else
+        return fileCopy.exists() &&
+               (file.remove() &
+               fileCopy.rename(fileName) &
+               setHidden(fileName, backup));
 }
 
-bool FileUtils::backup(const QDir &dir, const FileEntry &fileEntry)
+bool FileUtils::backup(const QDir &dir, const FileEntry &file)
 {
-    bool result = copy(dir, fileEntry, true);
+    bool result = copy(dir, file, true);
 
     if (result) {
-        qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileEntry.getName()));
+        qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(file.getName()));
     }
 
     return result;

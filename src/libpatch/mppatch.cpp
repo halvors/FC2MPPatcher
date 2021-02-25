@@ -14,8 +14,9 @@ void MPPatch::readSettings()
         return;
 
     QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
+
     settings->beginGroup(patch_configuration_network);
-        QNetworkInterface networkInterface = findValidInterface(settings->value(patch_configuration_network_interface_index).toInt());
+        const QNetworkInterface &networkInterface = findValidInterface(settings->value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
@@ -30,35 +31,29 @@ void MPPatch::readSettings()
     delete settings;
 }
 
-QNetworkInterface MPPatch::findValidInterface(int hintIndex)
+QNetworkInterface MPPatch::findValidInterface(const QString &interfaceName)
 {
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
 
-    // Replace stored interface in list.
-    if (hintIndex > 0) {
-        const QNetworkInterface networkInterface = QNetworkInterface::interfaceFromIndex(hintIndex);
+    // Insert configured network interface.
+    const QNetworkInterface &configuredNetworkInterface = QNetworkInterface::interfaceFromName(interfaceName);
 
-        // Removed identical network interface from list.
-        if (!list.contains(networkInterface)) {
-            const QNetworkInterface interfaceToRemove = networkInterface;
-            list.removeAt(list.indexOf(interfaceToRemove));
-        }
+    if (configuredNetworkInterface.isValid())
+        list.prepend(configuredNetworkInterface);
 
-        // Insert network interface.
-        list.prepend(networkInterface);
-    }
-
-    // Loop thru all of the systems network interfaces.
+    // Loop thru all of the systems network interfaces, and return the first valid found.
     for (const QNetworkInterface &networkInterface : list) {
         const QNetworkInterface::InterfaceFlags &flags = networkInterface.flags();
 
-        // We only want active network interfaces and not loopback interfaces.
-        if (flags.testFlag(QNetworkInterface::IsUp) && !flags.testFlag(QNetworkInterface::IsLoopBack)) {
-            QNetworkAddressEntry selectedAddressEntry;
+        // Skip invalid interfaces and loopback interfaces.
+        if (!networkInterface.isValid() && !flags.testFlag(QNetworkInterface::IsLoopBack))
+            continue;
 
+        // We only want active network interfaces.
+        if (flags.testFlag(QNetworkInterface::IsUp)) {
             // Scan thru addresses for this interface.
             for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-                // We're onlt looking for IPv4 addresses.
+                // We're only looking for IPv4 addresses.
                 if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
                     return networkInterface;
                 }

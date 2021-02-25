@@ -26,7 +26,7 @@ bool Patcher::isPatched(QString path)
                     break;
                 }
 
-                QFile backupFile = FileUtils::appendToName(dir, file, game_backup_suffix);
+                QFile backupFile = FileUtils::prependToName(dir, file, game_backup_prefix);
 
                 // Detect old installations of the patch.
                 if (backupFile.exists()) {
@@ -99,12 +99,12 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
 }
 
 void Patcher::undoPatch(const QDir &dir) {
-    for (const FileEntry &fileEntry : files) {
+    for (const FileEntry &file : files) {
         // Restore patched files.
-        FileUtils::restore(dir, fileEntry);
+        FileUtils::restore(dir, file);
 
         // Delete backed up game files.
-        QFile::remove(dir.filePath(FileUtils::appendToName(dir, fileEntry, game_backup_suffix)));
+        QFile::remove(dir.filePath(FileUtils::prependToName(dir, file, game_backup_prefix)));
     }
 
     // Delete patch library file.
@@ -124,7 +124,7 @@ void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface
     QSettings settings(file.fileName(), QSettings::IniFormat);
 
     settings.beginGroup(patch_configuration_network);
-        settings.setValue(patch_configuration_network_interface_index, interface.index());
+        settings.setValue(patch_configuration_network_interface, interface.name());
     settings.endGroup();
 
     qDebug().noquote() << QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName()));

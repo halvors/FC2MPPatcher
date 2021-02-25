@@ -25,7 +25,7 @@ constexpr char settings_group_window_isMaximized[] = "isMaximized";
 constexpr char game_name[] = "Far Cry 2";
 constexpr char game_publisher[] = "Ubisoft";
 constexpr char game_executable_directory[] = "bin";
-constexpr char game_backup_suffix[] = "_original";
+constexpr char game_backup_prefix[] = ".";
 
 constexpr char game_steam_name[] = "Steam";
 constexpr char game_steam_publisher[] = "Valve";
@@ -53,7 +53,7 @@ const QStringList patch_library_functions = {
 
 const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";
-constexpr char patch_configuration_network_interface_index[] = "InterfaceIndex";
+constexpr char patch_configuration_network_interface[] = "Interface";
 const QStringList patch_library_runtime_dependencies = {
     patch_library_file,
     "libgcc_s_dw2-1.dll",

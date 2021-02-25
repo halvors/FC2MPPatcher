@@ -1,10 +1,8 @@
 #include <QApplication>
+#include <QCommandLineParser>
 
 #include "console.h"
 #include "widget.h"
-
-#include <QCommandLineParser>
-#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -27,8 +25,8 @@ int main(int argc, char *argv[])
     QString installDir = parser.value(installDirectoryOption);
 
     if (cliMode) {
+        // Do task in background without GUI.
         Console console(installDir);
-
         return !console.exec();
     } else {
         // Display the GUI widget.

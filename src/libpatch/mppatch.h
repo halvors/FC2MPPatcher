@@ -26,7 +26,7 @@ private:
     static uint32_t publicAddress;
 
     static void readSettings();
-    static QNetworkInterface findValidInterface(int hintIndex);
+    static QNetworkInterface findValidInterface(const QString &interfaceName);
 };
 
 QString MPPatch::address = QString();
