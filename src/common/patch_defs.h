@@ -33,7 +33,7 @@ const QList<FileEntry> files = {
                       "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }
                 },
                 {
-                    // Common
+                    /* Common */
                     { 0x1001088e, 0 }, // bind()
                     { 0x10213d18, 0 }, // bind()
                     { 0x10c4e97a, 0 }, // bind()
@@ -68,7 +68,7 @@ const QList<FileEntry> files = {
                       "83e2ea791c6227cc96f2515c4638b24809439944d183ad6b0117d58eb2c8869b" }
                 },
                 {
-                    // Common
+                    /* Common */
                     { 0x1001076e, 0 }, // bind()
                     { 0x102161a8, 0 }, // bind()
                     { 0x10c5d10a, 0 }, // bind()
@@ -107,7 +107,7 @@ const QList<FileEntry> files = {
                       "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }
                 },
                 {
-                    // Common
+                    /* Common */
                     { 0x00425fc4, 0 }, // bind()
                     { 0x0042600b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
@@ -131,7 +131,8 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
-                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x008ed449 + 2, QByteArray("\x28", 1) } // change default value of maxUploadOnline from 768 (push 0x300) to 10240 (push 0x2800).
                 }
             },
             { // Steam (R2 is identical) and Uplay
@@ -144,7 +145,7 @@ const QList<FileEntry> files = {
                       "346c6b3a292a352b6ca88ff563f25564d501af632fcb09a07f6a19a1415236c6" }
                 },
                 {
-                    // Common
+                    /* Common */
                     { 0x004263d4, 0 }, // bind()
                     { 0x0042641b, 0 }, // bind()
                     { 0x004c9d2a, 0 }, // bind()
@@ -169,11 +170,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x00b27c3b, QByteArray("\x28", 1) }, // change default value of maxUploadOnline from 768 (0x300) to 10240 (0x2800).
+                    { 0x00b27c39 + 2, QByteArray("\x28", 1) }, // change default value of maxUploadOnline from 768 (push 0x300) to 10240 (push 0x2800).
 
+                    /* Experimental */
                     // PunkBuster
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00", 3) }, // change JZ to JMP in order to bypass checking that PB setting and installation is enabled/exists.
-                    { 0x00675575, QByteArray("\x77", 1) } // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
+                    { 0x00675574 + 1, QByteArray("\x77", 1) } // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
                 }
             }
         }
