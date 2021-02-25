@@ -43,7 +43,8 @@ const QList<FileEntry> files = {
                     { 0x10c5bde2, 3 }, // getAdapersInfo()
                     { 0x1001431c, 4 }, // getHostByName()
 
-                    // Server
+                    /* Server */
+                    // Custom map download
                     { 0x10cb29e2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
@@ -77,10 +78,11 @@ const QList<FileEntry> files = {
                     { 0x10c6a692, 3 }, // getAdapersInfo()
                     { 0x100141fc, 4 }, // getHostByName()
 
-                    // Client
+                    /* Client */
                     { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
 
-                    // Server
+                    /* Server */
+                    // Custom map download
                     { 0x10cebaf2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
@@ -115,8 +117,10 @@ const QList<FileEntry> files = {
                     { 0x00c444a6, 3 }, // getAdapersInfo()
                     { 0x00ba4cfc, 4 }, // getHostByName()
 
-                    // Server
+                    /* Server */
                     { 0x00c43ffd, 1 },  // connect()
+
+                    // Custom map download
                     { 0x004ecda5, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
@@ -150,12 +154,10 @@ const QList<FileEntry> files = {
                     { 0x00c46a66, 3 }, // getAdapersInfo()
                     { 0x00ba714c, 4 }, // getHostByName()
 
-                    // PunkBuster
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00", 3) }, // change JZ to JMP in order to bypass checking that PB setting and installation is enabled/exists.
-                    { 0x00675575, QByteArray("\x77", 1) }, // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
-
-                    // Server
+                    /* Server */
                     { 0x00c465bd, 1 }, // connect()
+
+                    // Custom map download
                     { 0x004eca95, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
@@ -166,7 +168,12 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    mov dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x00b27c3b, QByteArray("\x28", 1) }, // change default value of maxUploadOnline from 768 (0x300) to 10240 (0x2800).
+
+                    // PunkBuster
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00", 3) }, // change JZ to JMP in order to bypass checking that PB setting and installation is enabled/exists.
+                    { 0x00675575, QByteArray("\x77", 1) } // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
                 }
             }
         }

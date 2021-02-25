@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     QCommandLineOption cliOption({{ "n", "no-gui" }, "Run the application in headless mode." });
     QCommandLineOption installDirectoryOption({{ "d", "install-directory" }, QString("Path to the %1 installation directory.").arg(game_name), "directory" });
-    QCommandLineOption networkInterfaceOption({{ "i", "interface-name" }, QString("Network interface name to be used for LAN."), "name" });
+    QCommandLineOption networkInterfaceOption({{ "i", "interface-name" }, QString("Network interface name to be used for LAN matches."), "name" });
 
     QCommandLineParser parser;
     parser.addHelpOption();
