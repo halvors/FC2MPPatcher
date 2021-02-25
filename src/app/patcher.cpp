@@ -8,7 +8,7 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(QString path)
+bool Patcher::isPatched(const QString &path)
 {
     if (path.isEmpty())
         return false;
@@ -27,10 +27,11 @@ bool Patcher::isPatched(QString path)
                     break;
                 }
 
-                QFile backupFile = FileUtils::prependToName(dir, file, game_backup_prefix);
+                const QFile &backupFile = FileUtils::prependToName(dir, file, game_backup_prefix);
+                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file, game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
 
                 // Detect old installations of the patch.
-                if (backupFile.exists()) {
+                if (backupFile.exists() || backupFileLegacy.exists()) {
                     count++;
 
                     break;
@@ -106,6 +107,7 @@ void Patcher::undoPatch(const QDir &dir) {
 
         // Delete backed up game files.
         QFile::remove(dir.filePath(FileUtils::prependToName(dir, file, game_backup_prefix)));
+        QFile::remove(dir.filePath(FileUtils::appendToName(dir, file, game_backup_suffix))); // Temp, leave for some iterations, was changed in 0.1.12.
     }
 
     // Delete patch library file.
@@ -177,7 +179,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
 void log(const QString &msg, QWidget *widget)
 {
     if (widget)
-        QMessageBox::warning(widget, "Warning", msg);
+        QMessageBox::warning(widget, QT_TR_NOOP(QString("Warning")), msg);
     else
         qDebug().noquote() << msg;
 }

@@ -19,7 +19,7 @@ public:
 private:
     QSettings *settings;
     QString installDir;
-    QNetworkInterface networkInterface;
+    QNetworkInterface interface;
 
     void loadSettings();
     void saveSettings();

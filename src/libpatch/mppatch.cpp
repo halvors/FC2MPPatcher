@@ -7,6 +7,7 @@
 #include "mppatch.h"
 #include "defs.h"
 #include "patch_defs.h"
+#include "netutils.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
@@ -17,52 +18,21 @@ void MPPatch::readSettings()
     QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
 
     settings->beginGroup(patch_configuration_network);
-        const QNetworkInterface &networkInterface = findValidInterface(settings->value(patch_configuration_network_interface).toString());
+        const QNetworkInterface &interface = findValidInterface(settings->value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
-        for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
+        for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
+            const QHostAddress &hostAddress = addressEntry.ip();
+
             // We're only looking for IPv4 addresses.
-            if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                address = addressEntry.ip().toString();
+            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
+                address = hostAddress.toString();
                 broadcast = addressEntry.broadcast().toString();
             }
         }
     settings->endGroup();
 
     delete settings;
-}
-
-QNetworkInterface MPPatch::findValidInterface(const QString &interfaceName)
-{
-    QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-
-    // Insert configured network interface.
-    const QNetworkInterface &configuredNetworkInterface = QNetworkInterface::interfaceFromName(interfaceName);
-
-    if (configuredNetworkInterface.isValid())
-        list.prepend(configuredNetworkInterface);
-
-    // Loop thru all of the systems network interfaces, and return the first valid found.
-    for (const QNetworkInterface &networkInterface : list) {
-        const QNetworkInterface::InterfaceFlags &flags = networkInterface.flags();
-
-        // Skip invalid interfaces and loopback interfaces.
-        if (!networkInterface.isValid() || !flags.testFlag(QNetworkInterface::IsLoopBack))
-            continue;
-
-        // We only want active network interfaces.
-        if (flags.testFlag(QNetworkInterface::IsUp)) {
-            // Scan thru addresses for this interface.
-            for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-                // We're only looking for IPv4 addresses.
-                if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                    return networkInterface;
-                }
-            }
-        }
-    }
-
-    return QNetworkInterface();
 }
 
 int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int namelen)

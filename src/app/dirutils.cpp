@@ -1,6 +1,5 @@
 #include <QSettings>
 #include <QDebug>
-#include <QJsonObject>
 #include <QJsonDocument>
 #include <QRegularExpression>
 
@@ -13,35 +12,32 @@ QStringList DirUtils::installDirectories;
 bool DirUtils::isGameDirectory(QDir dir)
 {
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
-    if (dir.exists() | dir.cd(game_executable_directory)) {
-        for (const FileEntry &file : files) {
-            // TODO: Check against checksum here?
-            if (dir.exists(file.getName())) {
+    if (dir.exists() | dir.cd(game_executable_directory))
+        for (const FileEntry &file : files)
+            if (dir.exists(file.getName())) // TODO: Check against checksum here?
                 return true;
-            }
-        }
-    }
 
     return false;
 }
 
-bool DirUtils::isGameDirectory(const QString &path)
+bool DirUtils::isGameDirectory(const QString &dir)
 {
-    return isGameDirectory(QDir(path));
+    if (dir.isEmpty())
+        return false;
+
+    return isGameDirectory(QDir(dir));
 }
 
-QStringList &DirUtils::findInstallDirectories()
+const QStringList &DirUtils::findInstallDirectories()
 {
     // If install directories already detected, return early.
-    if (!installDirectories.isEmpty()) {
+    if (!installDirectories.isEmpty())
         return installDirectories;
-    }
 
     auto append = [&](const QString &path) {
         // Verfiy that path is not empty, already exist or an invalid game directory.
-        if (!path.isEmpty() && !installDirectories.contains(path) && isGameDirectory(path)) {
+        if (!path.isEmpty() && !installDirectories.contains(path) && isGameDirectory(path))
             installDirectories.append(path);
-        }
     };
 
     append(RetailUtils::getGameDirectory());
@@ -55,8 +51,10 @@ QString RetailUtils::installDirectory;
 QString RetailUtils::getGameDirectory()
 {
     // If install directory already detected, return early.
-    if (installDirectory.isEmpty()) {
-#ifdef Q_OS_WIN
+    if (installDirectory.isEmpty())
+        return installDirectory;
+
+#if defined(Q_OS_WIN)
     // Look for Far Cry 2 install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup(game_publisher);
@@ -71,7 +69,6 @@ QString RetailUtils::getGameDirectory()
         installDirectory = dir.absolutePath();
     }
 #endif
-    }
 
     return installDirectory;
 }
@@ -81,42 +78,38 @@ QStringList SteamUtils::libraries;
 
 QString SteamUtils::getGameDirectory()
 {
-    QDir dir = getInstallDirectory();
-
     // Search for other steam libraries.
-    QStringList libraries = findLibraries(dir);
+    QStringList libraries = findLibraries(getInstallDirectory());
 
     for (QDir dir : libraries) {
         // Entering directory where steamapps is stored.
-        if (!dir.cd(game_steam_app_directory)) {
+        if (!dir.cd(game_steam_app_directory))
             continue;
-        }
 
         // Assemble manifest file using provided appId.
         QFile manifestFile = dir.filePath(QString("%1_%2.%3").arg(game_steam_app_manifest_name).arg(game_steam_app_id).arg(game_steam_app_manifest_suffix));
 
-        if (!manifestFile.exists()) {
+        if (!manifestFile.exists())
             continue;
-        }
 
         // Only continue parsing json if we need it.
-        if (!dir.cd(game_steam_app_directory_common)) {
+        if (!dir.cd(game_steam_app_directory_common))
             continue;
-        }
 
         QJsonObject object = getJsonFromFile(manifestFile);
         QJsonValue value = object.value(game_steam_app_manifest_key);
 
         // Enter found game directory.
-        if (!dir.cd(value.toString())) {
+        if (!dir.cd(value.toString()))
             continue;
-        }
+
+        QString absolutePath = dir.absolutePath();
 
         // Verify that this is a game directory.
-        if (DirUtils::isGameDirectory(dir.absolutePath())) {
-            qDebug().noquote() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
+        if (DirUtils::isGameDirectory(absolutePath)) {
+            qDebug().noquote() << QT_TR_NOOP(QString("Found game install directory: %1").arg(absolutePath));
 
-            return dir.absolutePath();
+            return absolutePath;
         }
     }
 
@@ -126,11 +119,10 @@ QString SteamUtils::getGameDirectory()
 QString SteamUtils::getInstallDirectory()
 {
     // If install directory already detected, return early.
-    if (!installDirectory.isEmpty()) {
+    if (!installDirectory.isEmpty())
         return installDirectory;
-    }
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     // Find Steam install directory in registry.
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup(game_steam_publisher);
@@ -141,38 +133,33 @@ QString SteamUtils::getInstallDirectory()
 #elif defined(Q_OS_LINUX)
     QDir dir = QDir::home();
 
-    if (dir.cd(QString(".%1/%1").arg(game_steam_name).toLower())) {
+    if (dir.cd(QString(".%1/%1").arg(game_steam_name).toLower()))
         installDirectory = dir.absolutePath();
-    }
 #endif
 
-    if (!installDirectory.isEmpty()) {
+    if (!installDirectory.isEmpty())
         qDebug().noquote() << QT_TR_NOOP(QString("Found steam installation directory: %1").arg(installDirectory));
-    }
 
     return installDirectory;
 }
 
-QStringList &SteamUtils::findLibraries(QDir &dir)
+QStringList &SteamUtils::findLibraries(QDir dir)
 {
     // If libraries already found, return early.
-    if (!libraries.isEmpty()) {
+    if (!libraries.isEmpty())
         return libraries;
-    }
 
     // Add this directory as the default steam library.
     libraries.prepend(dir.absolutePath());
 
     // Entering directory where steamapps is stored.
-    if (!dir.cd(game_steam_app_directory)) {
+    if (!dir.cd(game_steam_app_directory))
         return libraries;
-    }
 
     QFile libraryFile = dir.filePath("libraryfolders.vdf");
 
-    if (!libraryFile.exists()) {
+    if (!libraryFile.exists())
         return libraries;
-    }
 
     QJsonObject object = getJsonFromFile(libraryFile);
     QJsonObject::iterator iterator;
@@ -197,20 +184,19 @@ QStringList &SteamUtils::findLibraries(QDir &dir)
 
 QJsonObject SteamUtils::getJsonFromFile(QFile &file)
 {
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QString data = file.readAll();
-        file.close();
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QJsonObject();
 
-        // Convert acf to json.
-        QString json = getJsonFromAcf(data.split(QChar::LineFeed));
+    QString data = file.readAll();
+    file.close();
 
-        // Parse json.
-        QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+    // Convert acf to json.
+    QString json = getJsonFromAcf(data.split(QChar::LineFeed));
 
-        return document.object();
-    }
+    // Parse json.
+    QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
 
-    return QJsonObject();
+    return document.object();
 }
 
 QString SteamUtils::getJsonFromAcf(const QStringList &lines)
@@ -224,11 +210,10 @@ QString SteamUtils::getJsonFromAcf(const QStringList &lines)
     };
 
     auto endLine = [&](int nextIndex) {
-        if (nextIndex < lines.length() && lines[nextIndex].endsWith("}")) {
+        if (nextIndex < lines.length() && lines[nextIndex].endsWith("}"))
             appendLine();
-        } else {
+        else
             appendLine(",");
-        }
     };
 
     for (int i = 1; i < lines.length(); i++) {

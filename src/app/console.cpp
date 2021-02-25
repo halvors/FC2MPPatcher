@@ -1,6 +1,7 @@
 #include <QDebug>
 
 #include "console.h"
+#include "netutils.h"
 #include "dirutils.h"
 #include "defs.h"
 #include "patcher.h"
@@ -11,15 +12,10 @@ Console::Console(const QString &installDir, const QString &interfaceName, QObjec
     settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
-    if (!installDir.isEmpty())
+    if (DirUtils::isGameDirectory(installDir))
         this->installDir = installDir;
 
-    if (!interfaceName.isEmpty()) {
-        const QNetworkInterface &networkInterface = QNetworkInterface::interfaceFromName(interfaceName);
-
-        if (networkInterface.isValid())
-            this->networkInterface = networkInterface;
-    }
+    this->interface = NetUtils::findValidInterface(interfaceName);
 }
 
 Console::~Console()
@@ -30,12 +26,12 @@ Console::~Console()
 bool Console::exec()
 {
     if (installDir.isEmpty()) {
-        qDebug().noquote() << QString("Error: No %1 installation directory specified, aborting!").arg(game_name);
-        return false;
-    }
+        qDebug().noquote() << tr("Error: No %1 installation directory specified, aborting!").arg(game_name);
 
-    if (!DirUtils::isGameDirectory(installDir)) {
+        return false;
+    } else if (!DirUtils::isGameDirectory(installDir)) {
         qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(installDir, game_name);
+
         return false;
     }
 
@@ -46,15 +42,13 @@ bool Console::exec()
     if (Patcher::isPatched(dir.absolutePath())) {
         Patcher::undoPatch(dir);
 
-        qDebug().noquote() << QString("Successfully unistalled patch.");
+        qDebug().noquote() << tr("Successfully uninstalled patch.");
     } else {
         // Apply patch to files, if successful continue.
-        if (Patcher::patch(dir)) {
-            // Generate network configuration.
-            Patcher::generateConfigurationFile(dir, networkInterface);
-        }
+        if (Patcher::patch(dir))
+            Patcher::generateConfigurationFile(dir, interface);
 
-        qDebug().noquote() << QString("Successfully installed patch.");
+        qDebug().noquote() << tr("Successfully installed patch.");
     }
 
     saveSettings();
@@ -66,19 +60,18 @@ void Console::loadSettings()
 {
     QDir dir = settings->value(settings_install_directory).toString();
 
-    if (DirUtils::isGameDirectory(dir)) {
-        // If we're in executable directory, cd up to install directory.
-        if (dir.dirName() == game_executable_directory) {
-            dir.cdUp();
-        }
+    if (!DirUtils::isGameDirectory(dir))
+        return;
 
-        installDir = dir.absolutePath();
-    }
+    // If we're in executable directory, cd up to install directory.
+    if (dir.dirName() == game_executable_directory)
+        dir.cdUp();
+
+    installDir = dir.absolutePath();
 }
 
 void Console::saveSettings()
 {
-    if (DirUtils::isGameDirectory(installDir)) {
+    if (DirUtils::isGameDirectory(installDir))
         settings->setValue(settings_install_directory, installDir);
-    }
 }

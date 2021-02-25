@@ -11,7 +11,7 @@
 class Patcher
 {
 public:
-    static bool isPatched(QString path);
+    static bool isPatched(const QString &path);
     static bool patch(const QDir &dir, QWidget *widget = nullptr);
     static void undoPatch(const QDir &dir);
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);

@@ -12,16 +12,14 @@ public:
         NEW_DATA
     };
 
-    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", Type type = INJECT_SYMBOL) :
+    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", const Type &type = INJECT_SYMBOL) :
         CodeEntry(address, QByteArray::number(word), section, type) {}
 
-    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", Type type = INJECT_DATA) :
-        address(address),
-        data(data),
-        section(section),
-        type(type) {}
+    CodeEntry(const QByteArray &data, const char *section = ".text_mp", const Type &type = NEW_DATA) :
+        CodeEntry(0, data, section, type) {}
 
-    CodeEntry(const QByteArray &data, const char *section = ".text_mp", Type type = NEW_DATA) :
+    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", const Type &type = INJECT_DATA) :
+        address(address),
         data(data),
         section(section),
         type(type) {}
@@ -30,7 +28,7 @@ public:
         return address;
     }
 
-    QByteArray getData() const {
+    const QByteArray &getData() const {
         return data;
     }
 
@@ -38,15 +36,15 @@ public:
         return section;
     }
 
-    Type getType() const {
+    const Type &getType() const {
         return type;
     }
 
 private:
     uint32_t address = 0;
-    QByteArray data;
+    const QByteArray data;
     const char *section;
-    Type type;
+    const Type type;
 };
 
 struct HashEntry {
@@ -64,7 +62,7 @@ public:
         return hashentries;
     }
 
-    const QList<CodeEntry> getCodeEntries() const {
+    const QList<CodeEntry> &getCodeEntries() const {
         return codeentries;
     }
 

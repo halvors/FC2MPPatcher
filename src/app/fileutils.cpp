@@ -11,15 +11,14 @@
 
 const char *FileUtils::checkSum(QFile file)
 {
-    if (file.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(QCryptographicHash::Sha256);
-        hash.addData(&file);
-        file.close();
+    if (!file.open(QFile::ReadOnly))
+        return nullptr;
 
-        return hash.result().toHex().constData();
-    }
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    hash.addData(&file);
+    file.close();
 
-    return nullptr;
+    return hash.result().toHex().constData();
 }
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched)
@@ -78,36 +77,41 @@ bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
     QFile file = fileName;
     QFile fileCopy = fileCopyName;
 
-    if (backup)
+    if (backup) {
         return !fileCopy.exists() &&
                (file.rename(fileCopyName) &
                file.copy(fileName) &
                setHidden(fileCopyName, backup));
-    else
+    } else {
+        // Temp, leave for some iterations, was changed in 0.1.12.
+        QFile fileCopyLegacy = appendToName(dir, fileEntry, game_backup_suffix);
+
+        if (fileCopyLegacy.exists() && (file.remove() & fileCopyLegacy.rename(fileName)))
+            return true;
+
         return fileCopy.exists() &&
                (file.remove() &
                fileCopy.rename(fileName) &
                setHidden(fileName, backup));
+    }
 }
 
 bool FileUtils::backup(const QDir &dir, const FileEntry &file)
 {
     bool result = copy(dir, file, true);
 
-    if (result) {
+    if (result)
         qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(file.getName()));
-    }
 
     return result;
 }
 
-bool FileUtils::restore(const QDir &dir, const FileEntry &fileEntry)
+bool FileUtils::restore(const QDir &dir, const FileEntry &file)
 {
-    bool result = copy(dir, fileEntry, false);
+    bool result = copy(dir, file, false);
 
-    if (result) {
-        qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileEntry.getName()));
-    }
+    if (result)
+        qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(file.getName()));
 
     return result;
 }

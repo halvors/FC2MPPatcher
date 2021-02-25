@@ -74,15 +74,13 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
     importSection.set_name(pe_patch_rdata_section);
     importSection.readable(true).writeable(true);
-
     section &attachedImportSection = image->add_section(importSection);
 
-    // Rebuild imports.
     import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
     settings.fill_missing_original_iats(true); // Needed in order to preserve original IAT.
-    rebuild_imports(*image, imports, attachedImportSection, settings);
+    rebuild_imports(*image, imports, attachedImportSection, settings); // Rebuild imports.
 
-    // Add extra .text section.
+    // Create .text section for custom assembly code.
     QByteArray textData;
 
     for (const CodeEntry &codeEntry : codeEntries)
@@ -98,7 +96,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
         image->add_section(textSection);
     }
 
-    // Patch code.
+    // Patch the existing code.
     patchCode(libraryFile, libraryFunctions, codeEntries);
 
     return true;
@@ -140,20 +138,21 @@ QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() == libraryFile.toStdString()) {
-            uint32_t address = image->get_image_base_32() + library.get_rva_to_iat();
+        if (library.get_name() != libraryFile.toStdString())
+            continue;
 
-            for (uint32_t i = 0; i < library.get_imported_functions().size(); i++) {
-                addresses.append(address);
+        uint32_t address = image->get_image_base_32() + library.get_rva_to_iat();
 
-                if (DEBUG_MODE)
-                    qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
+        for (uint32_t i = 0; i < library.get_imported_functions().size(); i++) {
+            addresses.append(address);
 
-                address += 4; // Size of one address entry.
-            }
+            if (DEBUG_MODE)
+                qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
 
-            break;
+            address += 4; // Size of one address entry.
         }
+
+        break;
     }
 
     return addresses;
@@ -173,6 +172,8 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
         // Read raw data of section as byte array.
         uint8_t *rawDataPtr = reinterpret_cast<uint8_t*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
 
+        qDebug().noquote() << "lol";
+
         // Patching all addresses specified for this target.
         for (const CodeEntry &codeEntry : codeEntries) {
             // Only patch addresses in their specified section.
@@ -187,7 +188,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                 continue;
 
             // Creating pointer to the data that is to be updated (aka. does pointer yoga).
-            uint32_t *basePtr = reinterpret_cast<uint32_t*>(rawDataPtr + address - sectionAddress);
+            uint32_t *basePtr = reinterpret_cast<uint32_t*>(rawDataPtr - sectionAddress + address);
 
             // Handle symbols differently from data.
             switch (codeEntry.getType()) {

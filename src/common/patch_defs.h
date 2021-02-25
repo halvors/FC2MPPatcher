@@ -6,7 +6,7 @@
 
 #include "entry.h"
 
-// Currently only applies for dedicated server, changes lobby server to that of game clients because server endpoint is down.
+// Currently only applies for dedicated server, changes lobby server to that of the client because the server endpoint is currently down.
 constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
 constexpr uint16_t patch_network_lobbyserver_port = 3035;
 
@@ -21,6 +21,7 @@ const QStringList patch_library_functions = {
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
+const QByteArray patch_asm_jz_to_jmp = QByteArray("\xEB", 1);
 
 const QList<FileEntry> files = {
     {
@@ -43,8 +44,8 @@ const QList<FileEntry> files = {
                     { 0x1001431c, 4 }, // getHostByName()
 
                     // Server
-                    { 0x10cb29e2, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   call dunia.10770BD0
+                    { 0x10cb29e2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
                                  "\xFF\x15\x10\xD7\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
@@ -80,8 +81,8 @@ const QList<FileEntry> files = {
                     { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
 
                     // Server
-                    { 0x10cebaf2, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   call dunia.1077D600
+                    { 0x10cebaf2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
                                  "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
@@ -116,7 +117,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c43ffd, 1 },  // connect()
-                    { 0x004ecda5, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -155,7 +156,7 @@ const QList<FileEntry> files = {
 
                     // Server
                     { 0x00c465bd, 1 }, // connect()
-                    { 0x004eca95, QByteArray("\xEB", 1) }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax

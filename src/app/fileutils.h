@@ -15,11 +15,11 @@ public:
     static QString prependToName(const QDir &dir, const FileEntry &file, const QString &head);
     static QString appendToName(const QDir &dir, const FileEntry &file, const QString &tail);
     static bool backup(const QDir &dir, const FileEntry &file);
-    static bool restore(const QDir &dir, const FileEntry &fileEntry);
+    static bool restore(const QDir &dir, const FileEntry &file);
 
 private:
     static bool setHidden(const QString &fileName, bool hidden);
-    static bool copy(const QDir &dir, const FileEntry &fileEntry, bool backup);
+    static bool copy(const QDir &dir, const FileEntry &file, bool backup);
 };
 
 #endif // FILEUTILS_H

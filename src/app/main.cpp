@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     parser.addOption(cliOption);
     parser.addOption(installDirectoryOption);
+    parser.addOption(networkInterfaceOption);
     parser.process(app);
 
     bool cliMode = parser.isSet(cliOption);

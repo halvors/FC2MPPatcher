@@ -1,7 +1,8 @@
-#include <QVersionNumber>
+
 #include <QLineEdit>
 #include <QDir>
 #include <QMessageBox>
+#include <QStringList>
 #include <QNetworkInterface>
 #include <QNetworkAddressEntry>
 #include <QHostAddress>
@@ -12,6 +13,7 @@
 #include "ui_widget.h"
 #include "dirutils.h"
 #include "fileutils.h"
+#include "netutils.h"
 #include "patcher.h"
 
 Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget *parent) :
@@ -41,25 +43,26 @@ Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget 
     loadSettings(installDir, interfaceName);
 
     // Update patch button according to patch status.
-    QString path = getInstallDirectory(false);
+    const QString &path = getInstallDirectory(false);
     bool patched = Patcher::isPatched(path);
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
-    connect(ui->comboBox_install_directory,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::comboBox_install_directory_currentIndexChanged);
-    connect(ui->pushButton_install_directory,   &QPushButton::clicked,                                  this, &Widget::pushButton_install_directory_clicked);
-    connect(ui->comboBox_network_interface,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::comboBox_network_interface_currentIndexChanged);
-    connect(ui->pushButton_patch,               &QPushButton::clicked,                                  this, &Widget::pushButton_patch_clicked);
+    connect(ui->comboBox_install_directory,   QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Widget::comboBox_install_directory_currentIndexChanged);
+    connect(ui->pushButton_install_directory, &QPushButton::clicked,                               this, &Widget::pushButton_install_directory_clicked);
+    connect(ui->comboBox_network_interface,   QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Widget::comboBox_network_interface_currentIndexChanged);
+    connect(ui->pushButton_patch,             &QPushButton::clicked,                               this, &Widget::pushButton_patch_clicked);
 
     // Register signals to saveSettings slot.
-    connect(ui->comboBox_install_directory,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::saveSettings);
-    connect(ui->comboBox_network_interface,     QOverload<int>::of(&QComboBox::currentIndexChanged),    this, &Widget::saveSettings);
-    connect(ui->pushButton_patch,               &QPushButton::clicked,                                  this, &Widget::saveSettings);
+    connect(ui->comboBox_install_directory,   QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Widget::saveSettings);
+    connect(ui->comboBox_network_interface,   QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Widget::saveSettings);
+    connect(ui->pushButton_patch,             &QPushButton::clicked,                               this, &Widget::saveSettings);
 }
 
 Widget::~Widget()
 {
     delete ui;
+    delete settings;
 }
 
 void Widget::closeEvent(QCloseEvent *event)
@@ -80,9 +83,8 @@ void Widget::loadSettings(const QString &installDir, const QString &interfaceNam
         const QStringList &installDirectories = DirUtils::findInstallDirectories();
 
         // If we're in executable directory, cd up to install directory.
-        if (dir.dirName() == game_executable_directory) {
+        if (dir.dirName() == game_executable_directory)
             dir.cdUp();
-        }
 
         // Avoid duplicate install directories.
         if (!installDirectories.contains(dir.absolutePath())) {
@@ -111,15 +113,14 @@ void Widget::loadSettings(const QString &installDir, const QString &interfaceNam
         resize(settings->value(settings_group_window_size, size()).toSize());
         move(settings->value(settings_group_window_position, pos()).toPoint());
 
-        if (settings->value(settings_group_window_isMaximized, false).toBool()) {
+        if (settings->value(settings_group_window_isMaximized, false).toBool())
             showMaximized();
-        }
     settings->endGroup();
 }
 
 void Widget::saveSettings() const
 {
-    QString path = ui->comboBox_install_directory->currentText();
+    const QString &path = ui->comboBox_install_directory->currentText();
 
     if (DirUtils::isGameDirectory(path)) {
         settings->setValue(settings_install_directory, path);
@@ -136,7 +137,7 @@ void Widget::saveSettings() const
 QString Widget::getInstallDirectory(bool warning)
 {
     // Create path to binary folder.
-    QDir dir = ui->comboBox_install_directory->currentText();
+    const QDir &dir = ui->comboBox_install_directory->currentText();
 
     if (DirUtils::isGameDirectory(dir)) {
         return dir.absolutePath();
@@ -163,32 +164,25 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     // If no network interfaces is found, return early.
     if (interfaces.isEmpty()) {
         ui->comboBox_network_interface->setEnabled(false);
-        ui->comboBox_network_interface->addItem(tr("No network interface found."));
+        ui->comboBox_network_interface->addItem(tr("No network interface available."));
 
         return;
     }
 
     // Loop thru all of the systems network interfaces.
     for (const QNetworkInterface &interface : interfaces) {
-        const QNetworkInterface::InterfaceFlags &flags = interface.flags();
-
-        if (!interface.isValid() || flags.testFlag(QNetworkInterface::IsLoopBack))
+        // Only consider active network interfaces and not loopback interfaces.
+        if (!NetUtils::isValid(interface))
             continue;
 
-        // Only show active network interfaces and not loopback interfaces.
-        if (flags.testFlag(QNetworkInterface::IsUp)) {
-            QNetworkAddressEntry selectedAddressEntry;
+        // Scan thru addresses for this interface.
+        for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
+            QHostAddress hostAddress = addressEntry.ip();
 
-            // Scan thru addresses for this interface.
-            for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
-                // Only select first IPv4 address found.
-                if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                    selectedAddressEntry = addressEntry;
-                    break;
-                }
+            // Only select first IPv4 address found.
+            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
+                ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + hostAddress.toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
             }
-
-            ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + selectedAddressEntry.ip().toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
         }
     }
 }
@@ -202,27 +196,27 @@ void Widget::comboBox_install_directory_currentIndexChanged(int index)
 {
     Q_UNUSED(index)
 
-    QString path = getInstallDirectory(false);
-    updatePatchStatus(Patcher::isPatched(path));
+    const QString &installDir = getInstallDirectory(false);
+    updatePatchStatus(Patcher::isPatched(installDir));
 }
 
 void Widget::pushButton_install_directory_clicked()
 {
-    QString path = QFileDialog::getExistingDirectory(this, tr("Select the %1 installation directory").arg(game_name), ui->comboBox_install_directory->currentText(), QFileDialog::ReadOnly);
+    QString installDir = QFileDialog::getExistingDirectory(this, tr("Please select the %1 installation directory").arg(game_name), ui->comboBox_install_directory->currentText(), QFileDialog::ReadOnly);
 
-    if (!DirUtils::isGameDirectory(path)) {
-        QMessageBox::information(this, tr("Information"), tr("Selected directory is not an %1 installation directory, please try again.").arg(game_name));
+    if (!DirUtils::isGameDirectory(installDir)) {
+        QMessageBox::information(this, tr("Information"), tr("The selected directory does not contain a %1 installation, please try again!").arg(game_name));
 
         return;
     }
 
-    ui->comboBox_install_directory->setCurrentText(path);
-    updatePatchStatus(Patcher::isPatched(path));
+    ui->comboBox_install_directory->setCurrentText(installDir);
+    updatePatchStatus(Patcher::isPatched(installDir));
 }
 
 void Widget::comboBox_network_interface_currentIndexChanged(int index)
 {
-    QDir dir = getInstallDirectory();
+    const QDir &dir = getInstallDirectory();
 
     // Only update network configuration if game is patched.
     if (Patcher::isPatched(dir.absolutePath())) {
@@ -234,13 +228,13 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
 void Widget::pushButton_patch_clicked()
 {
     // Create path to binary folder.
-    QString path = getInstallDirectory();
+    const QString &installDir = getInstallDirectory();
 
-    if (path.isEmpty()) {
+    if (installDir.isEmpty()) {
         return;
     }
 
-    QDir dir = path;
+    QDir dir = installDir;
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
@@ -253,7 +247,6 @@ void Widget::pushButton_patch_clicked()
         if (Patcher::patch(dir, this)) {
             // Generate network configuration.
             Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
-
             updatePatchStatus(true);
         }
     }

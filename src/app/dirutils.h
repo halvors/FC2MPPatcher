@@ -4,13 +4,14 @@
 #include <QDir>
 #include <QString>
 #include <QStringList>
+#include <QJsonObject>
 
 class DirUtils
 {
 public:
     static bool isGameDirectory(QDir dir);
-    static bool isGameDirectory(const QString &path);
-    static QStringList &findInstallDirectories();
+    static bool isGameDirectory(const QString &dir);
+    static const QStringList &findInstallDirectories();
 
 private:
     static QStringList installDirectories;
@@ -35,7 +36,7 @@ private:
     static QStringList libraries;
 
     static QString getInstallDirectory();
-    static QStringList &findLibraries(QDir &dir);
+    static QStringList &findLibraries(QDir dir);
     static QJsonObject getJsonFromFile(QFile &file);
     static QString getJsonFromAcf(const QStringList &lines);
 };
