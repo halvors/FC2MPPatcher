@@ -3,8 +3,9 @@ An utility for patching your Far Cry 2 installation to support multiplayer agian
 
 This resolves the following issues for the game and dedicated server:
  * Binding to the wrong network interface, resolving issues with online multiplayer. 
- * Annoncing wrong IP address in multiplayer, showing 9999 ping for mathces in lobby. 
+ * Annoncing wrong IP address in multiplayer, showing 9999 ping for matches in lobby. 
  * Broadcasting to wrong address, causing issues with LAN multiplayer (including over VPN).
+ * Dedicated Server not starting in online mode.
  * Joining matches hosted ingame.
  * Steam and Uplay version being unable to login to online accounts.
  * Custom map download from host not ever working properly on online servers.
