@@ -24,7 +24,7 @@ constexpr char settings_group_window_isMaximized[] = "isMaximized";
 constexpr char game_name[] = "Far Cry 2";
 constexpr char game_publisher[] = "Ubisoft";
 constexpr char game_executable_directory[] = "bin";
-constexpr char game_backup_prefix[] = ".";
+constexpr char game_hidden_prefix = '.';
 constexpr char game_backup_suffix[] = "_original"; // Temp, leave for some iterations, was changed in 0.1.12.
 
 // Steam

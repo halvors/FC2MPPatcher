@@ -11,7 +11,7 @@
 
 #include "widget.h"
 #include "ui_widget.h"
-#include "dirutils.h"
+#include "installdir.h"
 #include "fileutils.h"
 #include "netutils.h"
 #include "patcher.h"
@@ -79,8 +79,8 @@ void Widget::loadSettings(const QString &installDir, const QString &interfaceNam
     if (!installDir.isEmpty())
         dir = installDir;
 
-    if (DirUtils::isGameDirectory(dir)) {
-        const QStringList &installDirectories = DirUtils::findInstallDirectories();
+    if (InstallDir::isGameDirectory(dir)) {
+        const QStringList &installDirectories = InstallDir::findInstallDirectories();
 
         // If we're in executable directory, cd up to install directory.
         if (dir.dirName() == game_executable_directory)
@@ -122,7 +122,7 @@ void Widget::saveSettings() const
 {
     const QString &path = ui->comboBox_install_directory->currentText();
 
-    if (DirUtils::isGameDirectory(path)) {
+    if (InstallDir::isGameDirectory(path)) {
         settings->setValue(settings_install_directory, path);
     }
 
@@ -139,7 +139,7 @@ QString Widget::getInstallDirectory(bool warning)
     // Create path to binary folder.
     const QDir &dir = ui->comboBox_install_directory->currentText();
 
-    if (DirUtils::isGameDirectory(dir)) {
+    if (InstallDir::isGameDirectory(dir)) {
         return dir.absolutePath();
     }
 
@@ -152,7 +152,7 @@ QString Widget::getInstallDirectory(bool warning)
 
 void Widget::populateComboboxWithInstallDirectories() const
 {
-    for (const QString &path : DirUtils::findInstallDirectories()) {
+    for (const QString &path : InstallDir::findInstallDirectories()) {
         ui->comboBox_install_directory->addItem(path);
     }
 }
@@ -204,7 +204,7 @@ void Widget::pushButton_install_directory_clicked()
 {
     QString installDir = QFileDialog::getExistingDirectory(this, tr("Please select the %1 installation directory").arg(game_name), ui->comboBox_install_directory->currentText(), QFileDialog::ReadOnly);
 
-    if (!DirUtils::isGameDirectory(installDir)) {
+    if (!InstallDir::isGameDirectory(installDir)) {
         QMessageBox::information(this, tr("Information"), tr("The selected directory does not contain a %1 installation, please try again!").arg(game_name));
 
         return;

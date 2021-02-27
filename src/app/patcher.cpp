@@ -27,8 +27,8 @@ bool Patcher::isPatched(const QString &path)
                     break;
                 }
 
-                const QFile &backupFile = FileUtils::prependToName(dir, file, game_backup_prefix);
-                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file, game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
+                const QFile &backupFile = dir.filePath(QString(file.getName()).prepend(game_hidden_prefix));
+                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file.getName(), game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
 
                 // Detect old installations of the patch.
                 if (backupFile.exists() || backupFileLegacy.exists()) {
@@ -74,7 +74,7 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
             // Validate target file against stored checksum.
             if (FileUtils::isValid(dir, fileEntry, target, false)) {
                 // Backup original file.
-                FileUtils::backup(dir, fileEntry);
+                FileUtils::replicate(dir, fileEntry, true);
 
                 // Patch target file.
                 if (!DEBUG_MODE & !patchFile(dir, fileEntry, target)) {
@@ -85,6 +85,8 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
                 }
 
                 count++;
+            } else {
+                log(QT_TR_NOOP(QString("Error: Something went wrong while validating game files, aborting!")), widget);
             }
         }
     }
@@ -103,11 +105,11 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
 void Patcher::undoPatch(const QDir &dir) {
     for (const FileEntry &file : files) {
         // Restore patched files.
-        FileUtils::restore(dir, file);
+        FileUtils::replicate(dir, file, false);
 
         // Delete backed up game files.
-        QFile::remove(dir.filePath(FileUtils::prependToName(dir, file, game_backup_prefix)));
-        QFile::remove(dir.filePath(FileUtils::appendToName(dir, file, game_backup_suffix))); // Temp, leave for some iterations, was changed in 0.1.12.
+        //QFile::remove(dir.filePath(QString(file.getName()).prepend(game_hidden_prefix)));
+        //QFile::remove(dir.filePath(FileUtils::appendToName(dir, file.getName(), game_backup_suffix))); // Temp, leave for some iterations, was changed in 0.1.12.
     }
 
     // Delete patch library file.
@@ -171,12 +173,12 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     delete peFile;
 
     if (DEBUG_MODE)
-        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.getName()).arg(FileUtils::checkSum(dir.filePath(fileEntry.getName()))));
+        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.getName()).arg(FileUtils::calculateChecksum(dir.filePath(fileEntry.getName())).constData()));
 
     return FileUtils::isValid(dir, fileEntry, target, true);
 }
 
-void log(const QString &msg, QWidget *widget)
+void Patcher::log(const QString &msg, QWidget *widget)
 {
     if (widget)
         QMessageBox::warning(widget, QT_TR_NOOP(QString("Warning")), msg);

@@ -20,16 +20,16 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 HEADERS += \
     console.h \
-    dirutils.h \
     fileutils.h \
+    installdir.h \
     patcher.h \
     pefile.h \
     widget.h
 
 SOURCES += \
     console.cpp \
-    dirutils.cpp \
     fileutils.cpp \
+    installdir.cpp \
     main.cpp \
     patcher.cpp \
     pefile.cpp \

@@ -1,7 +1,13 @@
 - Use regex to validate input?
 
+Just remove TargetEntry in favor of FileEntry with new hashentry system?
+
+Should we use checksums to just find valid files so that people could rename them?
+
+Fix fish: “./fc2mppatcher -n” terminated by signal SIGSEGV (Address boundary error) because wrong file is selected when only 1?
+
 Networking:
-- Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces?
+- Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces? EDIT: Not possible because of ip address info in packets?
 
 Compiling:
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.

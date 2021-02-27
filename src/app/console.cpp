@@ -2,7 +2,7 @@
 
 #include "console.h"
 #include "netutils.h"
-#include "dirutils.h"
+#include "installdir.h"
 #include "defs.h"
 #include "patcher.h"
 
@@ -12,7 +12,7 @@ Console::Console(const QString &installDir, const QString &interfaceName, QObjec
     settings = new QSettings(app_configuration_file, QSettings::IniFormat, this);
     loadSettings();
 
-    if (DirUtils::isGameDirectory(installDir))
+    if (InstallDir::isGameDirectory(installDir))
         this->installDir = installDir;
 
     this->interface = NetUtils::findValidInterface(interfaceName);
@@ -26,10 +26,16 @@ Console::~Console()
 bool Console::exec()
 {
     if (installDir.isEmpty()) {
-        qDebug().noquote() << tr("Error: No %1 installation directory specified, aborting!").arg(game_name);
+        qDebug().noquote() << tr("No %1 installation directory specified, attempting auto detection...").arg(game_name);
 
-        return false;
-    } else if (!DirUtils::isGameDirectory(installDir)) {
+        installDir = InstallDir::findInstallDirectories().first();
+
+        if (installDir.isEmpty()) {
+            qDebug().noquote() << tr("Error: Auto detection failed, aborting!").arg(game_name);
+
+            return false;
+        }
+    } else if (!InstallDir::isGameDirectory(installDir)) {
         qDebug().noquote() << QString("Error: Directory \"%1\" does not contain a %2 installation, aborting!").arg(installDir, game_name);
 
         return false;
@@ -60,7 +66,7 @@ void Console::loadSettings()
 {
     QDir dir = settings->value(settings_install_directory).toString();
 
-    if (!DirUtils::isGameDirectory(dir))
+    if (!InstallDir::isGameDirectory(dir))
         return;
 
     // If we're in executable directory, cd up to install directory.
@@ -72,6 +78,6 @@ void Console::loadSettings()
 
 void Console::saveSettings()
 {
-    if (DirUtils::isGameDirectory(installDir))
+    if (InstallDir::isGameDirectory(installDir))
         settings->setValue(settings_install_directory, installDir);
 }

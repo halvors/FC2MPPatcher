@@ -172,6 +172,8 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
         // Read raw data of section as byte array.
         uint8_t *rawDataPtr = reinterpret_cast<uint8_t*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
 
+        // TODO: Use union for rawDataPtr so that we can have unsigned int and char ptr at same time?
+
         // Patching all addresses specified for this target.
         for (const CodeEntry &codeEntry : codeEntries) {
             // Only patch addresses in their specified section.

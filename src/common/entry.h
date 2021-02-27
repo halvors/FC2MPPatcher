@@ -48,27 +48,27 @@ private:
 };
 
 struct HashEntry {
-    const char *original;
-    const char *result;
+    const QByteArray original;
+    const QByteArray result;
 };
 
 class TargetEntry {
 public:
-    TargetEntry(const QList<HashEntry> &hashentries, const QList<CodeEntry> &codeentries) :
-        hashentries(hashentries),
-        codeentries(codeentries) {}
+    TargetEntry(const QList<HashEntry> &hashEntries, const QList<CodeEntry> &codeEntries) :
+        hashEntries(hashEntries),
+        codeEntries(codeEntries) {}
 
     const QList<HashEntry> &getHashEntries() const {
-        return hashentries;
+        return hashEntries;
     }
 
     const QList<CodeEntry> &getCodeEntries() const {
-        return codeentries;
+        return codeEntries;
     }
 
 private:
-    const QList<HashEntry> hashentries;
-    const QList<CodeEntry> codeentries;
+    const QList<HashEntry> hashEntries;
+    const QList<CodeEntry> codeEntries;
 };
 
 class FileEntry {
