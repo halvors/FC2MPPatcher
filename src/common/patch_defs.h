@@ -93,7 +93,11 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
-                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
+
+                    /* Experimental */
+                    // Remove mouse clamp
+                    { 0x105ffc78, QByteArray("\x90\x90\x90\x90\x90\x90\x90\x90", 8) } // Change byte 0x105ffc78 to 0x105ffc7f to "nop", no operation.
                 }
             }
         }
