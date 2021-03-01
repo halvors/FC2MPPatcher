@@ -196,6 +196,10 @@ void Widget::updatePatchStatus(const Patcher::State &patched) const
         text = tr("Uninstall patch");
         break;
 
+    case Patcher::UPGRADABLE:
+        text = tr("Upgrade patch");
+        break;
+
     default:
         text = tr("Install patch");
         break;
@@ -250,16 +254,23 @@ void Widget::pushButton_patch_clicked()
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir.absolutePath()) == Patcher::INSTALLED) {
+    switch (Patcher::isPatched(dir.absolutePath())) {
+    case Patcher::INSTALLED:
         Patcher::undoPatch(dir);
-
         updatePatchStatus(Patcher::NOT_INSTALLED);
-    } else {
+        break;
+
+    case Patcher::UPGRADABLE:
+        Patcher::undoPatch(dir);
+        [[fallthrough]];
+
+    default:
         // Apply patch to files, if successful continue.
         if (Patcher::patch(dir, this)) {
             // Generate network configuration.
             Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
             updatePatchStatus(Patcher::INSTALLED);
         }
+        break;
     }
 }

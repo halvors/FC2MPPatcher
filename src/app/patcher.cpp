@@ -14,7 +14,8 @@ Patcher::State Patcher::isPatched(const QString &path)
         return INVALID;
 
     QDir dir = path;
-    int count = 0;
+    unsigned int numInstalled = 0;
+    unsigned int numLegacyInstalled = 0;
 
     // Should we be looking in executable directory instead?
     if (dir.exists() | dir.cd(game_executable_directory)) {
@@ -22,11 +23,23 @@ Patcher::State Patcher::isPatched(const QString &path)
             for (const TargetEntry &target : file.targets) {
                 // Check if target file is patched.
                 if (FileUtils::isValid(dir, file, target, true)) {
-                    count++;
-
+                    numInstalled++;
                     break;
                 }
 
+                QByteArray checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
+
+                // Check if there are legacy versions installed.
+                for (QByteArray legacyHash : target.upgradeHashEntries) {
+                    qDebug() << QString("%1 == %2").arg(checksum.constData()).arg(legacyHash.constData());
+
+                    if (checksum == legacyHash) {
+                        numLegacyInstalled++;
+                        break;
+                    }
+                }
+
+                /*
                 const QFile &backupFile = dir.filePath(QString(file.name).prepend(game_hidden_prefix));
                 const QFile &backupFileLegacy = FileUtils::appendToName(dir, file.name, game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
 
@@ -36,11 +49,14 @@ Patcher::State Patcher::isPatched(const QString &path)
 
                     break;
                 }
+                */
             }
         }
     }
 
-    if (count == files.length())
+    if (numLegacyInstalled > 0)
+        return UPGRADABLE;
+    else if (numInstalled > 0)
         return INSTALLED;
 
     return NOT_INSTALLED;
