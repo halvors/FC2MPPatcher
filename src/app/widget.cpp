@@ -44,7 +44,7 @@ Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget 
 
     // Update patch button according to patch status.
     const QString &path = getInstallDirectory(false);
-    Patcher::PatchState patched = Patcher::isPatched(path);
+    Patcher::State patched = Patcher::isPatched(path);
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
@@ -187,7 +187,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     }
 }
 
-void Widget::updatePatchStatus(Patcher::PatchState patched) const
+void Widget::updatePatchStatus(const Patcher::State &patched) const
 {
     QString text;
 

@@ -8,7 +8,7 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-enum Patcher::PatchState Patcher::isPatched(const QString &path)
+Patcher::State Patcher::isPatched(const QString &path)
 {
     if (path.isEmpty())
         return INVALID;

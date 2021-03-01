@@ -31,7 +31,7 @@ private:
     QString getInstallDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
     void populateComboboxWithNetworkInterfaces() const;
-    void updatePatchStatus(Patcher::PatchState patched) const;
+    void updatePatchStatus(const enum Patcher::State &patched) const;
 
 private slots:
     void saveSettings() const;

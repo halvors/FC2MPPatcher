@@ -54,7 +54,7 @@ private:
 
 struct TargetEntry {
     const QList<HashEntry> hashEntries;
-    const QList<HashEntry> upgradeHashEntries;
+    const QList<QByteArray> upgradeHashEntries;
     const QList<CodeEntry> codeEntries;
 };
 
