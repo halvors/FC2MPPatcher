@@ -85,8 +85,6 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
                 }
 
                 count++;
-            } else {
-                log(QT_TR_NOOP(QString("Error: Something went wrong while validating game files, aborting!")), widget);
             }
         }
     }

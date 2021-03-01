@@ -51,10 +51,11 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
     bool prefix = fileName.startsWith(game_hidden_prefix);
     QString newFileName = QString(fileName);
 
-    if (hidden && !prefix)
+    if (hidden && !prefix) {
         newFileName = newFileName.prepend(game_hidden_prefix);
-    else
-        newFileName = newFileName.remove(0, 1);
+    } else if (!hidden && prefix) {
+        newFileName.remove(0, 1);
+    }
 
     bool success = true;
 
@@ -65,7 +66,7 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
 
     success &= newFileName.startsWith(game_hidden_prefix) == hidden;
 #elif defined(Q_OS_WIN)
-    std::wstring newFileNameW = newFileName.toStdWString();
+    std::wstring newFileNameW = dir.filePath(newFileName).toStdWString();
     DWORD attributes = GetFileAttributesW(newFileNameW.c_str());
 
     if (hidden)
@@ -81,7 +82,7 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
 
 bool FileUtils::replicate(const QDir &dir, const FileEntry &fileEntry, bool backup)
 {
-    const QString &fileName = fileEntry.getName();
+    const QString fileName = fileEntry.getName();
     const QString fileCopyName = QString(fileName).prepend(game_hidden_prefix);
     const QString &filePath = dir.filePath(fileName);
     const QString &fileCopyPath = dir.filePath(fileCopyName);
@@ -89,29 +90,24 @@ bool FileUtils::replicate(const QDir &dir, const FileEntry &fileEntry, bool back
     QFile file = dir.filePath(fileName);
     QFile fileCopy = dir.filePath(fileCopyName);
 
-    qDebug().noquote() << fileName;
-    qDebug().noquote() << fileCopyName;
-    qDebug().noquote() << filePath;
-    qDebug().noquote() << fileCopyPath;
-
     if (backup) {
         qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileName));
 
         return !fileCopy.exists() && (file.rename(fileCopyPath) &
-                                      file.copy(filePath));
-                                      //& setHidden(dir, fileCopyName, backup));
+                                      file.copy(filePath) &
+                                      setHidden(dir, fileCopyName, backup));
     } else {
         qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileName));
 
         // Temp, leave for some iterations, was changed in 0.1.12.
-        //QFile fileCopyLegacy = appendToName(dir, fileName, game_backup_suffix);
+        QFile fileCopyLegacy = appendToName(dir, fileName, game_backup_suffix);
 
-        //if (fileCopyLegacy.exists() && (file.remove() & fileCopyLegacy.rename(filePath)))
-            //return true;
+        if (fileCopyLegacy.exists() && (file.remove() & fileCopyLegacy.rename(filePath)))
+            return true;
 
         return fileCopy.exists() && (file.remove() &
-                                     fileCopy.rename(filePath));
-                                     //setHidden(dir, fileCopyName, backup));
+                                     fileCopy.rename(filePath) &
+                                     setHidden(dir, fileName, backup));
     }
 
     return false;
