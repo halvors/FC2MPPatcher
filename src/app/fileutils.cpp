@@ -49,24 +49,24 @@ QString FileUtils::appendToName(const QDir &dir, const QString &fileName, const 
 bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
 {
     bool prefix = fileName.startsWith(game_hidden_prefix);
+    bool success = true;
+
+#if defined(Q_OS_LINUX)
     QString newFileName = QString(fileName);
 
     if (hidden && !prefix) {
-        newFileName = newFileName.prepend(game_hidden_prefix);
+        newFileName.prepend(game_hidden_prefix);
     } else if (!hidden && prefix) {
         newFileName.remove(0, 1);
     }
 
-    bool success = true;
-
-#if defined(Q_OS_LINUX)
     QFile file = dir.filePath(fileName);
     QString newFilePath = dir.filePath(newFileName);
     file.rename(newFilePath);
 
     success &= newFileName.startsWith(game_hidden_prefix) == hidden;
 #elif defined(Q_OS_WIN)
-    std::wstring newFileNameW = dir.filePath(newFileName).toStdWString();
+    std::wstring newFileNameW = dir.filePath(fileName).toStdWString();
     DWORD attributes = GetFileAttributesW(newFileNameW.c_str());
 
     if (hidden)
