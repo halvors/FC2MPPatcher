@@ -1,8 +1,7 @@
 - Use regex to validate input?
 
-Just remove TargetEntry in favor of FileEntry with new hashentry system?
-
-Should we use checksums to just find valid files so that people could rename them?
+Unable to patch only one of the files and then revert that patch again, should we support some kind of way to only patch oini of them?
+Should we compare checksums with that of old releases to support upgrades?
 
 Fix fish: “./fc2mppatcher -n” terminated by signal SIGSEGV (Address boundary error) because wrong file is selected when only 1?
 

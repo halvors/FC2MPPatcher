@@ -45,7 +45,7 @@ bool Console::exec()
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir.absolutePath())) {
+    if (Patcher::isPatched(dir.absolutePath()) == Patcher::INSTALLED) {
         Patcher::undoPatch(dir);
 
         qDebug().noquote() << tr("Successfully uninstalled patch.");

@@ -7,6 +7,7 @@
 #include <QString>
 
 #include "defs.h"
+#include "patcher.h"
 
 namespace Ui {
     class Widget;
@@ -30,7 +31,7 @@ private:
     QString getInstallDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
     void populateComboboxWithNetworkInterfaces() const;
-    void updatePatchStatus(bool patched) const;
+    void updatePatchStatus(Patcher::PatchState patched) const;
 
 private slots:
     void saveSettings() const;

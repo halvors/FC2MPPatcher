@@ -4,6 +4,11 @@
 #include <QList>
 #include <QByteArray>
 
+struct HashEntry {
+    const QByteArray original;
+    const QByteArray result;
+};
+
 class CodeEntry {
 public:
     enum Type {
@@ -12,13 +17,13 @@ public:
         NEW_DATA
     };
 
-    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", const Type &type = INJECT_SYMBOL) :
+    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", const enum Type &type = INJECT_SYMBOL) :
         CodeEntry(address, QByteArray::number(word), section, type) {}
 
-    CodeEntry(const QByteArray &data, const char *section = ".text_mp", const Type &type = NEW_DATA) :
+    CodeEntry(const QByteArray &data, const char *section = ".text_mp", const enum Type &type = NEW_DATA) :
         CodeEntry(0, data, section, type) {}
 
-    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", const Type &type = INJECT_DATA) :
+    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", const enum Type &type = INJECT_DATA) :
         address(address),
         data(data),
         section(section),
@@ -41,51 +46,19 @@ public:
     }
 
 private:
-    uint32_t address = 0;
+    const uint32_t address = 0;
     const QByteArray data;
     const char *section;
-    const Type type;
+    const enum Type type;
 };
 
-struct HashEntry {
-    const QByteArray original;
-    const QByteArray result;
-};
-
-class TargetEntry {
-public:
-    TargetEntry(const QList<HashEntry> &hashEntries, const QList<CodeEntry> &codeEntries) :
-        hashEntries(hashEntries),
-        codeEntries(codeEntries) {}
-
-    const QList<HashEntry> &getHashEntries() const {
-        return hashEntries;
-    }
-
-    const QList<CodeEntry> &getCodeEntries() const {
-        return codeEntries;
-    }
-
-private:
+struct TargetEntry {
     const QList<HashEntry> hashEntries;
+    const QList<HashEntry> upgradeHashEntries;
     const QList<CodeEntry> codeEntries;
 };
 
-class FileEntry {
-public:
-    FileEntry(const char *name, const QList<TargetEntry> &targets) :
-        name(name),
-        targets(targets) {}
-
-    const char *getName() const {
-        return name;
-    }
-
-    const QList<TargetEntry> &getTargets() const {
-        return targets;
-    }
-
-private:
+struct FileEntry {
     const char *name;
     const QList<TargetEntry> targets;
 };

@@ -8,10 +8,10 @@
 #include "fileutils.h"
 #include "pefile.h"
 
-bool Patcher::isPatched(const QString &path)
+enum Patcher::PatchState Patcher::isPatched(const QString &path)
 {
     if (path.isEmpty())
-        return false;
+        return INVALID;
 
     QDir dir = path;
     int count = 0;
@@ -19,7 +19,7 @@ bool Patcher::isPatched(const QString &path)
     // Should we be looking in executable directory instead?
     if (dir.exists() | dir.cd(game_executable_directory)) {
         for (const FileEntry &file : files) {
-            for (const TargetEntry &target : file.getTargets()) {
+            for (const TargetEntry &target : file.targets) {
                 // Check if target file is patched.
                 if (FileUtils::isValid(dir, file, target, true)) {
                     count++;
@@ -27,8 +27,8 @@ bool Patcher::isPatched(const QString &path)
                     break;
                 }
 
-                const QFile &backupFile = dir.filePath(QString(file.getName()).prepend(game_hidden_prefix));
-                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file.getName(), game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
+                const QFile &backupFile = dir.filePath(QString(file.name).prepend(game_hidden_prefix));
+                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file.name, game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
 
                 // Detect old installations of the patch.
                 if (backupFile.exists() || backupFileLegacy.exists()) {
@@ -40,7 +40,10 @@ bool Patcher::isPatched(const QString &path)
         }
     }
 
-    return count == files.length();
+    if (count == files.length())
+        return INSTALLED;
+
+    return NOT_INSTALLED;
 }
 
 bool Patcher::patch(const QDir &dir, QWidget *widget)
@@ -49,7 +52,11 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
 
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
-        QFile file = dir.filePath(fileEntry.getName());
+        QFile file = dir.filePath(fileEntry.name);
+
+        if (!file.exists())
+            continue;
+
         QFileInfo fileInfo = file;
 
         // What permissions should be set for files.
@@ -67,10 +74,10 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
         if (!fileInfo.permission(permissions)) {
             file.setPermissions(permissions);
 
-            qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.getName()));
+            qDebug().noquote() << QT_TR_NOOP(QString("Setting write permissions for protected file %1").arg(fileEntry.name));
         }
 
-        for (const TargetEntry &target : fileEntry.getTargets()) {
+        for (const TargetEntry &target : fileEntry.targets) {
             // Validate target file against stored checksum.
             if (FileUtils::isValid(dir, fileEntry, target, false)) {
                 // Backup original file.
@@ -79,7 +86,7 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
                 // Patch target file.
                 if (!DEBUG_MODE & !patchFile(dir, fileEntry, target)) {
                     undoPatch(dir);
-                    log(QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(fileEntry.getName())), widget);
+                    log(QT_TR_NOOP(QString("Invalid checksum for patched file %1, aborting!").arg(fileEntry.name)), widget);
 
                     return false;
                 }
@@ -155,7 +162,7 @@ bool Patcher::copyFiles(const QDir &dir)
 
 bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const TargetEntry &target)
 {
-    QFile file = dir.filePath(fileEntry.getName());
+    QFile file = dir.filePath(fileEntry.name);
 
     qDebug().noquote() << QT_TR_NOOP(QString("Patching file %1").arg(file.fileName()));
 
@@ -163,7 +170,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile *peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_file, patch_library_functions, target.getCodeEntries());
+    peFile->apply(patch_library_file, patch_library_functions, target.codeEntries);
 
     // Write PE to file.
     peFile->write();
@@ -171,7 +178,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     delete peFile;
 
     if (DEBUG_MODE)
-        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.getName()).arg(FileUtils::calculateChecksum(dir.filePath(fileEntry.getName())).constData()));
+        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.name).arg(FileUtils::calculateChecksum(dir.filePath(fileEntry.name)).constData()));
 
     return FileUtils::isValid(dir, fileEntry, target, true);
 }

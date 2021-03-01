@@ -11,7 +11,14 @@
 class Patcher
 {
 public:
-    static bool isPatched(const QString &path);
+    enum PatchState {
+        INSTALLED,
+        NOT_INSTALLED,
+        UPGRADABLE,
+        INVALID
+    };
+
+    static enum PatchState isPatched(const QString &path);
     static bool patch(const QDir &dir, QWidget *widget = nullptr);
     static void undoPatch(const QDir &dir);
     static void generateConfigurationFile(const QDir &dir, const QNetworkInterface &interface);

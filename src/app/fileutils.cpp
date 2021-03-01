@@ -23,12 +23,12 @@ QByteArray FileUtils::calculateChecksum(QFile file)
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched)
 {
-    QByteArray fileChecksum = calculateChecksum(dir.filePath(file.getName()));
+    QByteArray fileChecksum = calculateChecksum(dir.filePath(file.name));
 
     if (fileChecksum.isEmpty())
         return false;
 
-    for (const HashEntry &entry : target.getHashEntries()) {
+    for (const HashEntry &entry : target.hashEntries) {
         QByteArray targetChecksum = patched ? entry.result : entry.original;
 
         if (fileChecksum == targetChecksum)
@@ -82,7 +82,7 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
 
 bool FileUtils::replicate(const QDir &dir, const FileEntry &fileEntry, bool backup)
 {
-    const QString fileName = fileEntry.getName();
+    const QString fileName = fileEntry.name;
     const QString fileCopyName = QString(fileName).prepend(game_hidden_prefix);
     const QString &filePath = dir.filePath(fileName);
     const QString &fileCopyPath = dir.filePath(fileCopyName);

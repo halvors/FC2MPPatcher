@@ -44,7 +44,7 @@ Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget 
 
     // Update patch button according to patch status.
     const QString &path = getInstallDirectory(false);
-    bool patched = Patcher::isPatched(path);
+    Patcher::PatchState patched = Patcher::isPatched(path);
     updatePatchStatus(patched);
 
     // Register GUI signals to slots.
@@ -187,9 +187,21 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     }
 }
 
-void Widget::updatePatchStatus(bool patched) const
+void Widget::updatePatchStatus(Patcher::PatchState patched) const
 {
-    ui->pushButton_patch->setText(!patched ? tr("Install patch") : tr("Uninstall patch"));
+    QString text;
+
+    switch (patched) {
+    case Patcher::INSTALLED:
+        text = tr("Uninstall patch");
+        break;
+
+    default:
+        text = tr("Install patch");
+        break;
+    }
+
+    ui->pushButton_patch->setText(text);
 }
 
 void Widget::comboBox_install_directory_currentIndexChanged(int index)
@@ -219,7 +231,7 @@ void Widget::comboBox_network_interface_currentIndexChanged(int index)
     const QDir &dir = getInstallDirectory();
 
     // Only update network configuration if game is patched.
-    if (Patcher::isPatched(dir.absolutePath())) {
+    if (Patcher::isPatched(dir.absolutePath()) == Patcher::INSTALLED) {
         // Generate network configuration.
         Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->itemData(index).value<QNetworkInterface>());
     }
@@ -238,16 +250,16 @@ void Widget::pushButton_patch_clicked()
     dir.cd(game_executable_directory);
 
     // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir.absolutePath())) {
+    if (Patcher::isPatched(dir.absolutePath()) == Patcher::INSTALLED) {
         Patcher::undoPatch(dir);
 
-        updatePatchStatus(false);
+        updatePatchStatus(Patcher::NOT_INSTALLED);
     } else {
         // Apply patch to files, if successful continue.
         if (Patcher::patch(dir, this)) {
             // Generate network configuration.
             Patcher::generateConfigurationFile(dir, ui->comboBox_network_interface->currentData().value<QNetworkInterface>());
-            updatePatchStatus(true);
+            updatePatchStatus(Patcher::INSTALLED);
         }
     }
 }

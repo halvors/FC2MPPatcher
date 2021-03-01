@@ -32,6 +32,7 @@ const QList<FileEntry> files = {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
                       "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }
                 },
+                { },
                 {
                     /* Common */
                     { 0x1001088e, 0 }, // bind()
@@ -67,6 +68,7 @@ const QList<FileEntry> files = {
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
                       "83e2ea791c6227cc96f2515c4638b24809439944d183ad6b0117d58eb2c8869b" }
                 },
+                { },
                 {
                     /* Common */
                     { 0x1001076e, 0 }, // bind()
@@ -110,6 +112,7 @@ const QList<FileEntry> files = {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
                       "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }
                 },
+                { },
                 {
                     /* Common */
                     { 0x00425fc4, 0 }, // bind()
@@ -148,6 +151,7 @@ const QList<FileEntry> files = {
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
                       "346c6b3a292a352b6ca88ff563f25564d501af632fcb09a07f6a19a1415236c6" }
                 },
+                { },
                 {
                     /* Common */
                     { 0x004263d4, 0 }, // bind()

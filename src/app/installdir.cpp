@@ -28,7 +28,7 @@ bool InstallDir::isGameDirectory(QDir dir)
     // Trying change to execuatable directory, assuming we're in install directory or that we already is in it.
     if (dir.exists() | dir.cd(game_executable_directory))
         for (const FileEntry &file : files)
-            if (dir.exists(file.getName())) // TODO: Check against checksum here? using FileUtils::isValid()d?
+            if (dir.exists(file.name)) // TODO: Check against checksum here? using FileUtils::isValid()d?
                 return true;
 
     return false;
