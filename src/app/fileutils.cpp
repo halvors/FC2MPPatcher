@@ -34,10 +34,10 @@ bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntr
         QByteArray targetChecksum = patched ? entry.result : entry.original;
 
         if (fileChecksum == targetChecksum) {
-            qDebug() << QString("Original: %1 == %2").arg(fileChecksum, targetChecksum);
+            qDebug() << QString("Original: %1 == %2").arg(fileChecksum.constData()).arg(targetChecksum.constData());
             return true;
         } else {
-            qDebug() << QString("Original: %1 != %2").arg(fileChecksum, targetChecksum);
+            qDebug() << QString("Original: %1 != %2").arg(fileChecksum.constData()).arg(targetChecksum.constData());
         }
     }
 
