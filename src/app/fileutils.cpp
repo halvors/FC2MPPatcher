@@ -51,7 +51,6 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
     bool prefix = fileName.startsWith(game_hidden_prefix);
     bool success = true;
 
-#if defined(Q_OS_LINUX)
     QString newFileName = QString(fileName);
 
     if (hidden && !prefix) {
@@ -60,6 +59,7 @@ bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
         newFileName.remove(0, 1);
     }
 
+#if defined(Q_OS_LINUX)
     QFile file = dir.filePath(fileName);
     QString newFilePath = dir.filePath(newFileName);
     file.rename(newFilePath);

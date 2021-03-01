@@ -133,7 +133,7 @@ bool PeFile::write() const
 
 QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
 {
-    QList<uint32_t> addresses;
+    QList<uint32_t> symbolAddressList;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
@@ -141,13 +141,14 @@ QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
         if (library.get_name() != libraryFile.toStdString())
             continue;
 
+        const import_library::imported_list &functions = library.get_imported_functions();
         uint32_t address = image->get_image_base_32() + library.get_rva_to_iat();
 
-        for (uint32_t i = 0; i < library.get_imported_functions().size(); i++) {
-            addresses.append(address);
+        for (uint32_t i = 0; i < functions.size(); i++) {
+            symbolAddressList.append(address);
 
             if (DEBUG_MODE)
-                qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(library.get_imported_functions()[i].get_name().c_str()).arg(address, 0, 16));
+                qDebug().noquote() << QT_TR_NOOP(QString("Function name: %1 with address of 0x%2.").arg(functions[i].get_name().c_str()).arg(address, 0, 16));
 
             address += 4; // Size of one address entry.
         }
@@ -155,7 +156,7 @@ QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
         break;
     }
 
-    return addresses;
+    return symbolAddressList;
 }
 
 bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
@@ -166,13 +167,8 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
     for (section &section : image->get_image_sections()) {
         qDebug().noquote() << QT_TR_NOOP(QString("Entering section: \"%1\"").arg(section.get_name().c_str()));
 
-        // Getting the base image address for later use.
-        uint32_t sectionAddress = image->get_image_base_32() + section.get_virtual_address();
-
         // Read raw data of section as byte array.
         uint8_t *rawDataPtr = reinterpret_cast<uint8_t*>(&section.get_raw_data()[0]); // NOTE: Seems to be same as section.get_virtual_data(0)[0];
-
-        // TODO: Use union for rawDataPtr so that we can have unsigned int and char ptr at same time?
 
         // Patching all addresses specified for this target.
         for (const CodeEntry &codeEntry : codeEntries) {
@@ -180,15 +176,15 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
             if (section.get_name() != std::string(codeEntry.getSection()))
                 continue;
 
-            uint32_t address = codeEntry.getAddress();
-            QByteArray data = codeEntry.getData();
+            const uint32_t address = codeEntry.getAddress();
+            const QByteArray &data = codeEntry.getData();
 
             // If address is zero, that means this function is not use for this file.
             if (address == 0)
                 continue;
 
             // Creating pointer to the data that is to be updated (aka. does pointer yoga).
-            uint32_t *basePtr = reinterpret_cast<uint32_t*>(rawDataPtr - sectionAddress + address);
+            uint32_t *wordPtr = reinterpret_cast<uint32_t*>(rawDataPtr - image->get_image_base_32() - section.get_virtual_address() + address);
 
             // Handle symbols differently from data.
             switch (codeEntry.getType()) {
@@ -204,17 +200,19 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                         return false;
                     }
 
-                    qDebug().noquote() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16).arg(libraryFunctions[index]).arg(functionAddress, 0, 16));
+                    qDebug().noquote() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16)
+                                                                                                                                                   .arg(libraryFunctions[index])
+                                                                                                                                                   .arg(functionAddress, 0, 16));
 
                     // Change the old address to point to new function instead.
-                    *basePtr = functionAddress;
+                    *wordPtr = functionAddress;
                 }
                 break;
 
             case CodeEntry::INJECT_DATA:
                 {
                     // Change the value at the address to the gived code.
-                    char *dataPtr = reinterpret_cast<char*>(basePtr);
+                    char *bytePtr = reinterpret_cast<char*>(wordPtr);
 
                     if (data.length() <= 0) {
                         qDebug().noquote() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));
@@ -222,10 +220,13 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                         return false;
                     }
 
-                    qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16).arg(QByteArray(dataPtr, data.length()).toHex().constData()).arg(data.toHex().constData()).arg(data.length()));
+                    qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16)
+                                                                                                                                                       .arg(QByteArray(bytePtr, data.length()).toHex().constData())
+                                                                                                                                                       .arg(data.toHex().constData())
+                                                                                                                                                       .arg(data.length()));
 
                     // Copy data.
-                    std::memcpy(dataPtr, data.constData(), data.length());
+                    std::memcpy(bytePtr, data.constData(), data.length());
                 }
                 break;
 

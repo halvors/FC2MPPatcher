@@ -51,10 +51,36 @@ bool Console::exec()
         qDebug().noquote() << tr("Successfully uninstalled patch.");
     } else {
         // Apply patch to files, if successful continue.
-        if (Patcher::patch(dir))
+        if (Patcher::patch(dir)) {
             Patcher::generateConfigurationFile(dir, interface);
 
-        qDebug().noquote() << tr("Successfully installed patch.");
+            qDebug().noquote() << tr("Successfully installed patch.");
+        } else {
+            qDebug().noquote() << tr("Error: Something went wrong while applying patch, aborting!");
+        }
+    }
+
+    switch (Patcher::isPatched(dir.absolutePath())) {
+    case Patcher::INSTALLED:
+        Patcher::undoPatch(dir);
+        qDebug().noquote() << tr("Successfully uninstalled patch.");
+        break;
+
+    case Patcher::UPGRADABLE:
+        Patcher::undoPatch(dir);
+        [[fallthrough]];
+
+    default:
+        // Apply patch to files, if successful continue.
+        if (Patcher::patch(dir)) {
+            // Generate network configuration.
+            Patcher::generateConfigurationFile(dir, interface);
+
+            qDebug().noquote() << tr("Successfully installed patch.");
+        } else {
+            qDebug().noquote() << tr("Error: Something went wrong while applying patch, aborting!");
+        }
+        break;
     }
 
     saveSettings();

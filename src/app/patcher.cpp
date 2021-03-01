@@ -14,8 +14,8 @@ Patcher::State Patcher::isPatched(const QString &path)
         return INVALID;
 
     QDir dir = path;
-    unsigned int numInstalled = 0;
-    unsigned int numLegacyInstalled = 0;
+    int numInstalled = 0;
+    int numLegacyInstalled = 0;
 
     // Should we be looking in executable directory instead?
     if (dir.exists() | dir.cd(game_executable_directory)) {
@@ -27,36 +27,33 @@ Patcher::State Patcher::isPatched(const QString &path)
                     break;
                 }
 
+                if (DEBUG_MODE) {
+                    const QFile &backupFile = dir.filePath(QString(file.name).prepend(game_hidden_prefix));
+
+                    // Detect old installations of the patch.
+                    if (backupFile.exists()) {
+                        numInstalled++;
+
+                        break;
+                    }
+                }
+
                 QByteArray checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
 
                 // Check if there are legacy versions installed.
-                for (QByteArray legacyHash : target.upgradeHashEntries) {
-                    qDebug() << QString("%1 == %2").arg(checksum.constData()).arg(legacyHash.constData());
-
+                for (QByteArray legacyHash : target.legacyHashEntries) {
                     if (checksum == legacyHash) {
                         numLegacyInstalled++;
                         break;
                     }
                 }
-
-                /*
-                const QFile &backupFile = dir.filePath(QString(file.name).prepend(game_hidden_prefix));
-                const QFile &backupFileLegacy = FileUtils::appendToName(dir, file.name, game_backup_suffix); // Temp, leave for some iterations, was changed in 0.1.12.
-
-                // Detect old installations of the patch.
-                if (backupFile.exists() || backupFileLegacy.exists()) {
-                    count++;
-
-                    break;
-                }
-                */
             }
         }
     }
 
     if (numLegacyInstalled > 0)
         return UPGRADABLE;
-    else if (numInstalled > 0)
+    else if (numInstalled == files.size())
         return INSTALLED;
 
     return NOT_INSTALLED;
@@ -64,7 +61,7 @@ Patcher::State Patcher::isPatched(const QString &path)
 
 bool Patcher::patch(const QDir &dir, QWidget *widget)
 {
-    unsigned int count = 0;
+    int numPatched = 0;
 
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
@@ -107,7 +104,7 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
                     return false;
                 }
 
-                count++;
+                numPatched++;
             }
         }
     }
@@ -120,7 +117,7 @@ bool Patcher::patch(const QDir &dir, QWidget *widget)
         return false;
     }
 
-    return true;
+    return numPatched == files.size();
 }
 
 void Patcher::undoPatch(const QDir &dir) {
@@ -158,20 +155,15 @@ void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface
 
 bool Patcher::copyFiles(const QDir &dir)
 {
-    bool success = false;
+    bool success = true;
 
     for (const QString &fileName : patch_library_runtime_dependencies) {
         QFile sourceFile = fileName;
         QFile destinationFile = dir.filePath(fileName);
 
         if (!destinationFile.exists() || destinationFile.remove())
-            success = sourceFile.copy(destinationFile.fileName());
+            success &= sourceFile.copy(destinationFile.fileName());
     }
-
-    if (success)
-        qDebug().noquote() << QT_TR_NOOP(QString("Copying runtime dependencies."));
-    else
-        qDebug().noquote() << QT_TR_NOOP(QString("Error: Could not copy runtime dependencies, missing from application directory."));
 
     return success;
 }
