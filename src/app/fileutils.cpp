@@ -25,20 +25,14 @@ bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntr
 {
     QByteArray fileChecksum = calculateChecksum(dir.filePath(file.getName()));
 
-    // TODO: Why empty checksums here?
-
-    //if (fileChecksum.isEmpty())
-    //    return false;
+    if (fileChecksum.isEmpty())
+        return false;
 
     for (const HashEntry &entry : target.getHashEntries()) {
         QByteArray targetChecksum = patched ? entry.result : entry.original;
 
-        if (fileChecksum == targetChecksum) {
-            qDebug() << QString("Original: %1 == %2").arg(fileChecksum, targetChecksum);
+        if (fileChecksum == targetChecksum)
             return true;
-        } else {
-            qDebug() << QString("Original: %1 != %2").arg(fileChecksum, targetChecksum);
-        }
     }
 
     return false;
@@ -113,7 +107,7 @@ bool FileUtils::replicate(const QDir &dir, const FileEntry &fileEntry, bool back
         //QFile fileCopyLegacy = appendToName(dir, fileName, game_backup_suffix);
 
         //if (fileCopyLegacy.exists() && (file.remove() & fileCopyLegacy.rename(filePath)))
-        //    return true;
+            //return true;
 
         return fileCopy.exists() && (file.remove() &
                                      fileCopy.rename(filePath));
