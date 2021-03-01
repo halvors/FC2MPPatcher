@@ -56,7 +56,7 @@ const QStringList &InstallDir::findInstallDirectories()
         registry.endGroup();
     registry.endGroup();
 
-    if (DirUtils::isGameDirectory(dir.absolutePath())) {
+    if (InstallDir::isGameDirectory(dir.absolutePath())) {
         qDebug().noquote() << QT_TR_NOOP(QString("Found game install directory: %1").arg(dir.absolutePath()));
 
         append(dir.absolutePath());
@@ -118,7 +118,7 @@ QString &InstallDir::getSteamDirectory()
     QSettings registry("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry32Format);
     registry.beginGroup(game_steam_publisher);
         registry.beginGroup(game_steam_name);
-            installDirectory = QDir(registry.value("InstallPath").toString()).absolutePath();
+            steamDirectory = QDir(registry.value("InstallPath").toString()).absolutePath();
         registry.endGroup();
     registry.endGroup();
 #endif
