@@ -214,13 +214,11 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004EC828, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads.
-                    //{ 0x00b27c39 + 2, QByteArray("\x28", 1) }, // change default value of maxUploadOnline from 768 (push 0x300) to 10240 (push 0x2800).
+                    { 0x004EC828, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
-                    /* Experimental */
                     // PunkBuster
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00", 3) }, // change JZ to JMP in order to bypass checking that PB setting and installation is enabled/exists.
-                    { 0x00675574 + 1, QByteArray("\x77", 1) } // change EnablePbSv() (E8 17 92 08 00) to DisablePbSv() (E8 77 92 08 00) at address 0x00675574
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing punkbuster checks for ranked matches.
+                    { 0x0094d593, QByteArray("\xEB", 1) } // change JZ to JMP in order to bypass autoenable punkbuster on ranked matches.
                 }
             }
         }
