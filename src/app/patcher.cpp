@@ -38,7 +38,7 @@ Patcher::State Patcher::isPatched(const QString &path)
                     }
                 }
 
-                QByteArray checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
+                const QByteArray &checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
 
                 // Check if there are legacy versions installed.
                 for (QByteArray legacyHash : target.legacyHashEntries) {
@@ -150,7 +150,7 @@ void Patcher::generateConfigurationFile(const QDir &dir, const QNetworkInterface
         settings.setValue(patch_configuration_network_interface, interface.name());
     settings.endGroup();
 
-    qDebug().noquote() << QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName()));
+    log(QT_TR_NOOP(QString("Generated configuration, saved to: %1").arg(file.fileName())));
 }
 
 bool Patcher::copyFiles(const QDir &dir)
@@ -172,7 +172,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
 {
     QFile file = dir.filePath(fileEntry.name);
 
-    qDebug().noquote() << QT_TR_NOOP(QString("Patching file %1").arg(file.fileName()));
+    log(QT_TR_NOOP(QString("Patching file %1").arg(file.fileName())));
 
     // Create PeFile instance for this particular target.
     PeFile *peFile = new PeFile(file);

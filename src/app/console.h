@@ -14,7 +14,7 @@ public:
     explicit Console(const QString &installDir = QString(), const QString &interfaceName = QString(), QObject *parent = nullptr);
     ~Console();
 
-    bool exec();
+    bool run();
 
 private:
     QSettings *settings;

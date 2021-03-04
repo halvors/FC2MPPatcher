@@ -44,22 +44,6 @@ bool Console::exec()
     QDir dir = installDir;
     dir.cd(game_executable_directory);
 
-    // Only show option to patch if not already patched.
-    if (Patcher::isPatched(dir.absolutePath()) == Patcher::INSTALLED) {
-        Patcher::undoPatch(dir);
-
-        qDebug().noquote() << tr("Successfully uninstalled patch.");
-    } else {
-        // Apply patch to files, if successful continue.
-        if (Patcher::patch(dir)) {
-            Patcher::generateConfigurationFile(dir, interface);
-
-            qDebug().noquote() << tr("Successfully installed patch.");
-        } else {
-            qDebug().noquote() << tr("Error: Something went wrong while applying patch, aborting!");
-        }
-    }
-
     switch (Patcher::isPatched(dir.absolutePath())) {
     case Patcher::INSTALLED:
         Patcher::undoPatch(dir);
