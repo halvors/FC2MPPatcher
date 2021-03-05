@@ -116,6 +116,11 @@ const QList<FileEntry> files = {
                                  "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
                     { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
 
+                    //107a3a15
+
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+
+
                     /* Experimental */
                     // Remove mouse clamp
                     { 0x105ffc78, QByteArray("\x90\x90\x90\x90\x90\x90\x90\x90", 8) } // Change byte 0x105ffc78 to 0x105ffc7f to "nop", no operation.
@@ -165,7 +170,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x008ed449 + 2, QByteArray("\x28", 1) } // change default value of maxUploadOnline from 768 (push 0x300) to 10240 (push 0x2800).
+                    { 0x004ecb38, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+
+                    // PunkBuster
+                    { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094c943, patch_asm_jz_to_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x00661eac, QByteArray("\x90\x90", 2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
                 }
             },
             { // Steam (R2 is identical) and Uplay
@@ -214,11 +224,11 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004EC828, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x004ec828, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // PunkBuster
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing punkbuster checks for ranked matches.
-                    { 0x0094d593, QByteArray("\xEB", 1) }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094d593, patch_asm_jz_to_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, QByteArray("\x90\x90", 2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental */
