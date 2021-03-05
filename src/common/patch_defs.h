@@ -218,7 +218,13 @@ const QList<FileEntry> files = {
 
                     // PunkBuster
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing punkbuster checks for ranked matches.
-                    { 0x0094d593, QByteArray("\xEB", 1) } // change JZ to JMP in order to bypass autoenable punkbuster on ranked matches.
+                    { 0x0094d593, QByteArray("\xEB", 1) }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0067552c, QByteArray("\x90\x90", 2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+
+                    /* Experimental */
+                    { 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
+                    //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
+                    { 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
                 }
             }
         }
