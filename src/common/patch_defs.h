@@ -114,16 +114,15 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
-                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) } // change function call to instead jump to the .text_p section.
 
                     //107a3a15
 
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-
+                    //{ 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
 
                     /* Experimental */
                     // Remove mouse clamp
-                    { 0x105ffc78, QByteArray("\x90\x90\x90\x90\x90\x90\x90\x90", 8) } // Change byte 0x105ffc78 to 0x105ffc7f to "nop", no operation.
+                    //{ 0x105ffc78, QByteArray("\x90\x90\x90\x90\x90\x90\x90\x90", 8) } // Change byte 0x105ffc78 to 0x105ffc7f to "nop", no operation.
                 }
             }
         }
@@ -229,12 +228,12 @@ const QList<FileEntry> files = {
                     // PunkBuster
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, patch_asm_jz_to_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x0067552c, QByteArray("\x90\x90", 2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0067552c, QByteArray("\x90\x90", 2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental */
-                    { 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
+                    //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
-                    { 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
+                    //{ 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
                 }
             }
         }
