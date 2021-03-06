@@ -1,11 +1,6 @@
+Ideas:
 - Use regex to validate input?
-
-Unable to patch only one of the files and then revert that patch again, should we support some kind of way to only patch oini of them?
-Should we compare checksums with that of old releases to support upgrades?
-
-Fix fish: “./fc2mppatcher -n” terminated by signal SIGSEGV (Address boundary error) because wrong file is selected when only 1?
-
-Networking:
+- Unable to patch only one of the files and then revert that patch again, should we support some kind of way to only patching one of them?
 - Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces? EDIT: Not possible because of ip address info in packets?
 
 Compiling:

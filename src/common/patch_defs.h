@@ -41,7 +41,7 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }
+                      "58b30f35da8afc9ac5de2f526d97846234d2cd332195b5a3567265702d5bb077" }
                 },
                 {
                     { "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }, // Hash for Retail version 0.1.11.
@@ -79,17 +79,17 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\x03\x25\xE4\xFE", 25) }, // jmp    <dunia.retur>
                     { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x10cb2588, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
             { // Steam and Uplay
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "d4942259d5d61c2f743bed7a0b156ab8489e868aa8cfd2b20fc5e417dd52cefa" },
+                      "d5c17109e9cc7d4f8b73804ac5a905952a858bd2ec09d359f49a46719eb30b4e" },
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "83e2ea791c6227cc96f2515c4638b24809439944d183ad6b0117d58eb2c8869b" }
+                      "bd18c139db5751efcdb99ccdef8a19a6c2730177f0fc967abedce5526d0676cd" }
                 },
                 {
                     { "d4942259d5d61c2f743bed7a0b156ab8489e868aa8cfd2b20fc5e417dd52cefa" }, // Hash for Steam version 0.1.11.
@@ -135,13 +135,7 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
                     { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x10ceb6c8, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
-
-                    /* Experimental / WIP */
-                    // Fix: Possibility to disable PunkBuster also for ranked matches.
-                    { 0x107a3a15, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) } // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    //Not needed? //{ 0, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    //{ 0, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x10ceb6c8, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
         }
@@ -152,7 +146,7 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }
+                      "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }
                 },
                 {
                     { "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }, // Hash for Retail version 0.1.11.
@@ -201,10 +195,10 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "cb5036fccf38a2a8cb73afc36df7844e160657c7f93c35554909b0e52e09ccee" },
+                      "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" },
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "346c6b3a292a352b6ca88ff563f25564d501af632fcb09a07f6a19a1415236c6" }
+                      "e90dc85ea2229b038278f6ac45805658fc12fd00ceeca05093d271c885584d4c" }
                 },
                 {
                     { "cb5036fccf38a2a8cb73afc36df7844e160657c7f93c35554909b0e52e09ccee" }, // Hash for Steam version 0.1.11.

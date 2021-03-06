@@ -86,7 +86,7 @@
      <item>
       <widget class="QComboBox" name="comboBox_network_interface">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select an network interace that Far Cry 2 should bind to, usually your primary interface or VPN service like Hamachi if you want to use that.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string/>
        </property>
       </widget>
      </item>
