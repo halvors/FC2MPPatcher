@@ -21,7 +21,18 @@ const QStringList patch_library_functions = {
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
-const QByteArray patch_asm_jz_to_jmp = QByteArray("\xEB", 1);
+
+// Reusable assembly constants.
+const QByteArray patch_asm_jmp = QByteArray("\xEB", 1);
+
+inline const QByteArray asm_nop(unsigned short numBytes) {
+    QByteArray nop;
+
+    for (unsigned short i = 0; i < numBytes; i++)
+        nop.append("\x90");
+
+    return nop;
+}
 
 const QList<FileEntry> files = {
     {
@@ -53,7 +64,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Custom map download
-                    { 0x10cb29e2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cb29e2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -104,7 +115,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Custom map download
-                    { 0x10cebaf2, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cebaf2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -158,7 +169,7 @@ const QList<FileEntry> files = {
                     { 0x00c43ffd, 1 },  // connect()
 
                     // Custom map download
-                    { 0x004ecda5, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -169,12 +180,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004ecb38, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // PunkBuster
                     { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094c943, patch_asm_jz_to_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x00661eac, QByteArray("\x90\x90", 2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0094c943, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
                 }
             },
             { // Steam (R2 is identical) and Uplay
@@ -212,7 +223,7 @@ const QList<FileEntry> files = {
                     { 0x00c465bd, 1 }, // connect()
 
                     // Custom map download
-                    { 0x004eca95, patch_asm_jz_to_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -223,12 +234,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004ec828, QByteArray("\x90\x90\x90\x90\x90\x90", 6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // PunkBuster
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094d593, patch_asm_jz_to_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x0067552c, QByteArray("\x90\x90", 2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0094d593, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental */
                     //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
