@@ -74,7 +74,8 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\x03\x25\xE4\xFE", 25) }, // jmp    <dunia.retur>
-                    { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
             { // Steam and Uplay
@@ -125,11 +126,13 @@ const QList<FileEntry> files = {
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
-                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) } // change function call to instead jump to the .text_p section.
+                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x10ceb6c8, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
-                    //107a3a15
-
-                    //{ 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    // PunkBuster
+                    { 0x107a3a15, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    //{ 0, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    //{ 0, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental */
                     // Remove mouse clamp
