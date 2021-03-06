@@ -62,8 +62,12 @@ const QList<FileEntry> files = {
                     { 0x10c5bde2, 3 }, // getAdapersInfo()
                     { 0x1001431c, 4 }, // getHostByName()
 
+                    /* Client */
+                    // Tweak: Remove mouse clamp
+                    { 0x105f2338, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
+
                     /* Server */
-                    // Custom map download
+                    // Fix: Custom map download
                     { 0x10cb29e2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
@@ -75,7 +79,7 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\x03\x25\xE4\xFE", 25) }, // jmp    <dunia.retur>
                     { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x10cb2588, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
             { // Steam and Uplay
@@ -112,10 +116,14 @@ const QList<FileEntry> files = {
                     { 0x100141fc, 4 }, // getHostByName()
 
                     /* Client */
+                    // Fix: Replace broken game id with working one.
                     { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
 
+                    // Tweak: Remove mouse clamp
+                    { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
+
                     /* Server */
-                    // Custom map download
+                    // Fix: Custom map download
                     { 0x10cebaf2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
@@ -129,14 +137,11 @@ const QList<FileEntry> files = {
                     { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
-                    // PunkBuster
-                    { 0x107a3a15, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    //{ 0, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    /* Experimental / WIP */
+                    // Fix: Possibility to disable PunkBuster also for ranked matches.
+                    { 0x107a3a15, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) } // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    //Not needed? //{ 0, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     //{ 0, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
-
-                    /* Experimental */
-                    // Remove mouse clamp
-                    //{ 0x105ffc78, QByteArray("\x90\x90\x90\x90\x90\x90\x90\x90", 8) } // Change byte 0x105ffc78 to 0x105ffc7f to "nop", no operation.
                 }
             }
         }
@@ -169,9 +174,10 @@ const QList<FileEntry> files = {
                     { 0x00ba4cfc, 4 }, // getHostByName()
 
                     /* Server */
+                    // Fix: Servers being able to register with Ubisoft in online mode.
                     { 0x00c43ffd, 1 },  // connect()
 
-                    // Custom map download
+                    // Fix: Custom map download
                     { 0x004ecda5, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
@@ -185,7 +191,7 @@ const QList<FileEntry> files = {
                     { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
-                    // PunkBuster
+                    // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094c943, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
@@ -223,9 +229,10 @@ const QList<FileEntry> files = {
                     { 0x00ba714c, 4 }, // getHostByName()
 
                     /* Server */
+                    // Fix: Servers being able to register with Ubisoft in online mode.
                     { 0x00c465bd, 1 }, // connect()
 
-                    // Custom map download
+                    // Fix: Custom map download
                     { 0x004eca95, patch_asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
@@ -239,12 +246,12 @@ const QList<FileEntry> files = {
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
-                    // PunkBuster
+                    // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
-                    /* Experimental */
+                    /* Experimental / WIP */
                     //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
                     //{ 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
