@@ -3,81 +3,112 @@
 #include <QDebug>
 
 #include "fileutils.h"
-#include "global.h"
+#include "defs.h"
 
-const char *FileUtils::checkSum(QFile file)
+#if defined(Q_OS_WIN)
+#include <qt_windows.h>
+#endif
+
+QByteArray FileUtils::calculateChecksum(QFile file)
 {
-    if (file.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(QCryptographicHash::Sha256);
-        hash.addData(&file);
-        file.close();
+    if (!file.open(QFile::ReadOnly))
+        return nullptr;
 
-        return hash.result().toHex().constData();
-    }
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    hash.addData(&file);
+    file.close();
 
-    return nullptr;
+    return hash.result().toHex();
 }
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched)
 {
-    const char *fileCheckSum = checkSum(dir.filePath(file.getName()));
+    QByteArray fileChecksum = calculateChecksum(dir.filePath(file.name));
 
-    for (const HashEntry &entry : target.getHashEntries()) {
-        const char *targetCheckSum = patched ? entry.result : entry.original;
+    if (fileChecksum.isEmpty())
+        return false;
 
-        if (strcmp(fileCheckSum, targetCheckSum) == 0)
+    for (const HashEntry &entry : target.hashEntries) {
+        QByteArray targetChecksum = patched ? entry.result : entry.original;
+
+        if (fileChecksum == targetChecksum)
             return true;
     }
 
     return false;
 }
 
-QString FileUtils::appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append)
+QString FileUtils::appendToName(const QDir &dir, const QString &fileName, const QString &tail)
 {
-    QStringList split = QString(fileEntry.getName()).split('.');
+    QStringList split = QString(fileName).split('.');
     QString suffix = '.' + split.takeLast();
 
-    return dir.filePath(split.join(QString()) + append + suffix);
+    return dir.filePath(split.join(QString()) + tail + suffix);
 }
 
-bool FileUtils::copy(const QDir &dir, const FileEntry &fileEntry, bool backup)
+bool FileUtils::setHidden(const QDir &dir, const QString &fileName, bool hidden)
 {
-    QString fileName = dir.filePath(fileEntry.getName());
-    QString fileCopyName = appendToName(dir, fileEntry, game_backup_suffix);
-    QFile file = fileName;
-    QFile fileCopy = fileCopyName;
+    bool prefix = fileName.startsWith(game_hidden_prefix);
+    bool success = true;
+
+    QString newFileName = QString(fileName);
+
+    if (hidden && !prefix) {
+        newFileName.prepend(game_hidden_prefix);
+    } else if (!hidden && prefix) {
+        newFileName.remove(0, 1);
+    }
+
+#if defined(Q_OS_LINUX)
+    QFile file = dir.filePath(fileName);
+    QString newFilePath = dir.filePath(newFileName);
+    file.rename(newFilePath);
+
+    success &= newFileName.startsWith(game_hidden_prefix) == hidden;
+#elif defined(Q_OS_WIN)
+    std::wstring newFileNameW = dir.filePath(fileName).toStdWString();
+    DWORD attributes = GetFileAttributesW(newFileNameW.c_str());
+
+    if (hidden)
+        attributes |= FILE_ATTRIBUTE_HIDDEN;
+    else
+        attributes &= ~FILE_ATTRIBUTE_HIDDEN;
+
+    success &= SetFileAttributesW(newFileNameW.c_str(), attributes);
+#endif
+
+    return success;
+}
+
+bool FileUtils::replicate(const QDir &dir, const FileEntry &fileEntry, bool backup)
+{
+    const QString fileName = fileEntry.name;
+    const QString fileCopyName = QString(fileName).prepend(game_hidden_prefix);
+    const QString &filePath = dir.filePath(fileName);
+    const QString &fileCopyPath = dir.filePath(fileCopyName);
+
+    QFile file = dir.filePath(fileName);
+    QFile fileCopy = dir.filePath(fileCopyName);
 
     if (backup) {
-        if (!fileCopy.exists()) {
-            return file.rename(fileCopyName) & file.copy(fileName);
-        }
+        qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileName));
+
+        return !fileCopy.exists() && (file.rename(fileCopyPath) &
+                                      file.copy(filePath) &
+                                      setHidden(dir, fileCopyName, backup));
     } else {
-        if (fileCopy.exists()) {
-            return file.remove() & fileCopy.rename(fileName);
-        }
+        qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileName));
+
+        // Temp, leave for some iterations, was changed in 0.1.12.
+        QFile fileCopyLegacy = appendToName(dir, fileName, game_backup_suffix);
+
+        if (fileCopyLegacy.exists() && (file.remove() & fileCopyLegacy.rename(filePath)))
+            return true;
+
+        return fileCopy.exists() && (file.remove() &
+                                     fileCopy.rename(filePath) &
+                                     setHidden(dir, fileName, backup));
     }
 
     return false;
-}
-
-bool FileUtils::backup(const QDir &dir, const FileEntry &fileEntry)
-{
-    bool result = copy(dir, fileEntry, true);
-
-    if (result) {
-        qDebug().noquote() << QT_TR_NOOP(QString("Backing up file: %1").arg(fileEntry.getName()));
-    }
-
-    return result;
-}
-
-bool FileUtils::restore(const QDir &dir, const FileEntry &fileEntry)
-{
-    bool result = copy(dir, fileEntry, false);
-
-    if (result) {
-        qDebug().noquote() << QT_TR_NOOP(QString("Restoring file: %1").arg(fileEntry.getName()));
-    }
-
-    return result;
 }

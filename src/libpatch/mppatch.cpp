@@ -1,31 +1,38 @@
+#include <QSettings>
 #include <QNetworkInterface>
 #include <QHostAddress>
 
 #include <iostream>
 
 #include "mppatch.h"
-#include "global.h"
+#include "defs.h"
+#include "patch_defs.h"
+#include "netutils.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
 {
-    if (!settings) {
-        settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
-        settings->beginGroup(patch_configuration_network);
-            QNetworkInterface networkInterface = QNetworkInterface::interfaceFromIndex(settings->value(patch_configuration_network_interface_index).toInt());
+    if (!address.isEmpty() && !broadcast.isEmpty())
+        return;
 
-            // Scan thru addresses for this interface.
-            for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-                // We're only looking for IPv4 addresses.
-                if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
-                    address = addressEntry.ip().toString();
-                    broadcast = addressEntry.broadcast().toString();
-                }
+    QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
+
+    settings->beginGroup(patch_configuration_network);
+        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
+
+        // Scan thru addresses for this interface.
+        for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
+            const QHostAddress &hostAddress = addressEntry.ip();
+
+            // We're only looking for IPv4 addresses.
+            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
+                address = hostAddress.toString();
+                broadcast = addressEntry.broadcast().toString();
             }
-        settings->endGroup();
-    }
+        }
+    settings->endGroup();
 
-    // TODO: Delete settings? Memory leak.
+    delete settings;
 }
 
 int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int namelen)
@@ -91,7 +98,7 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-unsigned int __stdcall MPPatch::getPublicIPAddress()
+uint32_t __stdcall MPPatch::getPublicIPAddress()
 {
     // Return cached address if it exists.
     if (publicAddress != 0)

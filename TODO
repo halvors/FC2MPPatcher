@@ -1,7 +1,7 @@
+Ideas:
 - Use regex to validate input?
-
-Networking:
-- Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces?
+- Unable to patch only one of the files and then revert that patch again, should we support some kind of way to only patching one of them?
+- Send broadcast out all interfaces instead of selecting just one for LAN play? Iterate thru all interfaces? EDIT: Not possible because of ip address info in packets?
 
 Compiling:
 - Build MPPatch.dll and static link libwinpthread.dll instead of dynamic linking.

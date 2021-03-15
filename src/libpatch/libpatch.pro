@@ -28,11 +28,6 @@ HEADERS += \
 
 SOURCES += mppatch.cpp
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
-
 include(../common/common.pri)
 
 # Including needed Windows libraries.

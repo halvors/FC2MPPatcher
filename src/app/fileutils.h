@@ -1,23 +1,22 @@
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
 
+#include <QFile>
 #include <QDir>
 #include <QString>
-#include <QFile>
 
 #include "entry.h"
 
 class FileUtils
 {
 public:
-    static const char *checkSum(QFile file);
-    static bool isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched);
-    static QString appendToName(const QDir &dir, const FileEntry &fileEntry, const QString &append);
-    static bool backup(const QDir &dir, const FileEntry &fileEntry);
-    static bool restore(const QDir &dir, const FileEntry &fileEntry);
+    static QByteArray calculateChecksum(QFile file);
+    static bool isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched = false);
+    static QString appendToName(const QDir &dir, const QString &fileName, const QString &tail);
+    static bool replicate(const QDir &dir, const FileEntry &fileEntry, bool backup);
 
 private:
-    static bool copy(const QDir &dir, const FileEntry &fileEntry, bool backup);
+    static bool setHidden(const QDir &dir, const QString &fileName, bool hidden);
 };
 
 #endif // FILEUTILS_H

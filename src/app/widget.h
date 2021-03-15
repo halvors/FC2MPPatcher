@@ -6,7 +6,8 @@
 #include <QCloseEvent>
 #include <QString>
 
-#include "global.h"
+#include "defs.h"
+#include "patcher.h"
 
 namespace Ui {
     class Widget;
@@ -17,7 +18,7 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = nullptr);
+    explicit Widget(const QString &installDir = QString(), const QString &interfaceName = QString(), QWidget *parent = nullptr);
     ~Widget();
 
 private:
@@ -25,12 +26,12 @@ private:
     QSettings *settings;
 
     void closeEvent(QCloseEvent *event);
-    void loadSettings();
+    void loadSettings(const QString &installDir, const QString &interfaceName);
 
     QString getInstallDirectory(bool warning = true);
     void populateComboboxWithInstallDirectories() const;
     void populateComboboxWithNetworkInterfaces() const;
-    void updatePatchStatus(bool patched) const;
+    void updatePatchStatus(const enum Patcher::State &patched) const;
 
 private slots:
     void saveSettings() const;
