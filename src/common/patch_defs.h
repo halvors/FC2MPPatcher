@@ -251,8 +251,8 @@ const QList<FileEntry> files = {
                     { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental / WIP */
-                    //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
-                    //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
+                    //{ 0x0052c8d3, asm_nop(2) } // MinPlayers?... 75 03 // works somehow..?
+                    //{ 0x00b046ff, asm_nop(2) } // MinPlayers?... 75 03 // takes care of persist thru refresh??
                     //{ 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
                 }
             }
