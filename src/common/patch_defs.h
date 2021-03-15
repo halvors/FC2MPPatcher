@@ -23,7 +23,7 @@ const QStringList patch_library_functions = {
 const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
 
 // Reusable assembly constants.
-const QByteArray patch_asm_jmp = QByteArray("\xEB", 1);
+const QByteArray asm_jmp = QByteArray("\xEB", 1);
 
 inline const QByteArray asm_nop(unsigned short numBytes) {
     QByteArray nop;
@@ -68,7 +68,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Fix: Custom map download
-                    { 0x10cb29e2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -124,7 +124,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Fix: Custom map download
-                    { 0x10cebaf2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -172,7 +172,7 @@ const QList<FileEntry> files = {
                     { 0x00c43ffd, 1 },  // connect()
 
                     // Fix: Custom map download
-                    { 0x004ecda5, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -187,7 +187,7 @@ const QList<FileEntry> files = {
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094c943, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0094c943, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
                 }
             },
@@ -227,7 +227,7 @@ const QList<FileEntry> files = {
                     { 0x00c465bd, 1 }, // connect()
 
                     // Fix: Custom map download
-                    { 0x004eca95, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -242,7 +242,7 @@ const QList<FileEntry> files = {
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094d593, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     /* Experimental / WIP */
