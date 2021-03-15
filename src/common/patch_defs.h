@@ -122,6 +122,11 @@ const QList<FileEntry> files = {
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
+                    // Tweak: Eliminate one-frame latency
+                    { 0x10343202, QByteArray("\xB0\x00"            // mov   al,0
+                                             "\x88\x46\x12", 5) }, // mov   byte ptr ds:[esi+12],al
+                    { 0x10343207, asm_nop(97) }, // set RENDER_THREAD to 0 in order to remain single-threaded, and replace unused code with NOP's.
+
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
