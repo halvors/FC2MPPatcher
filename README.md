@@ -43,8 +43,11 @@ If hosting a server to be used by players thru VPN, you have to select your VPN 
 Also please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server always listens on 0.0.0.0 (any), which means it's reachable on any network adapter.
 
 ## Discord
-Please join us at Discord for support, and to find other people to play with!
+### Getting suppport for the patch
 https://discord.gg/82G9Fh5
+
+### Getting in touch with other players
+https://discord.gg/2XgQzhd
 
 ## Thanks to
 ### Contributors
