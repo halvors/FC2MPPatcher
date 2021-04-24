@@ -119,6 +119,22 @@ const QList<FileEntry> files = {
                     // Fix: Replace broken game id with working one.
                     { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
 
+                    /**
+                     * Patch ubi.com endpoints with out own.
+                     *
+                     * Original: gconnect.ubi.com0000
+                     * New:      gc.farcry2.online
+                     *
+                     * Original: onlineconfigservice.ubi.com
+                     * New:      onlineconfig.farcry2.online
+                     */
+
+                    { 0x10f05568, QByteArray("gc.farcry2.online"), ".rdata" },
+                    { 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online"), ".rdata" },
+
+                    // Hack to avoid verfiying certificate with local public key.
+                    { 0x10C24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
