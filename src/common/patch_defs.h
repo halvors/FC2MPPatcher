@@ -132,7 +132,7 @@ const QList<FileEntry> files = {
                     { 0x10f05568, QByteArray("gc.farcry2.online"), ".rdata" },
                     { 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online"), ".rdata" },
 
-                    // Hack to avoid verfiying certificate with local public key.
+                    // Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10C24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Tweak: Remove mouse clamp
@@ -241,6 +241,15 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Servers being able to register with Ubisoft in online mode.
                     { 0x00c465bd, 1 }, // connect()
+
+                    /**
+                     * Patch ubi.com endpoints with out own.
+                     *
+                     * Original: gconnect.ubi.com0000
+                     * New:      gc.farcry2.online
+                     */
+
+                    { 0x01061b78, QByteArray("gc.farcry2.online"), ".rdata" },
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
