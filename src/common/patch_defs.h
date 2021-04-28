@@ -20,7 +20,7 @@ const QStringList patch_library_functions = {
 };
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
-const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
+const QByteArray patch_game_connect = "gc.farcry2.online";
 
 // Reusable assembly constants.
 const QByteArray asm_jmp = QByteArray("\xEB", 1);
@@ -116,9 +116,6 @@ const QList<FileEntry> files = {
                     { 0x100141fc, 4 }, // getHostByName()
 
                     /* Client */
-                    // Fix: Replace broken game id with working one.
-                    { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
-
                     /**
                      * Patch ubi.com endpoints with out own.
                      *
@@ -129,11 +126,11 @@ const QList<FileEntry> files = {
                      * New:      onlineconfig.farcry2.online
                      */
 
-                    { 0x10f05568, QByteArray("gc.farcry2.online"), ".rdata" },
+                    { 0x10f05568, patch_game_connect, ".rdata" },
                     { 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online"), ".rdata" },
 
                     // Hack to avoid verfiying agora certificate with public key from game files.
-                    { 0x10C24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+                    { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -248,8 +245,7 @@ const QList<FileEntry> files = {
                      * Original: gconnect.ubi.com0000
                      * New:      gc.farcry2.online
                      */
-
-                    { 0x01061b78, QByteArray("gc.farcry2.online"), ".rdata" },
+                    { 0x01061b78, patch_game_connect, ".rdata" },
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
