@@ -20,6 +20,7 @@ const QStringList patch_library_functions = {
 };
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
+const QByteArray patch_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
 const QByteArray patch_game_connect = "gc.farcry2.online";
 
 // Reusable assembly constants.
@@ -116,6 +117,8 @@ const QList<FileEntry> files = {
                     { 0x100141fc, 4 }, // getHostByName()
 
                     /* Client */
+                    // Fix: Replace broken game id with working one.
+                    //{ 0x10e420c0, patch_game_id, ".rdata" }, // game_id
                     /**
                      * Patch ubi.com endpoints with out own.
                      *
@@ -124,10 +127,12 @@ const QList<FileEntry> files = {
                      *
                      * Original: onlineconfigservice.ubi.com
                      * New:      onlineconfig.farcry2.online
+                     *           gc.farcry2.online:307400000
                      */
 
                     { 0x10f05568, patch_game_connect, ".rdata" },
-                    { 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online"), ".rdata" },
+                    { 0x10f3fa7c, QByteArray(patch_game_connect).append(":3074").append(5, '\0'), ".rdata" },
+                    //{ 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online").append(5, '\0'), ".rdata" },
 
                     // Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
@@ -264,7 +269,10 @@ const QList<FileEntry> files = {
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0067552c, asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+
+                    // Experimental bypass ranked enforced min player limit.
+                    { 0x0052c8d3, asm_nop(2) } // MinPlayers?
 
                     /* Experimental / WIP */
                     //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
