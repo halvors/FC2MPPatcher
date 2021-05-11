@@ -21,16 +21,37 @@ const QStringList patch_library_functions = {
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
 const QByteArray patch_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
-const QByteArray patch_game_connect = "gc.farcry2.online";
+
+/**
+ * Patch values patch related to community backend.
+ *
+ * Original: gconnect.ubi.com0000
+ * New:      gc.farcry2.online000
+ *
+ * Original: onlineconfigservice.ubi.com
+ * New:      gc.farcry2.online:307400000
+ *
+ * Original: stun.apac.ubi.com00
+ * New:      stun.farcry2.online
+ *
+ * Original: stun.emea.ubi.com00
+ * New:      stun.farcry2.online
+ *
+ * Original: stun.ncsa.ubi.com00
+ * New:      stun.farcry2.online
+ */
+const QByteArray patch_endpoint_gconnect = "gc.farcry2.online";
+const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_gconnect).append(":3074").append(5, '\0');
+const QByteArray patch_endpoint_stun = "stun.farcry2.online";
 
 // Reusable assembly constants.
 const QByteArray asm_jmp = QByteArray("\xEB", 1);
 
-inline const QByteArray asm_nop(unsigned short numBytes) {
+inline const QByteArray asm_nop(uint16_t numBytes) {
     QByteArray nop;
 
-    for (unsigned short i = 0; i < numBytes; i++)
-        nop.append("\x90");
+    for (uint16_t i = 0; i < numBytes; i++)
+        nop.append('\x90');
 
     return nop;
 }
@@ -62,6 +83,16 @@ const QList<FileEntry> files = {
                     { 0x10014053, 2 }, // sendTo()
                     { 0x10c5bde2, 3 }, // getAdapersInfo()
                     { 0x1001431c, 4 }, // getHostByName()
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10e7cb98, patch_endpoint_gconnect, ".rdata" },
+                    { 0x10e7f400, patch_endpoint_stun, ".rdata" },
+                    { 0x10e7f414, patch_endpoint_stun, ".rdata" },
+                    { 0x10e7f428, patch_endpoint_stun, ".rdata" },
+
+                    /* Client */
+                    // Fix: Hack to avoid verfiying agora certificate with public key from game files.
+                    { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     /* Client */
                     // Tweak: Remove mouse clamp
@@ -116,25 +147,20 @@ const QList<FileEntry> files = {
                     { 0x10c6a692, 3 }, // getAdapersInfo()
                     { 0x100141fc, 4 }, // getHostByName()
 
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10f05568, patch_endpoint_gconnect, ".rdata" },
+                    { 0x10f07dd0, patch_endpoint_stun, ".rdata" },
+                    { 0x10f07de4, patch_endpoint_stun, ".rdata" },
+                    { 0x10f07df8, patch_endpoint_stun, ".rdata" },
+
                     /* Client */
                     // Fix: Replace broken game id with working one.
                     //{ 0x10e420c0, patch_game_id, ".rdata" }, // game_id
-                    /**
-                     * Patch ubi.com endpoints with out own.
-                     *
-                     * Original: gconnect.ubi.com0000
-                     * New:      gc.farcry2.online
-                     *
-                     * Original: onlineconfigservice.ubi.com
-                     * New:      onlineconfig.farcry2.online
-                     *           gc.farcry2.online:307400000
-                     */
 
-                    { 0x10f05568, patch_game_connect, ".rdata" },
-                    { 0x10f3fa7c, QByteArray(patch_game_connect).append(":3074").append(5, '\0'), ".rdata" },
-                    //{ 0x10f3fa7c, QByteArray("onlineconfig.farcry2.online").append(5, '\0'), ".rdata" },
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
 
-                    // Hack to avoid verfiying agora certificate with public key from game files.
+                    // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Tweak: Remove mouse clamp
@@ -185,9 +211,15 @@ const QList<FileEntry> files = {
                     { 0x00c444a6, 3 }, // getAdapersInfo()
                     { 0x00ba4cfc, 4 }, // getHostByName()
 
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x0105eb28, patch_endpoint_gconnect, ".rdata" },
+                    { 0x0105fdd0, patch_endpoint_stun, ".rdata" },
+                    { 0x0105fde4, patch_endpoint_stun, ".rdata" },
+                    { 0x0105fdf8, patch_endpoint_stun, ".rdata" },
+
                     /* Server */
                     // Fix: Servers being able to register with Ubisoft in online mode.
-                    { 0x00c43ffd, 1 },  // connect()
+                    //{ 0x00c43ffd, 1 },  // connect()
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -240,17 +272,15 @@ const QList<FileEntry> files = {
                     { 0x00c46a66, 3 }, // getAdapersInfo()
                     { 0x00ba714c, 4 }, // getHostByName()
 
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x01061b78, patch_endpoint_gconnect, ".rdata" },
+                    { 0x01062e20, patch_endpoint_stun, ".rdata" },
+                    { 0x01062e34, patch_endpoint_stun, ".rdata" },
+                    { 0x01062e48, patch_endpoint_stun, ".rdata" },
+
                     /* Server */
                     // Fix: Servers being able to register with Ubisoft in online mode.
-                    { 0x00c465bd, 1 }, // connect()
-
-                    /**
-                     * Patch ubi.com endpoints with out own.
-                     *
-                     * Original: gconnect.ubi.com0000
-                     * New:      gc.farcry2.online
-                     */
-                    { 0x01061b78, patch_game_connect, ".rdata" },
+                    //{ 0x00c465bd, 1 }, // connect()
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -271,10 +301,9 @@ const QList<FileEntry> files = {
                     { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
-                    // Experimental bypass ranked enforced min player limit.
-                    { 0x0052c8d3, asm_nop(2) } // MinPlayers?
-
                     /* Experimental / WIP */
+                    { 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
+
                     //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
                     //{ 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
