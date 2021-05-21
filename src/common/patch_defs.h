@@ -19,9 +19,6 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
 };
 
-// Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
-const QByteArray patch_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
-
 /**
  * Patch values patch related to community backend.
  *
@@ -228,8 +225,8 @@ const QList<FileEntry> files = {
                     { 0x0105fdf8, patch_endpoint_stun, ".rdata" },
 
                     /* Server */
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    //{ 0x00c43ffd, 1 },  // connect()
+                    // Tweak: Replace game id with dev version.
+                    { 0x01042f50, patch_dev_dedicated_server_id, ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -293,9 +290,6 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Tweak: Replace game id with dev version.
                     { 0x01045fb0, patch_dev_dedicated_server_id, ".rdata" }, // game_id
-
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    //{ 0x00c465bd, 1 }, // connect()
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
