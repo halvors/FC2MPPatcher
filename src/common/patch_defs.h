@@ -95,6 +95,9 @@ const QList<FileEntry> files = {
                     { 0x10e7f428, patch_endpoint_stun, ".rdata" },
 
                     /* Client */
+                    // Tweak: Replace game id with dev version.
+                    { 0x10dba4c4, patch_dev_game_id, ".rdata" }, // game_id
+
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
