@@ -44,6 +44,9 @@ const QByteArray patch_endpoint_gconnect = "gc.farcry2.online";
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_gconnect).append(":3074").append(5, '\0');
 const QByteArray patch_endpoint_stun = "stun.farcry2.online";
 
+const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
+const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
+
 // Reusable assembly constants.
 const QByteArray asm_jmp = QByteArray("\xEB", 1);
 
@@ -157,8 +160,8 @@ const QList<FileEntry> files = {
                     { 0x10f07df8, patch_endpoint_stun, ".rdata" },
 
                     /* Client */
-                    // Fix: Replace broken game id with working one.
-                    { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
+                    // Tweak: Replace game id with dev version.
+                    { 0x10e420c0, patch_dev_game_id, ".rdata" }, // game_id
 
                     // Fix: Patch Ubisoft endpoints with our own.
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
@@ -285,6 +288,9 @@ const QList<FileEntry> files = {
                     { 0x01062e48, patch_endpoint_stun, ".rdata" },
 
                     /* Server */
+                    // Tweak: Replace game id with dev version.
+                    { 0x01045fb0, patch_dev_dedicated_server_id, ".rdata" }, // game_id
+
                     // Fix: Servers being able to register with Ubisoft in online mode.
                     //{ 0x00c465bd, 1 }, // connect()
 
