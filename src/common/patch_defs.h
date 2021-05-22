@@ -6,10 +6,6 @@
 
 #include "entry.h"
 
-// Currently only applies for dedicated server, changes lobby server to that of the client because the server endpoint is currently down.
-constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
-constexpr uint16_t patch_network_lobbyserver_port = 3035;
-
 const QStringList patch_library_functions = {
     "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
     "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
@@ -222,9 +218,6 @@ const QList<FileEntry> files = {
                     { 0x0105fdf8, patch_endpoint_stun, ".rdata" },
 
                     /* Server */
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    //{ 0x00c43ffd, 1 },  // connect()
-
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
@@ -285,9 +278,6 @@ const QList<FileEntry> files = {
                     { 0x01062e48, patch_endpoint_stun, ".rdata" },
 
                     /* Server */
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    //{ 0x00c465bd, 1 }, // connect()
-
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50

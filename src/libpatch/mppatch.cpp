@@ -22,7 +22,7 @@ void MPPatch::readSettings()
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
-            const QHostAddress &hostAddress = addressEntry.ip();
+            QHostAddress hostAddress = addressEntry.ip();
 
             // We're only looking for IPv4 addresses.
             if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
@@ -43,17 +43,6 @@ int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int nam
     name_in->sin_addr.s_addr = INADDR_ANY;
 
     return bind(s, name, namelen);
-}
-
-int WSAAPI __stdcall MPPatch::connect_patch(SOCKET s, const sockaddr *name, int namelen)
-{
-    sockaddr_in *name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
-
-    // If connecting to lobbyserver on port 3100, use default lobby server port instead.
-    if (name_in->sin_addr.s_addr == inet_addr(patch_network_lobbyserver_address) && name_in->sin_port == htons(3100))
-        name_in->sin_port = htons(patch_network_lobbyserver_port);
-
-    return connect(s, name, namelen);
 }
 
 int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, int flags, const sockaddr *to, int tolen)
