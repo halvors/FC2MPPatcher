@@ -6,13 +6,8 @@
 
 #include "entry.h"
 
-// Currently only applies for dedicated server, changes lobby server to that of the client because the server endpoint is currently down.
-constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
-constexpr uint16_t patch_network_lobbyserver_port = 3035;
-
 const QStringList patch_library_functions = {
     "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
@@ -20,16 +15,39 @@ const QStringList patch_library_functions = {
 };
 
 // Currently only applies to Steam and Uplay editions, changes game id sent to Ubisoft to that of the Retail edition.
-const QByteArray patch_game_id = QString("2c66b725e7fb0697c0595397a14b0bc8").toUtf8();
+const QByteArray patch_game_id("2c66b725e7fb0697c0595397a14b0bc8");
+
+/**
+ * Patch values patch related to community backend.
+ *
+ * Original: gconnect.ubi.com0000
+ * New:      conf.farcry2.online0
+ *
+ * Original: onlineconfigservice.ubi.com
+ * New:      conf.farcry2.online:3074000
+ *
+ * Original: stun.apac.ubi.com00
+ * New:      stun.farcry2.online
+ *
+ * Original: stun.emea.ubi.com00
+ * New:      stun.farcry2.online
+ *
+ * Original: stun.ncsa.ubi.com00
+ * New:      stun.farcry2.online
+ */
+const QByteArray patch_endpoint_config_host = "conf.farcry2.online";
+const constexpr uint16_t patch_endpoint_config_port = 3074;
+const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
+const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
 // Reusable assembly constants.
-const QByteArray patch_asm_jmp = QByteArray("\xEB", 1);
+const QByteArray asm_jmp("\xEB", 1);
 
-inline const QByteArray asm_nop(unsigned short numBytes) {
+inline const QByteArray asm_nop(uint16_t numBytes) {
     QByteArray nop;
 
-    for (unsigned short i = 0; i < numBytes; i++)
-        nop.append("\x90");
+    for (uint16_t i = 0; i < numBytes; i++)
+        nop.append('\x90');
 
     return nop;
 }
@@ -41,9 +59,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "58b30f35da8afc9ac5de2f526d97846234d2cd332195b5a3567265702d5bb077" }
+                      "7f0ff9ac6b07c17944df76beb563ad4d9a35cd7832f4f3f2d6aa5da1f482d9b8" }
                 },
                 {
+                    { "58b30f35da8afc9ac5de2f526d97846234d2cd332195b5a3567265702d5bb077" }, // Hash for Retail version 0.1.12.
                     { "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }, // Hash for Retail version 0.1.11.
                     { "020ba8709ba7090fa9e29c77f26a66ea230aef92677fe93560d97e391be43c97" }, // Hash for Retail version 0.1.10.
                     { "dde6c2bcd9e333ca68a6c40ab6da8446a53b0721a03700b7302c3d40054cac8a" }, // Hash for Retail version 0.1.6.
@@ -58,9 +77,19 @@ const QList<FileEntry> files = {
                     { 0x10c4e97a, 0 }, // bind()
                     { 0x10cb9a8c, 0 }, // bind()
                     { 0x10cb9ad4, 0 }, // bind()
-                    { 0x10014053, 2 }, // sendTo()
-                    { 0x10c5bde2, 3 }, // getAdapersInfo()
-                    { 0x1001431c, 4 }, // getHostByName()
+                    { 0x10014053, 1 }, // sendTo()
+                    { 0x10c5bde2, 2 }, // getAdapersInfo()
+                    { 0x1001431c, 3 }, // getHostByName()
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10e7cb98, patch_endpoint_config_host, ".rdata" },
+                    { 0x10e7f400, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f414, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
+
+                    /* Client */
+                    // Fix: Hack to avoid verfiying agora certificate with public key from game files.
+                    { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     /* Client */
                     // Tweak: Remove mouse clamp
@@ -68,7 +97,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Fix: Custom map download
-                    { 0x10cb29e2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -86,12 +115,14 @@ const QList<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "d5c17109e9cc7d4f8b73804ac5a905952a858bd2ec09d359f49a46719eb30b4e" },
+                      "98f0a42ead437a2587a2695da2a7a54aceff691c7228b8878cce54e838fc271b" },
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "bd18c139db5751efcdb99ccdef8a19a6c2730177f0fc967abedce5526d0676cd" }
+                      "1f3049ee8991b639b9370b01be17c3ab9b68da6024651596520fd5e2037c11ed" }
                 },
                 {
+                    { "d5c17109e9cc7d4f8b73804ac5a905952a858bd2ec09d359f49a46719eb30b4e" }, // Hash for Steam version 0.1.12.
+                    { "bd18c139db5751efcdb99ccdef8a19a6c2730177f0fc967abedce5526d0676cd" }, // Hash for Uplay version 0.1.12.
                     { "d4942259d5d61c2f743bed7a0b156ab8489e868aa8cfd2b20fc5e417dd52cefa" }, // Hash for Steam version 0.1.11.
                     { "83e2ea791c6227cc96f2515c4638b24809439944d183ad6b0117d58eb2c8869b" }, // Hash for Uplay version 0.1.11.
                     { "40f4d55fe0ac6b370798983de2ca1dd09ef0423a7c523b7c424cadddbd894a25" }, // Hash for Steam version 0.1.10.
@@ -111,20 +142,32 @@ const QList<FileEntry> files = {
                     { 0x10c5d10a, 0 }, // bind()
                     { 0x10cf289c, 0 }, // bind()
                     { 0x10cf28e4, 0 }, // bind()
-                    { 0x10013f33, 2 }, // sendTo()
-                    { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 }, // getHostByName()
+                    { 0x10013f33, 1 }, // sendTo()
+                    { 0x10c6a692, 2 }, // getAdapersInfo()
+                    { 0x100141fc, 3 }, // getHostByName()
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10f05568, patch_endpoint_config_host, ".rdata" },
+                    { 0x10f07dd0, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10f07de4, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10f07df8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
                     // Fix: Replace broken game id with working one.
                     { 0x10e420c0, patch_game_id, ".rdata" }, // game_id
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
+
+                    // Fix: Hack to avoid verfiying agora certificate with public key from game files.
+                    { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
                     /* Server */
                     // Fix: Custom map download
-                    { 0x10cebaf2, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -146,9 +189,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }
+                      "20a85ddbff6a6a0fc35aa3ddaff9e4d08ce660000b9568731c39b3d94ac38e8d" }
                 },
                 {
+                    { "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }, // Hash for Retail version 0.1.12.
                     { "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }, // Hash for Retail version 0.1.11.
                     { "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64" }, // Hash for Retail version 0.1.10.
                     { "64c07c4d04d1180f3ff497a6ecc1ce8a48b021e201c640242db32e9a98cb5d1a" }, // Hash for Retail version 0.1.6.
@@ -163,16 +207,19 @@ const QList<FileEntry> files = {
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba126e, 0 }, // bind()
                     { 0x00e83eda, 0 }, // bind()
-                    { 0x00ba4a33, 2 }, // sendTo()
-                    { 0x00c444a6, 3 }, // getAdapersInfo()
-                    { 0x00ba4cfc, 4 }, // getHostByName()
+                    { 0x00ba4a33, 1 }, // sendTo()
+                    { 0x00c444a6, 2 }, // getAdapersInfo()
+                    { 0x00ba4cfc, 3 }, // getHostByName()
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x0105eb28, patch_endpoint_config_host, ".rdata" },
+                    { 0x0105fdd0, patch_endpoint_stun_host, ".rdata" },
+                    { 0x0105fde4, patch_endpoint_stun_host, ".rdata" },
+                    { 0x0105fdf8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    { 0x00c43ffd, 1 },  // connect()
-
                     // Fix: Custom map download
-                    { 0x004ecda5, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -187,7 +234,7 @@ const QList<FileEntry> files = {
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094c943, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0094c943, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     // Fix: Unintentional line break due to UTF-16 when client joins or leaves.
@@ -199,12 +246,14 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" },
+                      "0eeba5e94d07b225eca772575283897169b893b755d481e0184c20952e515442" },
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "e90dc85ea2229b038278f6ac45805658fc12fd00ceeca05093d271c885584d4c" }
+                      "ef30f22cff98914d408ba69a6778c00e793c0b1eae128718091df206c3c1bd85" }
                 },
                 {
+                    { "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" }, // Hash for Steam version 0.1.12.
+                    { "e90dc85ea2229b038278f6ac45805658fc12fd00ceeca05093d271c885584d4c" }, // Hash for Uplay version 0.1.12.
                     { "cb5036fccf38a2a8cb73afc36df7844e160657c7f93c35554909b0e52e09ccee" }, // Hash for Steam version 0.1.11.
                     { "346c6b3a292a352b6ca88ff563f25564d501af632fcb09a07f6a19a1415236c6" }, // Hash for Uplay version 0.1.11.
                     { "bfb73dffcac987a511be8a7d34f66644e9171dc0fee6a48a17256d6b5e55dc64" }, // Hash for Steam version 0.1.10.
@@ -222,16 +271,19 @@ const QList<FileEntry> files = {
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba36be, 0 }, // bind()
                     { 0x00e85ffa, 0 }, // bind()
-                    { 0x00ba6e83, 2 }, // sendTo()
-                    { 0x00c46a66, 3 }, // getAdapersInfo()
-                    { 0x00ba714c, 4 }, // getHostByName()
+                    { 0x00ba6e83, 1 }, // sendTo()
+                    { 0x00c46a66, 2 }, // getAdapersInfo()
+                    { 0x00ba714c, 3 }, // getHostByName()
+
+                    // Fix: Patch Ubisoft endpoints with our own.
+                    { 0x01061b78, patch_endpoint_config_host, ".rdata" },
+                    { 0x01062e20, patch_endpoint_stun_host, ".rdata" },
+                    { 0x01062e34, patch_endpoint_stun_host, ".rdata" },
+                    { 0x01062e48, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
-                    // Fix: Servers being able to register with Ubisoft in online mode.
-                    { 0x00c465bd, 1 }, // connect()
-
                     // Fix: Custom map download
-                    { 0x004eca95, patch_asm_jmp }, // change JZ (74) to JMP (EB)
+                    { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -246,7 +298,7 @@ const QList<FileEntry> files = {
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
-                    { 0x0094d593, patch_asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
+                    { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     // Fix: Unintentional line break due to UTF-16 when client joins or leaves.
@@ -254,9 +306,11 @@ const QList<FileEntry> files = {
                     //{ 0x00c425e6, QByteArray("\x73", 1) } // change %S ti %s for "Client left"
 
                     /* Experimental / WIP */
-                    //{ 0x0052c8d3, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // works somehow..?
-                    //{ 0x00b046ff, QByteArray("\x90\x90", 2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
-                    //{ 0x0094df05, QByteArray("\x90\x90", 2) } // MinPlayers?... 74 0f // bypass join in progress check?
+                    //{ 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
+
+                    //{ 0x0052c8d3, asm_nop(2) }, // MinPlayers?... 75 03 // works somehow..?
+                    //{ 0x00b046ff, asm_nop(2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
+                    //{ 0x0094df05, asm_nop(2) } // MinPlayers?... 74 0f // bypass join in progress check?
                 }
             }
         }
