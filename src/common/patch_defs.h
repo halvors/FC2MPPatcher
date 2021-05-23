@@ -6,13 +6,8 @@
 
 #include "entry.h"
 
-// Currently only applies for dedicated server, changes lobby server to that of the client because the server endpoint is currently down.
-constexpr char patch_network_lobbyserver_address[] = "216.98.48.56";
-constexpr uint16_t patch_network_lobbyserver_port = 3035;
-
 const QStringList patch_library_functions = {
     "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-    "_ZN7MPPatch13connect_patchEjPK8sockaddri@12",                // connect()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
@@ -23,10 +18,10 @@ const QStringList patch_library_functions = {
  * Patch values patch related to community backend.
  *
  * Original: gconnect.ubi.com0000
- * New:      gc.farcry2.online000
+ * New:      conf.farcry2.online0
  *
  * Original: onlineconfigservice.ubi.com
- * New:      gc.farcry2.online:307400000
+ * New:      conf.farcry2.online:3074000
  *
  * Original: stun.apac.ubi.com00
  * New:      stun.farcry2.online
@@ -37,15 +32,16 @@ const QStringList patch_library_functions = {
  * Original: stun.ncsa.ubi.com00
  * New:      stun.farcry2.online
  */
-const QByteArray patch_endpoint_gconnect = "gc.farcry2.online";
-const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_gconnect).append(":3074").append(5, '\0');
-const QByteArray patch_endpoint_stun = "stun.farcry2.online";
+const QByteArray patch_endpoint_config_host = "conf.farcry2.online";
+const constexpr uint16_t patch_endpoint_config_port = 3074;
+const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
+const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
 const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
 const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
 
 // Reusable assembly constants.
-const QByteArray asm_jmp = QByteArray("\xEB", 1);
+const QByteArray asm_jmp("\xEB", 1);
 
 inline const QByteArray asm_nop(uint16_t numBytes) {
     QByteArray nop;
@@ -63,7 +59,7 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "1d7fa188f0aa7046195b6eb7e4494ebd8ae649136719425faad21909df0639a5" }
+                      "7f0ff9ac6b07c17944df76beb563ad4d9a35cd7832f4f3f2d6aa5da1f482d9b8" }
                 },
                 {
                     { "58b30f35da8afc9ac5de2f526d97846234d2cd332195b5a3567265702d5bb077" }, // Hash for Retail version 0.1.12.
@@ -81,15 +77,15 @@ const QList<FileEntry> files = {
                     { 0x10c4e97a, 0 }, // bind()
                     { 0x10cb9a8c, 0 }, // bind()
                     { 0x10cb9ad4, 0 }, // bind()
-                    { 0x10014053, 2 }, // sendTo()
-                    { 0x10c5bde2, 3 }, // getAdapersInfo()
-                    { 0x1001431c, 4 }, // getHostByName()
+                    { 0x10014053, 1 }, // sendTo()
+                    { 0x10c5bde2, 2 }, // getAdapersInfo()
+                    { 0x1001431c, 3 }, // getHostByName()
 
                     // Fix: Patch Ubisoft endpoints with our own.
-                    { 0x10e7cb98, patch_endpoint_gconnect, ".rdata" },
-                    { 0x10e7f400, patch_endpoint_stun, ".rdata" },
-                    { 0x10e7f414, patch_endpoint_stun, ".rdata" },
-                    { 0x10e7f428, patch_endpoint_stun, ".rdata" },
+                    { 0x10e7cb98, patch_endpoint_config_host, ".rdata" },
+                    { 0x10e7f400, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f414, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
                     // Tweak: Replace game id with dev version.
@@ -122,10 +118,10 @@ const QList<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "8258f42dfe094f92f331722dcf687bd02e983ad2a0205de89851334683c38f7b" },
+                      "98f0a42ead437a2587a2695da2a7a54aceff691c7228b8878cce54e838fc271b" },
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "e6163b4d33591af427e962605408ac9bcf5b748603949e91818f004b95087702" }
+                      "1f3049ee8991b639b9370b01be17c3ab9b68da6024651596520fd5e2037c11ed" }
                 },
                 {
                     { "d5c17109e9cc7d4f8b73804ac5a905952a858bd2ec09d359f49a46719eb30b4e" }, // Hash for Steam version 0.1.12.
@@ -149,15 +145,15 @@ const QList<FileEntry> files = {
                     { 0x10c5d10a, 0 }, // bind()
                     { 0x10cf289c, 0 }, // bind()
                     { 0x10cf28e4, 0 }, // bind()
-                    { 0x10013f33, 2 }, // sendTo()
-                    { 0x10c6a692, 3 }, // getAdapersInfo()
-                    { 0x100141fc, 4 }, // getHostByName()
+                    { 0x10013f33, 1 }, // sendTo()
+                    { 0x10c6a692, 2 }, // getAdapersInfo()
+                    { 0x100141fc, 3 }, // getHostByName()
 
                     // Fix: Patch Ubisoft endpoints with our own.
-                    { 0x10f05568, patch_endpoint_gconnect, ".rdata" },
-                    { 0x10f07dd0, patch_endpoint_stun, ".rdata" },
-                    { 0x10f07de4, patch_endpoint_stun, ".rdata" },
-                    { 0x10f07df8, patch_endpoint_stun, ".rdata" },
+                    { 0x10f05568, patch_endpoint_config_host, ".rdata" },
+                    { 0x10f07dd0, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10f07de4, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10f07df8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
                     // Tweak: Replace game id with dev version.
@@ -196,7 +192,7 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "1ca2678496e202bd6b86864f6ed21be178a2abab67fc425c0a3aab8625918c25" }
+                      "20a85ddbff6a6a0fc35aa3ddaff9e4d08ce660000b9568731c39b3d94ac38e8d" }
                 },
                 {
                     { "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }, // Hash for Retail version 0.1.12.
@@ -214,15 +210,15 @@ const QList<FileEntry> files = {
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba126e, 0 }, // bind()
                     { 0x00e83eda, 0 }, // bind()
-                    { 0x00ba4a33, 2 }, // sendTo()
-                    { 0x00c444a6, 3 }, // getAdapersInfo()
-                    { 0x00ba4cfc, 4 }, // getHostByName()
+                    { 0x00ba4a33, 1 }, // sendTo()
+                    { 0x00c444a6, 2 }, // getAdapersInfo()
+                    { 0x00ba4cfc, 3 }, // getHostByName()
 
                     // Fix: Patch Ubisoft endpoints with our own.
-                    { 0x0105eb28, patch_endpoint_gconnect, ".rdata" },
-                    { 0x0105fdd0, patch_endpoint_stun, ".rdata" },
-                    { 0x0105fde4, patch_endpoint_stun, ".rdata" },
-                    { 0x0105fdf8, patch_endpoint_stun, ".rdata" },
+                    { 0x0105eb28, patch_endpoint_config_host, ".rdata" },
+                    { 0x0105fdd0, patch_endpoint_stun_host, ".rdata" },
+                    { 0x0105fde4, patch_endpoint_stun_host, ".rdata" },
+                    { 0x0105fdf8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
                     // Tweak: Replace game id with dev version.
@@ -252,10 +248,10 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "64af2e7be0fa6413d8b955eaa2c55dadf6d0e250d3b0e4c006dd5ba4ce6bd7cd" },
+                      "0eeba5e94d07b225eca772575283897169b893b755d481e0184c20952e515442" },
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "4ea78e5a3a94fd95c70f98521c4cfabadb2db6767e5b0edb3ed137dfc3679c7b" }
+                      "ef30f22cff98914d408ba69a6778c00e793c0b1eae128718091df206c3c1bd85" }
                 },
                 {
                     { "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" }, // Hash for Steam version 0.1.12.
@@ -277,15 +273,15 @@ const QList<FileEntry> files = {
                     { 0x004c9d2a, 0 }, // bind()
                     { 0x00ba36be, 0 }, // bind()
                     { 0x00e85ffa, 0 }, // bind()
-                    { 0x00ba6e83, 2 }, // sendTo()
-                    { 0x00c46a66, 3 }, // getAdapersInfo()
-                    { 0x00ba714c, 4 }, // getHostByName()
+                    { 0x00ba6e83, 1 }, // sendTo()
+                    { 0x00c46a66, 2 }, // getAdapersInfo()
+                    { 0x00ba714c, 3 }, // getHostByName()
 
                     // Fix: Patch Ubisoft endpoints with our own.
-                    { 0x01061b78, patch_endpoint_gconnect, ".rdata" },
-                    { 0x01062e20, patch_endpoint_stun, ".rdata" },
-                    { 0x01062e34, patch_endpoint_stun, ".rdata" },
-                    { 0x01062e48, patch_endpoint_stun, ".rdata" },
+                    { 0x01061b78, patch_endpoint_config_host, ".rdata" },
+                    { 0x01062e20, patch_endpoint_stun_host, ".rdata" },
+                    { 0x01062e34, patch_endpoint_stun_host, ".rdata" },
+                    { 0x01062e48, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
                     // Tweak: Replace game id with dev version.
