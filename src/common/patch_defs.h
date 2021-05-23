@@ -189,7 +189,7 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "20a85ddbff6a6a0fc35aa3ddaff9e4d08ce660000b9568731c39b3d94ac38e8d" }
+                      "e27028099deacc23e19cfe3b743c2d795cf4beb41bbd6c5e63b6f9ece430c4e4" }
                 },
                 {
                     { "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }, // Hash for Retail version 0.1.12.
@@ -246,10 +246,10 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "0eeba5e94d07b225eca772575283897169b893b755d481e0184c20952e515442" },
+                      "e7e1539377c2a723f9b258669398f06e04780e30dd0f63e1d9dbba7bcf13a560" },
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "ef30f22cff98914d408ba69a6778c00e793c0b1eae128718091df206c3c1bd85" }
+                      "99fe9d86eeb52d643f283d0385e9075bf78b2ed445b64c772163240d736d87ce" }
                 },
                 {
                     { "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" }, // Hash for Steam version 0.1.12.
