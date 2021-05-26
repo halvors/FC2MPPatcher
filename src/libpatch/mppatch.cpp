@@ -94,6 +94,7 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
         return publicAddress;
 
     try {
+        // you can pass http::InternetProtocol::V6 to Request to make an IPv6 request
         http::Request request("http://api.ipify.org");
 
         // send a get request
@@ -103,6 +104,23 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
     } catch (const std::exception &e) {
 
     }
+
+    /*
+    // Query for public ip address.
+    QNetworkAccessManager *con = new QNetworkAccessManager();
+    QNetworkReply *reply = con->get(QNetworkRequest(QUrl("http://api.ipify.org")));
+
+    // Trick to do this synchronously.
+    QEventLoop loop;
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() == QNetworkReply::NoError)
+        publicAddress = QHostAddress(reply->readAll().constData()).toIPv4Address();
+
+    delete reply;
+    delete con;
+    */
 
     return publicAddress;
 }
