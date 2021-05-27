@@ -171,7 +171,7 @@ const QList<FileEntry> files = {
                     { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
@@ -280,15 +280,21 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\xA4\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
-                                 "\x8B\xC8"                     // mov    ecx,eax
-                                 "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    mov dword ptr ds:[eax+8],ecx
+                                 "\xE8\x14\x72\x2F\xFF"         // call   fc2serverlauncher.AA9220 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                     // test   al,al
+                                 "\x75\x16"                     // jne    <fc2serverlauncher.lan>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\x8B\xC8"                     // pop    eax
+                                 "\x58"                         // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xEC\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
+                                 "\xE9\xDF\x10\x30\xFF"         // jmp    <fc2serverlauncher.return>
+                                 "\x58"                         // pop    eax
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xD8\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.return>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
