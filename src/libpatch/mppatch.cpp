@@ -94,7 +94,6 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
         return publicAddress;
 
     try {
-        // you can pass http::InternetProtocol::V6 to Request to make an IPv6 request
         http::Request request("http://api.ipify.org");
 
         // send a get request
