@@ -288,13 +288,14 @@ const QList<FileEntry> files = {
                                  "\x75\x16"                     // jne    <fc2serverlauncher.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
                                  "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
-                                 "\x8B\xC8"                     // pop    eax
-                                 "\x58"                         // mov    dword ptr ds:[eax+8],ecx
+                                 "\x8B\xC8"                     // mov    ecx,eax
+                                 "\x58"                         // pop    eax
+                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
                                  "\xE9\xDF\x10\x30\xFF"         // jmp    <fc2serverlauncher.return>
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xD8\x10\x30\xFF", 25) }, // jmp    <fc2serverlauncher.return>
+                                 "\xE9\xDF\x10\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
