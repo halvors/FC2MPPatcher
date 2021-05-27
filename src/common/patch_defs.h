@@ -280,6 +280,9 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
+
+                    // 5 + 1 + 1 + 5 + 2 + 2 + 4 + 6 + 2 + 1 + 3 + 1 + 5 + 1 + 1 + 5 = 45
+
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -295,7 +298,7 @@ const QList<FileEntry> files = {
                                  "\xE9\xDF\x10\x30\xFF"         // jmp    <fc2serverlauncher.return>
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xDF\x10\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
+                                 "\xE9\xD8\x10\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
