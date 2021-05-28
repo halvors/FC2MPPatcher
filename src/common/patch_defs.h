@@ -220,20 +220,28 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50
+
+                    { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xE8\x04\x01\x30\xFF"         // call   fc2serverlauncher.AAF110 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                     // test   al,al
+                                 "\x75\x16"                     // jne    <fc2serverlauncher.lan>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\x4C\x91\x30\xFF", 25) }, // jmp    <fc2serverlauncher.retur>
-                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                                 "\xE9\x3F\x91\x30\xFF"         // jmp    <fc2serverlauncher.return>
+                                 "\x58"                         // pop    eax
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\x38\x91\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
-                    { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094c943, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
                 }
@@ -280,7 +288,6 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
-
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -301,7 +308,7 @@ const QList<FileEntry> files = {
                     { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
                     { 0x0067552c, asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
