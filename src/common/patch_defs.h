@@ -281,8 +281,6 @@ const QList<FileEntry> files = {
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
 
-                    // 5 + 1 + 1 + 5 + 2 + 2 + 4 + 6 + 2 + 1 + 3 + 1 + 5 + 1 + 1 + 5 = 45
-
                     { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
@@ -305,7 +303,35 @@ const QList<FileEntry> files = {
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00\x90", 6) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x0067552c, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0067552c, asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+
+                    // Fix: Unintentional line break due to UTF-16 character being printed on client join.
+                    { QByteArray("\x68\x78\x3F\x04\x01"         // push   fc2serverlauncher.1043F78
+                                 "\x57"                         // push   edi
+                                 "\x50"                         // push   eax
+                                 "\x51"                         // push   ecx
+                                 "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
+                                 "\x66\x85\xC9"                 // test   cx,cx
+                                 "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\x80\xE1\x80"                 // and    cl,80
+                                 "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\x84\xED"                     // test   ch,ch
+                                 "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
+                                 "\x90\x90\x90"                 // nop    nop nop
+                                 "\xB1\x3F"                     // mov    cl,3F
+                                 "\x32\xED"                     // xor    ch,ch
+                                 "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
+                                 "\x83\xC0\x02"                 // add    eax,2
+                                 "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
+                                 "\x90\x90\x90"                 // nop    nop nop
+                                 "\x59"                         // pop    ecx
+                                 "\x58"                         // pop    eax
+                                 "\xE9\x13\x28\x55\xFF", 45) }, // nop    nop nop
+                    { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
                     //{ 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
