@@ -330,7 +330,7 @@ const QList<FileEntry> files = {
                                  "\x90\x90\x90"                 // nop    nop nop
                                  "\x59"                         // pop    ecx
                                  "\x58"                         // pop    eax
-                                 "\xE9\x13\x28\x55\xFF", 45) }, // nop    nop nop
+                                 "\xE9\x13\x28\x55\xFF", 64) }, // nop    nop nop
                     { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
