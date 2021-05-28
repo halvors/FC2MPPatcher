@@ -84,23 +84,19 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     QByteArray textData;
 
     for (const CodeEntry &codeEntry : codeEntries) {
-        if (codeEntry.getType() == CodeEntry::NEW_DATA) {
-            qDebug() << QString("Text length: %1").arg(textData.size());
+        if (codeEntry.getType() != CodeEntry::NEW_DATA)
+            continue;
 
-            int length = textData.size();
-            int padding = 0;
+        int length = textData.size();
 
-            if (textData.size() > 0) {
-                padding += 32 - (length % 32);
-
-                qDebug() << QString("Padding length: %1").arg(padding);
-            }
+        if (length > 0) {
+            int padding = 32 - (length % 32);
 
             for (int i = 0; i < padding; i++)
                 textData.append('\x00');
-
-            textData.append(codeEntry.getData());
         }
+
+        textData.append(codeEntry.getData());
     }
 
     if (!textData.isEmpty()) {

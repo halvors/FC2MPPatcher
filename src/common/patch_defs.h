@@ -333,6 +333,35 @@ const QList<FileEntry> files = {
                                  "\xE9\x13\x28\x55\xFF", 64) }, // nop    nop nop
                     { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
+
+                  // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
+                  { QByteArray("\x68\xD8\x3F\x04\x01"         // push   fc2serverlauncher.1043FD8
+                               "\x57"                         // push   edi
+                               "\x50"                         // push   eax
+                               "\x51"                         // push   ecx
+                               "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
+                               "\x66\x85\xC9"                 // test   cx,cx
+                               "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
+                               "\x90\x90\x90\x90"             // nop    nop nop nop
+                               "\x80\xE1\x80"                 // and    cl,80
+                               "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
+                               "\x90\x90\x90\x90"             // nop    nop nop nop
+                               "\x84\xED"                     // test   ch,ch
+                               "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
+                               "\x90\x90\x90\x90"             // nop    nop nop nop
+                               "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
+                               "\x90\x90\x90"                 // nop    nop nop
+                               "\xB1\x3F"                     // mov    cl,3F
+                               "\x32\xED"                     // xor    ch,ch
+                               "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
+                               "\x83\xC0\x02"                 // add    eax,2
+                               "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
+                               "\x90\x90\x90"                 // nop    nop nop
+                               "\x59"                         // pop    ecx
+                               "\x58"                         // pop    eax
+                               "\xE9\x23\x29\x55\xFF", 64) }, // nop    nop nop
+                  { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
+
                     /* Experimental / WIP */
                     //{ 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
 
