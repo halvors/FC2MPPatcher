@@ -98,15 +98,22 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0
+                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\x10\xD7\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xE8\xC4\x8E\xEB\xFE"         // call   dunia.107E7ED0 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                     // test   al,al
+                                 "\x75\x16"                     // jne    <dunia.lan>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xFF\x15\xDC\xD6\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\x03\x25\xE4\xFE", 25) }, // jmp    <dunia.retur>
+                                 "\xE9\xF6\x24\xE4\xFE"         // jmp    <dunia.return>
+                                 "\x58"                         // pop    eax
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xEF\x24\xE4\xFE", 45) }, // jmp    <dunia.return>
                     { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
@@ -235,7 +242,7 @@ const QList<FileEntry> files = {
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <fc2serverlauncher.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\xFF\x15\xBC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
@@ -244,7 +251,7 @@ const QList<FileEntry> files = {
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
                                  "\xE9\x38\x91\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x00ab8160, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
@@ -348,33 +355,33 @@ const QList<FileEntry> files = {
                     { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
 
-                  // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
-                  { QByteArray("\x68\xD8\x3F\x04\x01"         // push   fc2serverlauncher.1043FD8
-                               "\x57"                         // push   edi
-                               "\x50"                         // push   eax
-                               "\x51"                         // push   ecx
-                               "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
-                               "\x66\x85\xC9"                 // test   cx,cx
-                               "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
-                               "\x90\x90\x90\x90"             // nop    nop nop nop
-                               "\x80\xE1\x80"                 // and    cl,80
-                               "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
-                               "\x90\x90\x90\x90"             // nop    nop nop nop
-                               "\x84\xED"                     // test   ch,ch
-                               "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
-                               "\x90\x90\x90\x90"             // nop    nop nop nop
-                               "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
-                               "\x90\x90\x90"                 // nop    nop nop
-                               "\xB1\x3F"                     // mov    cl,3F
-                               "\x32\xED"                     // xor    ch,ch
-                               "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
-                               "\x83\xC0\x02"                 // add    eax,2
-                               "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
-                               "\x90\x90\x90"                 // nop    nop nop
-                               "\x59"                         // pop    ecx
-                               "\x58"                         // pop    eax
-                               "\xE9\x23\x29\x55\xFF", 64) }, // nop    nop nop
-                  { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
+                    // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
+                    { QByteArray("\x68\xD8\x3F\x04\x01"         // push   fc2serverlauncher.1043FD8
+                                 "\x57"                         // push   edi
+                                 "\x50"                         // push   eax
+                                 "\x51"                         // push   ecx
+                                 "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
+                                 "\x66\x85\xC9"                 // test   cx,cx
+                                 "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\x80\xE1\x80"                 // and    cl,80
+                                 "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\x84\xED"                     // test   ch,ch
+                                 "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
+                                 "\x90\x90\x90"                 // nop    nop nop
+                                 "\xB1\x3F"                     // mov    cl,3F
+                                 "\x32\xED"                     // xor    ch,ch
+                                 "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
+                                 "\x83\xC0\x02"                 // add    eax,2
+                                 "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
+                                 "\x90\x90\x90"                 // nop    nop nop
+                                 "\x59"                         // pop    ecx
+                                 "\x58"                         // pop    eax
+                                 "\xE9\x23\x29\x55\xFF", 64) }, // nop    nop nop
+                    { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
                     //{ 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
