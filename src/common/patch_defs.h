@@ -168,15 +168,22 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600
+                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xE8\x24\x09\xD9\xFE"         // call   dunia.1077D930 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                     // test   al,al
+                                 "\x75\x16"                     // jne    <dunia.lan>
+                                 "\x90\x90\x90\x90"             // nop    nop nop nop
+                                 "\xFF\x15\xE4\xB9\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xE3\x0E\xD9\xFE", 25) }, // jmp    <dunia.retur>
+                                 "\xE9\xD6\x0E\xD9\xFE"         // jmp    <dunia.return>
+                                 "\x58"                         // pop    eax
+                                 "\x59"                         // pop    ecx
+                                 "\xE9\xCF\x0E\xD9\xFE", 45) }, // jmp    <dunia.return>
                     { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
