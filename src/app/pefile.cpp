@@ -83,9 +83,25 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     // Create .text section for custom assembly code.
     QByteArray textData;
 
-    for (const CodeEntry &codeEntry : codeEntries)
-        if (codeEntry.getType() == CodeEntry::NEW_DATA)
+    for (const CodeEntry &codeEntry : codeEntries) {
+        if (codeEntry.getType() == CodeEntry::NEW_DATA) {
+            qDebug() << QString("Text length: %1").arg(textData.size());
+
+            int length = textData.size();
+            int padding = 0;
+
+            if (textData.size() > 0) {
+                padding += 32 - (length % 32);
+
+                qDebug() << QString("Padding length: %1").arg(padding);
+            }
+
+            for (int i = 0; i < padding; i++)
+                textData.append('\x00');
+
             textData.append(codeEntry.getData());
+        }
+    }
 
     if (!textData.isEmpty()) {
         section textSection;
