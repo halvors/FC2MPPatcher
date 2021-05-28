@@ -1,8 +1,7 @@
 #include <QSettings>
 #include <QNetworkInterface>
 #include <QHostAddress>
-
-#include <iostream>
+#include <QCryptographicHash>
 
 #include "mppatch.h"
 #include "defs.h"
@@ -105,22 +104,21 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
 
     }
 
-    /*
-    // Query for public ip address.
-    QNetworkAccessManager *con = new QNetworkAccessManager();
-    QNetworkReply *reply = con->get(QNetworkRequest(QUrl("http://api.ipify.org")));
-
-    // Trick to do this synchronously.
-    QEventLoop loop;
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-
-    if (reply->error() == QNetworkReply::NoError)
-        publicAddress = QHostAddress(reply->readAll().constData()).toIPv4Address();
-
-    delete reply;
-    delete con;
-    */
-
     return publicAddress;
+}
+
+void __stdcall MPPatch::genOneTimeKey(uint8_t *out, uint64_t *outLen, char *challenge, char *username, char *password)
+{
+    QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
+    passwordHash.addData(password, strlen(password));
+
+    QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
+    oneTimeHash.addData(username, strlen(username));
+    oneTimeHash.addData(challenge, strlen(challenge));
+    oneTimeHash.addData(passwordHash.result().toHex().toUpper());
+
+    QByteArray result = oneTimeHash.result().toHex();
+
+    *outLen = result.size();
+    strncpy(out, result.constData(), *outLen);
 }
