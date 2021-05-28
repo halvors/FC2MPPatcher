@@ -58,7 +58,7 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, i
     return sendto(s, buf, len, flags, to, tolen);
 }
 
-unsigned long __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, unsigned long *sizePointer)
+uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, unsigned long *sizePointer)
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
