@@ -52,7 +52,7 @@ https://discord.gg/2XgQzhd
 ## Thanks to
 ### Contributors
 <i>zenoy and halvors</i> - for patching the assembly code and creating the patcher application.  
-<i>svinsen, FEARIV, Gabor and Lasercar</i> - For help testing and community support.
+<i>svinsen, FEARIV, Gabor and Lasercar</i> - for help testing and with community support.
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
