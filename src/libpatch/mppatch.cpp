@@ -2,6 +2,7 @@
 #include <QNetworkInterface>
 #include <QHostAddress>
 #include <QCryptographicHash>
+#include <cstring>
 
 #include "mppatch.h"
 #include "defs.h"
@@ -86,6 +87,27 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
+int __cdecl MPPatch::genOneTimeKey(char *out, uint64_t *outLen, char *challenge, char *username, char *password)
+{
+    //QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
+    //passwordHash.addData(password, strlen(password));
+
+    QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Sha256);
+    passwordHash.addData(password);
+
+    QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
+    oneTimeHash.addData(username, strlen(username));
+    oneTimeHash.addData(challenge, strlen(challenge));
+    oneTimeHash.addData(passwordHash.result().toHex().toUpper());
+
+    QByteArray result = oneTimeHash.result().toHex();
+
+    *outLen = result.size();
+    std::memcpy(out, result.constData(), *outLen);
+
+    return 0;
+}
+
 uint32_t __stdcall MPPatch::getPublicIPAddress()
 {
     // Return cached address if it exists.
@@ -105,20 +127,4 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
     }
 
     return publicAddress;
-}
-
-void __stdcall MPPatch::genOneTimeKey(uint8_t *out, uint64_t *outLen, char *challenge, char *username, char *password)
-{
-    QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
-    passwordHash.addData(password, strlen(password));
-
-    QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
-    oneTimeHash.addData(username, strlen(username));
-    oneTimeHash.addData(challenge, strlen(challenge));
-    oneTimeHash.addData(passwordHash.result().toHex().toUpper());
-
-    QByteArray result = oneTimeHash.result().toHex();
-
-    *outLen = result.size();
-    strncpy(out, result.constData(), *outLen);
 }

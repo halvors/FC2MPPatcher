@@ -11,6 +11,7 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+    "_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_",                   // genOneTimeKey()
     "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
 };
 
@@ -89,36 +90,40 @@ const QList<FileEntry> files = {
                     { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
-                    // Tweak: Replace game id with dev version.
+                    // Tweak: Replace game_id with dev version.
                     { 0x10dba4c4, patch_dev_game_id, ".rdata" }, // game_id
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
-                    /* Client */
+                    // Fix: Change function call genOneTimeKey() to instead call external.
+                    { QByteArray("\xFF\x15\x08\xD7\x92\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                 "\xE9\x25\x47\x2E\xFF", 11) }, // jmp    dunia.119ED040
+                    { 0x10c1372b, QByteArray("\xE9\xD0\xB8\xD1\x00", 5) }, // change function call to instead jump to the .text_p section.
+
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xCB\x1B\xE4\xFE"         // call   dunia.10770BD0 ; GetNetFileServerAddress()
+                    { QByteArray("\xE8\xAB\x1B\xE4\xFE"         // call   dunia.10770BD0 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xE8\xC4\x8E\xEB\xFE"         // call   dunia.107E7ED0 ; IsSessionTypeLAN()
+                                 "\xE8\xA4\x8E\xEB\xFE"         // call   dunia.107E7ED0 ; IsSessionTypeLAN()
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <dunia.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\xDC\xD6\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xFF\x15\x0C\xD7\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xF6\x24\xE4\xFE"         // jmp    <dunia.return>
+                                 "\xE9\xD6\x24\xE4\xFE"         // jmp    <dunia.return>
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xEF\x24\xE4\xFE", 45) }, // jmp    <dunia.return>
-                    { 0x10771517, QByteArray("\xE9\xE4\xDA\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
+                                 "\xE9\xCF\x24\xE4\xFE", 45) }, // jmp    <dunia.return>
+                    { 0x10771517, QByteArray("\xE9\x04\xDB\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
@@ -159,21 +164,26 @@ const QList<FileEntry> files = {
                     { 0x10c6a692, 2 }, // getAdapersInfo()
                     { 0x100141fc, 3 }, // getHostByName()
 
-                    // Fix: Patch Ubisoft endpoints with our own.
+                    // Fix: Swap Ubisoft endpoints with our own.
                     { 0x10f05568, patch_endpoint_config_host, ".rdata" },
                     { 0x10f07dd0, patch_endpoint_stun_host, ".rdata" },
                     { 0x10f07de4, patch_endpoint_stun_host, ".rdata" },
                     { 0x10f07df8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
-                    // Tweak: Replace game id with dev version.
+                    // Tweak: Replace game_id with dev version.
                     { 0x10e420c0, patch_dev_game_id, ".rdata" }, // game_id
 
-                    // Fix: Patch Ubisoft endpoints with our own.
+                    // Fix: Swap Ubisoft endpoints with our own.
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+
+                    // Fix: Change function call genOneTimeKey() to instead call external.
+                    { QByteArray("\xFF\x15\x10\xBA\x9E\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                 "\xE9\x02\x7A\x23\xFF", 11) }, // jmp    dunia.119ED040
+                    { 0x10c24a08, QByteArray("\xE9\xF3\x85\xDC\x00", 5) }, // change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -181,23 +191,23 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xFB\x05\xD9\xFE"         // call   dunia.1077D600 ; GetNetFileServerAddress()
+                    { QByteArray("\xE8\xDB\x05\xD9\xFE"         // call   dunia.1077D600 ; GetNetFileServerAddress()
                                  "\x51"                         // push   ecx
                                  "\x50"                         // push   eax
-                                 "\xE8\x24\x09\xD9\xFE"         // call   dunia.1077D930 ; IsSessionTypeLAN()
+                                 "\xE8\x04\x09\xD9\xFE"         // call   dunia.1077D930 ; IsSessionTypeLAN()
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <dunia.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\xE4\xB9\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>]
+                                 "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xD6\x0E\xD9\xFE"         // jmp    <dunia.return>
+                                 "\xE9\xB6\x0E\xD9\xFE"         // jmp    <dunia.return>
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
-                                 "\xE9\xCF\x0E\xD9\xFE", 45) }, // jmp    <dunia.return>
-                    { 0x1077def7, QByteArray("\xE9\x04\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
+                                 "\xE9\xAF\x0E\xD9\xFE", 45) }, // jmp    <dunia.return>
+                    { 0x1077def7, QByteArray("\xE9\x24\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
@@ -232,14 +242,14 @@ const QList<FileEntry> files = {
                     { 0x00c444a6, 2 }, // getAdapersInfo()
                     { 0x00ba4cfc, 3 }, // getHostByName()
 
-                    // Fix: Patch Ubisoft endpoints with our own.
+                    // Fix: Swap Ubisoft endpoints with our own.
                     { 0x0105eb28, patch_endpoint_config_host, ".rdata" },
                     { 0x0105fdd0, patch_endpoint_stun_host, ".rdata" },
                     { 0x0105fde4, patch_endpoint_stun_host, ".rdata" },
                     { 0x0105fdf8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
-                    // Tweak: Replace game id with dev version.
+                    // Tweak: Replace game_id with dev version.
                     { 0x01042f50, patch_dev_dedicated_server_id, ".rdata" }, // game_id
 
                     // Fix: Custom map download
@@ -305,14 +315,14 @@ const QList<FileEntry> files = {
                     { 0x00c46a66, 2 }, // getAdapersInfo()
                     { 0x00ba714c, 3 }, // getHostByName()
 
-                    // Fix: Patch Ubisoft endpoints with our own.
+                    // Fix: Swap Ubisoft endpoints with our own.
                     { 0x01061b78, patch_endpoint_config_host, ".rdata" },
                     { 0x01062e20, patch_endpoint_stun_host, ".rdata" },
                     { 0x01062e34, patch_endpoint_stun_host, ".rdata" },
                     { 0x01062e48, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
-                    // Tweak: Replace game id with dev version.
+                    // Tweak: Replace game_id with dev version.
                     { 0x01045fb0, patch_dev_dedicated_server_id, ".rdata" }, // game_id
 
                     // Fix: Custom map download
