@@ -38,8 +38,11 @@ const constexpr uint16_t patch_endpoint_config_port = 3074;
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
 const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
-const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
-const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
+//const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
+//const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
+
+const QByteArray patch_dev_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
+const QByteArray patch_dev_dedicated_server_id = QByteArray("9cc10a3d6fb2cc872794b475104c204e");
 
 // Reusable assembly constants.
 const QByteArray asm_jmp("\xEB", 1);
@@ -409,7 +412,7 @@ const QList<FileEntry> files = {
                     { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
-                    //{ 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
+                    { 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
 
                     //{ 0x0052c8d3, asm_nop(2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, asm_nop(2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
