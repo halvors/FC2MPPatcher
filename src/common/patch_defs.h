@@ -262,7 +262,7 @@ const QList<FileEntry> files = {
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <fc2serverlauncher.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\xBC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
@@ -271,7 +271,7 @@ const QList<FileEntry> files = {
                                  "\x58"                         // pop    eax
                                  "\x59"                         // pop    ecx
                                  "\xE9\x38\x91\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
-                    { 0x00ab8160, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
                     { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
@@ -334,7 +334,7 @@ const QList<FileEntry> files = {
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <fc2serverlauncher.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\x74\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\xFF\x15\xA0\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
