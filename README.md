@@ -47,7 +47,7 @@ Also please be aware that IP addresses shown in server logs may be misleading, n
 https://discord.gg/82G9Fh5
 
 ### Getting in touch with other players
-https://discord.gg/2XgQzhd
+discord.link/FC2
 
 ## Thanks to
 ### Contributors
