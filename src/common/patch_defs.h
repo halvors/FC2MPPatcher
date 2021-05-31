@@ -11,7 +11,7 @@ const QStringList patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_",                   // genOneTimeKey()
+    "_ZN7MPPatch13genOneTimeKeyEPhPjPcS2_S2_",                    // genOneTimeKey()
     "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
 };
 
@@ -38,11 +38,11 @@ const constexpr uint16_t patch_endpoint_config_port = 3074;
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
 const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
-//const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
-//const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
+const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
+const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
 
-const QByteArray patch_dev_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
-const QByteArray patch_dev_dedicated_server_id = QByteArray("9cc10a3d6fb2cc872794b475104c204e");
+//const QByteArray patch_dev_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
+//const QByteArray patch_dev_dedicated_server_id = QByteArray("9cc10a3d6fb2cc872794b475104c204e");
 
 // Reusable assembly constants.
 const QByteArray asm_jmp("\xEB", 1);
@@ -184,7 +184,7 @@ const QList<FileEntry> files = {
                     { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Fix: Change function call genOneTimeKey() to instead call external.
-                    { QByteArray("\xFF\x15\x10\xBA\x9E\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                    { QByteArray("\xFF\x15\x0C\xBA\x9E\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                  "\xE9\x02\x7A\x23\xFF", 11) }, // jmp    dunia.119ED040
                     { 0x10c24a08, QByteArray("\xE9\xF3\x85\xDC\x00", 5) }, // change function call to instead jump to the .text_p section.
 
@@ -201,7 +201,7 @@ const QList<FileEntry> files = {
                                  "\x84\xC0"                     // test   al,al
                                  "\x75\x16"                     // jne    <dunia.lan>
                                  "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\x14\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\xFF\x15\x10\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                  "\x8B\xC8"                     // mov    ecx,eax
                                  "\x58"                         // pop    eax
                                  "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx

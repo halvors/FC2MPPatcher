@@ -87,7 +87,7 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-int __cdecl MPPatch::genOneTimeKey(char *out, uint64_t *outLen, char *challenge, char *username, char *password)
+int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password)
 {
     //QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
     //passwordHash.addData(password, strlen(password));
