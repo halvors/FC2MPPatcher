@@ -6,7 +6,7 @@ TARGET = argon2
 DESTDIR = $$PWD
 TEMPLATE = lib
 CONFIG += \
-        c++17 \
+        c++20 \
         staticlib
 
 # The following define makes your compiler emit warnings if you use

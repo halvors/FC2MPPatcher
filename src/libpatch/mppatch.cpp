@@ -7,7 +7,8 @@
 #include "mppatch.h"
 #include "defs.h"
 #include "patch_defs.h"
-#include "utils.h"
+#include "netutils.h"
+#include "cryptoutils.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
@@ -18,7 +19,7 @@ void MPPatch::readSettings()
     QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
 
     settings->beginGroup(patch_configuration_network);
-        QNetworkInterface networkInterface = Utils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
+        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
@@ -92,7 +93,7 @@ int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challen
     //QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
     //passwordHash.addData(password, strlen(password));
 
-    QByteArray passwordHash = Utils::hashPassword(password);
+    QByteArray passwordHash = CryptoUtils::hashPassword(password);
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username, strlen(username));

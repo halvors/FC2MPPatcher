@@ -1,15 +1,13 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef NETUTILS_H
+#define NETUTILS_H
 
 class QNetworkInterface;
 class QString;
-class QByteArray;
 
-class Utils {
+class NetUtils {
 public:
     static bool isValid(const QNetworkInterface &networkInterface);
     static QNetworkInterface findValidInterface(const QString &networkInterfaceName);
-    static QByteArray hashPassword(const QByteArray &password);
 };
 
-#endif // UTILS_H
+#endif // NETUTILS_H

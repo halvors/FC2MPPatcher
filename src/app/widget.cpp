@@ -13,7 +13,7 @@
 #include "ui_widget.h"
 #include "installdir.h"
 #include "fileutils.h"
-#include "utils.h"
+#include "netutils.h"
 #include "patcher.h"
 
 Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget *parent) :
@@ -172,7 +172,7 @@ void Widget::populateComboboxWithNetworkInterfaces() const
     // Loop thru all of the systems network interfaces.
     for (const QNetworkInterface &interface : interfaces) {
         // Only consider active network interfaces and not loopback interfaces.
-        if (!Utils::isValid(interface))
+        if (!NetUtils::isValid(interface))
             continue;
 
         // Scan thru addresses for this interface.
