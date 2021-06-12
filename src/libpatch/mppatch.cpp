@@ -98,7 +98,7 @@ int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challen
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username, strlen(username));
     oneTimeHash.addData(challenge, strlen(challenge));
-    oneTimeHash.addData(passwordHash.toHex()); // TODO: Is toHex() needed here?...
+    oneTimeHash.addData(passwordHash); // TODO: Is toHex() needed here?...
 
     QByteArray result = oneTimeHash.result().toHex();
 
