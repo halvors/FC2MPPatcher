@@ -1,3 +1,6 @@
 [submodule "lib/libpebliss"]
 	path = lib/libpebliss
 	url = https://github.com/halvors/libpebliss.git
+[submodule "lib/libargon2"]
+	path = lib/libargon2
+	url = https://github.com/halvors/libargon2.git

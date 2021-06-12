@@ -49,3 +49,9 @@ INCLUDEPATH += $$PWD/../../lib/libpebliss/pe_lib
 DEPENDPATH += $$PWD/../../lib/libpebliss/pe_lib
 
 LIBS += -L$$PWD/../../lib/libpebliss -lpebliss
+
+# Argon2
+INCLUDEPATH += $$PWD/../../lib/libargon2/include
+DEPENDPATH += $$PWD/../../lib/libargon2/include
+
+LIBS += -L$$PWD/../../lib/libargon2 -largon2
