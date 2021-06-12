@@ -1,14 +1,13 @@
-QT -= gui
+QT -= \
+    core \
+    gui
 
-QT += network
-
-TARGET = mppatch
+TARGET = argon2
+DESTDIR = $$PWD
 TEMPLATE = lib
 CONFIG += \
-    c++17 \
-    skip_target_version_ext
-
-DEFINES += MPPATCH_LIBRARY
+        c++17 \
+        staticlib
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -21,22 +20,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+SOURCES += \
+    $$PWD/src/argon2.c \
+    $$PWD/src/core.c \
+    $$PWD/src/blake2/blake2b.c \
+    $$PWD/src/thread.c \
+    $$PWD/src/encoding.c \
+    $$PWD/src/ref.c
+
 HEADERS += \
-    httprequest.h \
-    mppatch.h \
-    mppatch_global.h
+    $$PWD/include/argon2.h \
+    $$PWD/src/core.h \
+    $$PWD/src/blake2/blake2.h \
+    $$PWD/src/blake2/blake2-impl.h \
+    $$PWD/src/blake2/blamka-round-ref.h \
+    $$PWD/src/thread.h \
+    $$PWD/src/encoding.h
 
-SOURCES += mppatch.cpp
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
 
-include(../common/common.pri)
-
-# Argon2
-INCLUDEPATH += $$PWD/../../lib/libargon2/include
-DEPENDPATH += $$PWD/../../lib/libargon2/include
-
-LIBS += -L$$PWD/../../lib/libargon2 -largon2
-
-# Including needed Windows libraries.
-LIBS += \
-    -lws2_32 \
-    -lIPHLPAPI
+INCLUDEPATH += $$PWD/include
+DEPENDPATH += $$PWD/include

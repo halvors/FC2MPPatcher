@@ -7,8 +7,8 @@ DEPENDPATH += $$PWD
 HEADERS += \
     $$PWD/defs.h \
     $$PWD/entry.h \
-    $$PWD/netutils.h \
-    $$PWD/patch_defs.h
+    $$PWD/patch_defs.h \
+    $$PWD/utils.h
 
 SOURCES += \
-    $$PWD/netutils.cpp
+    $$PWD/utils.cpp

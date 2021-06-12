@@ -7,7 +7,7 @@
 #include "mppatch.h"
 #include "defs.h"
 #include "patch_defs.h"
-#include "netutils.h"
+#include "utils.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
@@ -18,7 +18,7 @@ void MPPatch::readSettings()
     QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
 
     settings->beginGroup(patch_configuration_network);
-        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
+        QNetworkInterface networkInterface = Utils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
@@ -92,13 +92,12 @@ int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challen
     //QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
     //passwordHash.addData(password, strlen(password));
 
-    QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Sha256);
-    passwordHash.addData(password);
+    QByteArray passwordHash = Utils::hashPassword(password);
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username, strlen(username));
     oneTimeHash.addData(challenge, strlen(challenge));
-    oneTimeHash.addData(passwordHash.result().toHex().toUpper());
+    oneTimeHash.addData(passwordHash.toHex()); // TODO: Is toHex() needed here?...
 
     QByteArray result = oneTimeHash.result().toHex();
 

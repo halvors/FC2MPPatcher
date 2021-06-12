@@ -48,4 +48,4 @@ include(../common/common.pri)
 INCLUDEPATH += $$PWD/../../lib/libpebliss/pe_lib
 DEPENDPATH += $$PWD/../../lib/libpebliss/pe_lib
 
-LIBS += -L$$PWD/../../lib/libpebliss/lib -lpebliss
+LIBS += -L$$PWD/../../lib/libpebliss -lpebliss

@@ -1,7 +1,7 @@
 #include <QDebug>
 
 #include "console.h"
-#include "netutils.h"
+#include "utils.h"
 #include "installdir.h"
 #include "defs.h"
 #include "patcher.h"
@@ -15,7 +15,7 @@ Console::Console(const QString &installDir, const QString &interfaceName, QObjec
     if (InstallDir::isGameDirectory(installDir))
         this->installDir = installDir;
 
-    this->interface = NetUtils::findValidInterface(interfaceName);
+    this->interface = Utils::findValidInterface(interfaceName);
 }
 
 Console::~Console()
