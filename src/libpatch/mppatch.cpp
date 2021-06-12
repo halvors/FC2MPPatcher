@@ -90,15 +90,12 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
 
 int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password)
 {
-    //QCryptographicHash passwordHash(QCryptographicHash::Algorithm::Md5);
-    //passwordHash.addData(password, strlen(password));
-
     QByteArray passwordHash = CryptoUtils::hashPassword(password);
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username, strlen(username));
     oneTimeHash.addData(challenge, strlen(challenge));
-    oneTimeHash.addData(passwordHash); // TODO: Is toHex() needed here?...
+    oneTimeHash.addData(passwordHash.toHex());
 
     QByteArray result = oneTimeHash.result().toHex();
 
