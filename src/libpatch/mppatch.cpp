@@ -1,13 +1,14 @@
 #include <QSettings>
 #include <QNetworkInterface>
 #include <QHostAddress>
-
-#include <iostream>
+#include <QCryptographicHash>
+#include <cstring>
 
 #include "mppatch.h"
 #include "defs.h"
 #include "patch_defs.h"
 #include "netutils.h"
+#include "cryptoutils.h"
 #include "HTTPRequest.h"
 
 void MPPatch::readSettings()
@@ -87,6 +88,23 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
+int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password)
+{
+    QByteArray passwordHash = CryptoUtils::hashPassword(password);
+
+    QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
+    oneTimeHash.addData(username, strlen(username));
+    oneTimeHash.addData(challenge, strlen(challenge));
+    oneTimeHash.addData(passwordHash.toHex());
+
+    QByteArray result = oneTimeHash.result().toHex();
+
+    *outLen = result.size();
+    std::memcpy(out, result.constData(), *outLen);
+
+    return 0;
+}
+
 uint32_t __stdcall MPPatch::getPublicIPAddress()
 {
     // Return cached address if it exists.
@@ -104,23 +122,6 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
     } catch (const std::exception &e) {
 
     }
-
-    /*
-    // Query for public ip address.
-    QNetworkAccessManager *con = new QNetworkAccessManager();
-    QNetworkReply *reply = con->get(QNetworkRequest(QUrl("http://api.ipify.org")));
-
-    // Trick to do this synchronously.
-    QEventLoop loop;
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-
-    if (reply->error() == QNetworkReply::NoError)
-        publicAddress = QHostAddress(reply->readAll().constData()).toIPv4Address();
-
-    delete reply;
-    delete con;
-    */
 
     return publicAddress;
 }

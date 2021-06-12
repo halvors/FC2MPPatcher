@@ -22,13 +22,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
+    cryptoutils.h \
     httprequest.h \
     mppatch.h \
     mppatch_global.h
 
-SOURCES += mppatch.cpp
+SOURCES += mppatch.cpp \
+    cryptoutils.cpp
 
 include(../common/common.pri)
+
+# Argon2
+INCLUDEPATH += $$PWD/../../lib/libargon2/include
+DEPENDPATH += $$PWD/../../lib/libargon2/include
+
+LIBS += -L$$PWD/../../lib/libargon2 -largon2
 
 # Including needed Windows libraries.
 LIBS += \

@@ -1,5 +1,8 @@
 #include "netutils.h"
 
+#include <QNetworkInterface>
+#include <QString>
+
 bool NetUtils::isValid(const QNetworkInterface &networkInterface)
 {
     QNetworkInterface::InterfaceFlags flags = networkInterface.flags();

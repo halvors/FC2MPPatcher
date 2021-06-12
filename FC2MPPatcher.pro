@@ -4,14 +4,16 @@ SUBDIRS += \
     libpebliss \
     app
 
-win32 {
-    SUBDIRS += libpatch
-}
-
-# Where to find the sub projects - give the folders
 libpebliss.subdir = lib/libpebliss
 app.subdir = src/app
-libpatch.subdir = src/libpatch
-
-# What subproject depends on others
 app.depends = libpebliss
+
+win32 {
+    SUBDIRS += \
+        libargon2 \
+        libpatch
+
+    libargon2.subdir = lib/libargon2
+    libpatch.subdir = src/libpatch
+    libpatch.depends = libargon2
+}

@@ -1,8 +1,8 @@
 #ifndef NETUTILS_H
 #define NETUTILS_H
 
-#include <QNetworkInterface>
-#include <QString>
+class QNetworkInterface;
+class QString;
 
 class NetUtils {
 public:
