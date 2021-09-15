@@ -3,7 +3,6 @@
 
 #include <QByteArray>
 #include <QList>
-
 #include "entry.h"
 
 const QStringList patch_library_functions = {
@@ -38,11 +37,22 @@ const constexpr uint16_t patch_endpoint_config_port = 3074;
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
 const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
-const QByteArray patch_dev_game_id = QByteArray("88838b37e409143c9319694a6418df42");
-const QByteArray patch_dev_dedicated_server_id = QByteArray("3776f77a31dfdb6b34f6e689ee132d02");
+const QList<QByteArray> agoraIdList = {
+    "2c66b725e7fb0697c0595397a14b0bc8", // Ubi (Retail)
+    "5865cbb3ffd54d7eb2ba667044b0cab1", // Ubi (Steam)
+    "9cc10a3d6fb2cc872794b475104c204e", // Ubi (Dedicated server)
 
-//const QByteArray patch_dev_game_id = QByteArray("2c66b725e7fb0697c0595397a14b0bc8");
-//const QByteArray patch_dev_dedicated_server_id = QByteArray("9cc10a3d6fb2cc872794b475104c204e");
+    "9c111cf209674ba51a79523f848b17fa", // Staging (Retail)
+    "6d748d974900863b0bc45fe3c9d99311", // Staging (Steam)
+    "ace72bbedda97396a7807ea10e1b87cf", // Staging (Dedicated server)
+
+    "787292792231d5d89f9015576217b5a4", // Dev (Retail)
+    "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
+    "d75461366f6cabb69e833dbe61fc904a", // Dev (Dedicated server)
+
+    "88838b37e409143c9319694a6418df42", // Staging (Steam) // TODO: To be removed
+    "3776f77a31dfdb6b34f6e689ee132d02"  // Staging (Dedicated server) // TODO: To be removed
+};
 
 // Reusable assembly constants.
 const QByteArray asm_jmp("\xEB", 1);
@@ -93,8 +103,11 @@ const QList<FileEntry> files = {
                     { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
+                    // Tweak: Replace game_id with staging version.
+                    //{ 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
+
                     // Tweak: Replace game_id with dev version.
-                    { 0x10dba4c4, patch_dev_game_id, ".rdata" }, // game_id
+                    { 0x10dba4c4, agoraIdList[6], ".rdata" }, // game_id
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
@@ -174,8 +187,11 @@ const QList<FileEntry> files = {
                     { 0x10f07df8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Client */
+                    // Tweak: Replace game_id with staging version.
+                    //{ 0x10e420c0, agoraIdList[4], ".rdata" }, // game_id
+
                     // Tweak: Replace game_id with dev version.
-                    { 0x10e420c0, patch_dev_game_id, ".rdata" }, // game_id
+                    { 0x10e420c0, agoraIdList[7], ".rdata" }, // game_id
 
                     // Fix: Swap Ubisoft endpoints with our own.
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
@@ -252,8 +268,11 @@ const QList<FileEntry> files = {
                     { 0x0105fdf8, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
+                    // Tweak: Replace game_id with staging version.
+                    //{ 0x01042f50, agoraIdList[5], ".rdata" }, // game_id
+
                     // Tweak: Replace game_id with dev version.
-                    { 0x01042f50, patch_dev_dedicated_server_id, ".rdata" }, // game_id
+                    { 0x01042f50, agoraIdList[8], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -325,8 +344,11 @@ const QList<FileEntry> files = {
                     { 0x01062e48, patch_endpoint_stun_host, ".rdata" },
 
                     /* Server */
+                    // Tweak: Replace game_id with staging version.
+                    //{ 0x01045fb0, agoraIdList[5], ".rdata" }, // game_id
+
                     // Tweak: Replace game_id with dev version.
-                    { 0x01045fb0, patch_dev_dedicated_server_id, ".rdata" }, // game_id
+                    { 0x01045fb0, agoraIdList[8], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
