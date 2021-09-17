@@ -105,10 +105,10 @@ const QList<FileEntry> files = {
 
                     /* Client */
                     // Tweak: Replace game_id with staging version.
-                    //{ 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
+                    { 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
 
                     // Tweak: Replace game_id with dev version.
-                    { 0x10dba4c4, agoraIdList[6], ".rdata" }, // game_id
+                    //{ 0x10dba4c4, agoraIdList[6], ".rdata" }, // game_id
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
                     { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
@@ -191,10 +191,10 @@ const QList<FileEntry> files = {
 
                     /* Client */
                     // Tweak: Replace game_id with staging version.
-                    //{ 0x10e420c0, agoraIdList[4], ".rdata" }, // game_id
+                    { 0x10e420c0, agoraIdList[4], ".rdata" }, // game_id
 
                     // Tweak: Replace game_id with dev version.
-                    { 0x10e420c0, agoraIdList[7], ".rdata" }, // game_id
+                    //{ 0x10e420c0, agoraIdList[7], ".rdata" }, // game_id
 
                     // Fix: Swap Ubisoft endpoints with our own.
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
@@ -273,10 +273,10 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Tweak: Replace game_id with staging version.
-                    //{ 0x01042f50, agoraIdList[5], ".rdata" }, // game_id
+                    { 0x01042f50, agoraIdList[5], ".rdata" }, // game_id
 
                     // Tweak: Replace game_id with dev version.
-                    { 0x01042f50, agoraIdList[8], ".rdata" }, // game_id
+                    //{ 0x01042f50, agoraIdList[8], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -351,10 +351,10 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Tweak: Replace game_id with staging version.
-                    //{ 0x01045fb0, agoraIdList[5], ".rdata" }, // game_id
+                    { 0x01045fb0, agoraIdList[5], ".rdata" }, // game_id
 
                     // Tweak: Replace game_id with dev version.
-                    { 0x01045fb0, agoraIdList[8], ".rdata" }, // game_id
+                    //{ 0x01045fb0, agoraIdList[8], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
