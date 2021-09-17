@@ -177,12 +177,11 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
-            QHostAddress hostAddress = addressEntry.ip();
+            const QHostAddress hostAddress = addressEntry.ip();
 
             // Only select first IPv4 address found.
-            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
+            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol)
                 ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + hostAddress.toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 #ifndef CRYPTOUTILS_H
 #define CRYPTOUTILS_H
 
-#include <cstdint>
+
 
 #define HASH_LENGTH 32
 
@@ -10,7 +10,9 @@
 #define PARALLELISM 1       // number of threads and lanes.
 #define SALT_LENGTH 16
 
-class QByteArray;
+#include <cstdint>
+
+#include <QByteArray>
 
 class CryptoUtils
 {

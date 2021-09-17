@@ -73,9 +73,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "cd14c176f0e86cc5b362e91badf32d882e54be0ecec85057d5200206433c1cff" }
+                      "9bfb6cf3be83af54a3625df887bf6a3aeacb13dd32a683a282c4fc4f03a4d50f" }
                 },
                 {
+                    { "cd14c176f0e86cc5b362e91badf32d882e54be0ecec85057d5200206433c1cff" }, // Hash for Retail version 0.1.14.
                     { "7f0ff9ac6b07c17944df76beb563ad4d9a35cd7832f4f3f2d6aa5da1f482d9b8" }, // Hash for Retail version 0.1.13.
                     { "58b30f35da8afc9ac5de2f526d97846234d2cd332195b5a3567265702d5bb077" }, // Hash for Retail version 0.1.12.
                     { "a3ae457d942ae499d79c583f32e356cc101ffe1a221aae9220d1ac64695f3c79" }, // Hash for Retail version 0.1.11.
@@ -147,12 +148,14 @@ const QList<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "03175df34cde45fccc02fc0c23d4aca40eef49cf228dfdc5932069a941082fa7" },
+                      "3cb9feaf36ac1c057a3fac56e57f3a60bd0f7749f26d3ad55e9366bdbdd7d696" },
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "1d8da17ef910181520a03005710fe6a2a56c10277ddecf8cab5ea4371e228c3f" }
+                      "b32d68ad40ad1e7cd7fc22836125b9b6ea25c8c2e4d17801ad8efeda58876ea3" }
                 },
                 {
+                    { "03175df34cde45fccc02fc0c23d4aca40eef49cf228dfdc5932069a941082fa7" }, // Hash for Steam version 0.1.14.
+                    { "1d8da17ef910181520a03005710fe6a2a56c10277ddecf8cab5ea4371e228c3f" }, // Hash for Uplay version 0.1.14.
                     { "98f0a42ead437a2587a2695da2a7a54aceff691c7228b8878cce54e838fc271b" }, // Hash for Steam version 0.1.13.
                     { "1f3049ee8991b639b9370b01be17c3ab9b68da6024651596520fd5e2037c11ed" }, // Hash for Uplay version 0.1.13.
                     { "d5c17109e9cc7d4f8b73804ac5a905952a858bd2ec09d359f49a46719eb30b4e" }, // Hash for Steam version 0.1.12.
@@ -238,9 +241,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "418b8393f912bb6cdede77360914fc32979964aab1950d240f15ceb35ad80da0" }
+                      "26a9f3a1cf1880df79e395006b0fb595767c10b0265283e4e9928353d30f1e79" }
                 },
                 {
+                    { "418b8393f912bb6cdede77360914fc32979964aab1950d240f15ceb35ad80da0" }, // Hash for Retail version 0.1.14.
                     { "20a85ddbff6a6a0fc35aa3ddaff9e4d08ce660000b9568731c39b3d94ac38e8d" }, // Hash for Retail version 0.1.13.
                     { "31738feedf18d2459ce8cb62589bcdc59254be7060dbbdd0d1cbe485efbacdd2" }, // Hash for Retail version 0.1.12.
                     { "9d9bbce845d81ab01821593f45783de5aba886a4133881cad265245e14247732" }, // Hash for Retail version 0.1.11.
@@ -306,12 +310,14 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "b3d4c57e6ad51c6e4615106329a5c33d0121c25f5c5e22da80201c2488f78c5c" },
+                      "db5cfd6e70ea8abe54c221aff028132ec581684755a687e21aad7173cd57856c" },
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "86a5701effea1bc0f51dc8dfe19b007bce73998b37956b3079eb58b4652c96ff" }
+                      "258d1c9461c751f245d8b8c93894ffa9957e064b2b8a87a9dec9303c21ff595f" }
                 },
                 {
+                    { "b3d4c57e6ad51c6e4615106329a5c33d0121c25f5c5e22da80201c2488f78c5c" }, // Hash for Steam version 0.1.14.
+                    { "86a5701effea1bc0f51dc8dfe19b007bce73998b37956b3079eb58b4652c96ff" }, // Hash for Uplay version 0.1.14.
                     { "0eeba5e94d07b225eca772575283897169b893b755d481e0184c20952e515442" }, // Hash for Steam version 0.1.13.
                     { "ef30f22cff98914d408ba69a6778c00e793c0b1eae128718091df206c3c1bd85" }, // Hash for Uplay version 0.1.13.
                     { "04df9d30bce8f7e22788a2fc7c6bad6719caf0f22de42f936ed7e3ed6cc1dda6" }, // Hash for Steam version 0.1.12.
@@ -434,7 +440,7 @@ const QList<FileEntry> files = {
                     { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
-                    { 0x0052c8d3, asm_nop(2) } // bypass min player limit enforced in ranked mode.
+                    { 0x0052c8d3, asm_nop(2) }, // bypass min player limit enforced in ranked mode.
 
                     //{ 0x0052c8d3, asm_nop(2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, asm_nop(2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
