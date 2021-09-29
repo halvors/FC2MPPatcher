@@ -43,16 +43,13 @@ If hosting a server to be used by players thru VPN, you have to select your VPN 
 Also please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server always listens on 0.0.0.0 (any), which means it's reachable on any network adapter.
 
 ## Discord
-### Getting suppport for the patch
-https://discord.gg/82G9Fh5
-
-### Getting in touch with other players
+### To get support and reach out to other players
 https://discord.link/FC2
 
 ## Thanks to
 ### Contributors
-<i>zenoy and halvors</i> - for patching the assembly code and creating the patcher application.  
-<i>svinsen, FEARIV, Gabor and Lasercar</i> - for help testing and with community support.
+<i>zenoy, halvors and FEARIV</i> - for patching the assembly code, creating the patcher application and web development.  
+<i>svinsen, Gabor and Lasercar</i> - for help testing and with community support.
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
