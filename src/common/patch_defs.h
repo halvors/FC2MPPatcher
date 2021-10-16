@@ -32,7 +32,7 @@ const QStringList patch_library_functions = {
  * Original: stun.ncsa.ubi.com00
  * New:      stun.farcry2.online
  */
-const QByteArray patch_endpoint_config_host = "conf.farcry2.online";
+static const QByteArray patch_endpoint_config_host = "conf.farcry2.online";
 const constexpr uint16_t patch_endpoint_config_port = 3074;
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
 const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";

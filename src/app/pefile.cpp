@@ -231,8 +231,8 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                     }
 
                     qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16)
-                                                                                                                                                       .arg(QByteArray(bytePtr, data.length()).toHex().constData())
-                                                                                                                                                       .arg(data.toHex().constData())
+                                                                                                                                                       .arg(QByteArray(bytePtr, data.length()).toHex().constData(),
+                                                                                                                                                            data.toHex().constData())
                                                                                                                                                        .arg(data.length()));
 
                     // Copy data.

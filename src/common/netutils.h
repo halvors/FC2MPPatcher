@@ -1,12 +1,14 @@
 #ifndef NETUTILS_H
 #define NETUTILS_H
 
-class QNetworkInterface;
-class QString;
+#include <QNetworkInterface>
+#include <QList>
+#include <QString>
 
 class NetUtils {
 public:
     static bool isValid(const QNetworkInterface &networkInterface);
+    static QList<QNetworkInterface> getValidInterfaces();
     static QNetworkInterface findValidInterface(const QString &networkInterfaceName);
 };
 

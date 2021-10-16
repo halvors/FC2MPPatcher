@@ -23,7 +23,7 @@ Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget 
     ui->setupUi(this);
 
     // Set window title.
-    setWindowTitle(QString("%1 %2%3").arg(app_name).arg(APP_VERSION).arg(DEBUG_MODE ? "-dev" : QString()));
+    setWindowTitle(QString("%1 %2%3").arg(app_name).arg(APP_VERSION, DEBUG_MODE ? "-dev" : QString()));
 
     // Set label text.
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
@@ -159,7 +159,7 @@ void Widget::populateComboboxWithInstallDirectories() const
 
 void Widget::populateComboboxWithNetworkInterfaces() const
 {
-    const QList<QNetworkInterface> &interfaces = QNetworkInterface::allInterfaces();
+    const QList<QNetworkInterface> &interfaces = NetUtils::getValidInterfaces();
 
     // If no network interfaces is found, return early.
     if (interfaces.isEmpty()) {
@@ -171,17 +171,14 @@ void Widget::populateComboboxWithNetworkInterfaces() const
 
     // Loop thru all of the systems network interfaces.
     for (const QNetworkInterface &interface : interfaces) {
-        // Only consider active network interfaces and not loopback interfaces.
-        if (!NetUtils::isValid(interface))
-            continue;
-
-        // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
             const QHostAddress hostAddress = addressEntry.ip();
 
             // Only select first IPv4 address found.
-            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol)
+            if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
                 ui->comboBox_network_interface->addItem(interface.humanReadableName() + " (" + hostAddress.toString() + ")", QVariant::fromValue<QNetworkInterface>(interface));
+                break;
+            }
         }
     }
 }

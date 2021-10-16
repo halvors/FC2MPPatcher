@@ -15,6 +15,29 @@ bool NetUtils::isValid(const QNetworkInterface &networkInterface)
            flags.testFlag(QNetworkInterface::CanBroadcast);
 }
 
+QList<QNetworkInterface> NetUtils::getValidInterfaces()
+{
+    QList<QNetworkInterface> list;
+
+    // Loop thru all of the systems network interfaces.
+    for (const QNetworkInterface &interface : QNetworkInterface::allInterfaces()) {
+        // Only consider active network interfaces and not loopback interfaces.
+        if (!NetUtils::isValid(interface))
+            continue;
+
+        // Scan thru addresses for this interface.
+        for (const QNetworkAddressEntry &addressEntry : interface.addressEntries()) {
+            // We're only looking for IPv4 addresses.
+            if (addressEntry.ip().protocol() == QAbstractSocket::IPv4Protocol) {
+                list.push_back(interface);
+                break;
+            }
+        }
+    }
+
+    return list;
+}
+
 QNetworkInterface NetUtils::findValidInterface(const QString &networkInterfaceName)
 {
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
@@ -38,3 +61,5 @@ QNetworkInterface NetUtils::findValidInterface(const QString &networkInterfaceNa
 
     return QNetworkInterface();
 }
+
+
