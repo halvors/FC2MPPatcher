@@ -17,13 +17,13 @@ public:
         NEW_DATA
     };
 
-    CodeEntry(uint32_t address, uint32_t word, const char *section = ".text", Type type = INJECT_SYMBOL) :
+    CodeEntry(const uint32_t address, const uint32_t word, const char *section = ".text", Type type = INJECT_SYMBOL) :
         CodeEntry(address, QByteArray::number(word), section, type) {}
 
     CodeEntry(const QByteArray &data, const char *section = ".text_mp", Type type = NEW_DATA) :
         CodeEntry(0, data, section, type) {}
 
-    CodeEntry(uint32_t address, const QByteArray &data, const char *section = ".text", Type type = INJECT_DATA) :
+    CodeEntry(const uint32_t address, const QByteArray &data, const char *section = ".text", Type type = INJECT_DATA) :
         address(address),
         data(data),
         section(section),
