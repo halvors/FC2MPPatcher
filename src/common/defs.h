@@ -41,6 +41,9 @@ constexpr char game_steam_app_library[] = "libraryfolders.vdf";
 constexpr char pe_patch_rdata_section[] = ".rdata_p";
 constexpr char pe_patch_text_section[] = ".text_p";
 
+// Assembly
+constexpr uint8_t asm_nop = 0x90;
+
 // Patch
 constexpr char patch_library_name[] = "MPPatch";
 const QString patch_library_file = QString(patch_library_name).toLower() + ".dll";

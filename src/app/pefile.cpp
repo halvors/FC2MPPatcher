@@ -73,7 +73,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
     importSection.set_name(pe_patch_rdata_section);
-    importSection.readable(true); //.writeable(true);
+    importSection.readable(true).writeable(true);
     section &attachedImportSection = image->add_section(importSection);
 
     import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
@@ -81,20 +81,21 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings); // Rebuild imports.
 
     // Create .text section for custom assembly code.
-    std::string textData;
-    constexpr uint32_t paddingSpacing = 32;
+    constexpr uint32_t textLength = 1024;
+    std::string textData(textLength, asm_nop);
+    constexpr uint32_t alignToSpacing = 32;
 
     for (const CodeEntry& codeEntry : codeEntries) {
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
 
-        uint32_t paddingBytes = paddingSpacing - (textData.size() % paddingSpacing);
+        const uint32_t paddingBytes = alignToSpacing - (textData.size() % alignToSpacing);
 
-        if (paddingBytes < paddingSpacing)
+        if (paddingBytes < alignToSpacing)
             for (uint32_t i = 0; i < paddingBytes; i++)
-                textData += '\x90';
+                textData += asm_nop;
 
-        textData.append(codeEntry.getData());
+        textData += codeEntry.getData().toStdString();
     }
 
     if (!textData.empty()) {
