@@ -93,7 +93,7 @@ const QList<QByteArray> agoraIdList = {
 // Reusable assembly constants.
 const QByteArray asm_jmp("\xEB", 1);
 
-inline const QByteArray asm_nop(const uint16_t numBytes) {
+inline const QByteArray get_asm_nop(const uint16_t numBytes) {
     QByteArray nop;
 
     for (uint16_t i = 0; i < numBytes; i++)
@@ -145,7 +145,7 @@ const QList<FileEntry> files = {
                     { 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
-                    { 0x10c1354c, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+                    { 0x10c1354c, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // Fix: Change function call genOneTimeKey() to instead call external.
                     { QByteArray("\xFF\x15\x08\xD7\x92\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
@@ -153,7 +153,7 @@ const QList<FileEntry> files = {
                     { 0x10c1372b, QByteArray("\xE9\xD0\xB8\xD1\x00", 5) }, // change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
-                    { 0x105f2338, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
+                    { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
                     /* Server */
                     // Fix: Custom map download
@@ -175,7 +175,7 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xCF\x24\xE4\xFE", 45) }, // jmp    <dunia.return>
                     { 0x10771517, QByteArray("\xE9\x04\xDB\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x10cb2588, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
             { // Steam and Uplay
@@ -234,7 +234,7 @@ const QList<FileEntry> files = {
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
-                    { 0x10c24829, asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+                    { 0x10c24829, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
                     // TODO: Add agora root public key here.
 
@@ -244,7 +244,7 @@ const QList<FileEntry> files = {
                     { 0x10c24a08, QByteArray("\xE9\xF3\x85\xDC\x00", 5) }, // change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
-                    { 0x105ffc78, asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
+                    { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
                     /* Server */
                     // Fix: Custom map download
@@ -282,7 +282,7 @@ const QList<FileEntry> files = {
                     */
 
                     { 0x1077def7, QByteArray("\xE9\x24\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x10ceb6c8, asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
         }
@@ -348,12 +348,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\x38\x91\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
                     { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004ecb38, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x004ecb38, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
-                    { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094c74b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(get_asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094c943, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x00661eac, asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x00661eac, get_asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
                 }
             },
             { // Steam (R2 is identical) and Uplay
@@ -425,12 +425,12 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\xE9\xD8\x10\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
                     { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
-                    { 0x004ec828, asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    { 0x004ec828, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
-                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
+                    { 0x0094d39b, QByteArray("\xE9\xA9\x00\x00\x00", 5).append(get_asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094d593, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x0067552c, asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x0067552c, get_asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client join.
                     { QByteArray("\x68\x78\x3F\x04\x01"         // push   fc2serverlauncher.1043F78
@@ -458,7 +458,7 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\x58"                         // pop    eax
                                  "\xE9\x13\x28\x55\xFF", 64) }, // nop    nop nop
-                    { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
+                    { 0x00d0488d, QByteArray("\xE9\xAE\xD7\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
@@ -487,10 +487,10 @@ const QList<FileEntry> files = {
                                  "\x59"                         // pop    ecx
                                  "\x58"                         // pop    eax
                                  "\xE9\x23\x29\x55\xFF", 64) }, // nop    nop nop
-                    { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(asm_nop(1)) }, // change function call to instead jump to the .text_p section.
+                    { 0x00d049dd, QByteArray("\xE9\x9E\xD6\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */
-                    { 0x0052c8d3, asm_nop(2) }, // bypass min player limit enforced in ranked mode.
+                    { 0x0052c8d3, get_asm_nop(2) }, // bypass min player limit enforced in ranked mode.
 
                     //{ 0x0052c8d3, asm_nop(2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, asm_nop(2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
