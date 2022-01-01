@@ -82,30 +82,31 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
 
     // Create .text section for custom assembly code.
     constexpr uint32_t textLength = 1024;
-    std::string textData(textLength, asm_nop);
     constexpr uint32_t alignToSpacing = 32;
+    std::string textBytes(textLength, asm_nop);
 
     for (const CodeEntry& codeEntry : codeEntries) {
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
 
-        const uint32_t paddingBytes = alignToSpacing - (textData.size() % alignToSpacing);
+        const uint32_t paddingBytes = alignToSpacing - (textBytes.size() % alignToSpacing);
 
         if (paddingBytes < alignToSpacing)
             for (uint32_t i = 0; i < paddingBytes; i++)
-                textData += asm_nop;
+                textBytes += asm_nop;
 
-        textData += codeEntry.getData().toStdString();
+        textBytes += codeEntry.getData().toStdString();
     }
 
-    if (!textData.empty()) {
-        section textSection;
-        //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
-        textSection.set_name(pe_patch_text_section);
-        textSection.readable(true).executable(true);
-        textSection.set_raw_data(textData);
-        image->add_section(textSection);
-    }
+    // Extend to minimal length of section
+    textBytes.append(textLength - textBytes.size(), asm_nop);
+
+    section textSection;
+    //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
+    textSection.set_name(pe_patch_text_section);
+    textSection.readable(true).executable(true);
+    textSection.set_raw_data(textBytes);
+    image->add_section(textSection);
 
     // Patch the existing code.
     patchCode(libraryFile, libraryFunctions, codeEntries);
