@@ -73,7 +73,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     section importSection;
     importSection.get_raw_data().resize(1);	// We cannot add empty sections, so let it be the initial data size 1.
     importSection.set_name(pe_patch_rdata_section);
-    importSection.readable(true).writeable(true);
+    importSection.readable(true); //.writeable(true);
     section &attachedImportSection = image->add_section(importSection);
 
     import_rebuilder_settings settings; // Modify the PE header and do not clear the IMAGE_DIRECTORY_ENTRY_IAT field.
@@ -81,28 +81,28 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings); // Rebuild imports.
 
     // Create .text section for custom assembly code.
-    QByteArray textData;
-    const int paddingSpacing = 32;
+    std::string textData;
+    constexpr uint32_t paddingSpacing = 32;
 
-    for (const CodeEntry &codeEntry : codeEntries) {
+    for (const CodeEntry& codeEntry : codeEntries) {
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
 
-        int paddingBytes = paddingSpacing - (textData.size() % paddingSpacing);
+        uint32_t paddingBytes = paddingSpacing - (textData.size() % paddingSpacing);
 
         if (paddingBytes < paddingSpacing)
-            for (int i = 0; i < paddingBytes; i++)
-                textData.append('\x00');
+            for (uint32_t i = 0; i < paddingBytes; i++)
+                textData += '\x90';
 
         textData.append(codeEntry.getData());
     }
 
-    if (!textData.isEmpty()) {
+    if (!textData.empty()) {
         section textSection;
-        textSection.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
+        //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
         textSection.set_name(pe_patch_text_section);
         textSection.readable(true).executable(true);
-        textSection.set_raw_data(textData.toStdString());
+        textSection.set_raw_data(textData);
         image->add_section(textSection);
     }
 
