@@ -81,25 +81,37 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings); // Rebuild imports.
 
     // Create .text section for custom assembly code.
-    constexpr uint32_t textLength = 1024;
-    constexpr uint32_t alignToSpacing = 32;
-    std::string textBytes(textLength, asm_nop);
+    constexpr size_t textLength = 1024;
+    constexpr size_t alignToSpacingBytes = 32;
+    std::string textBytes;
+
+    //qDebug() << "File size: " << image->get_file_alignment();
+    uint32_t test = image->get_file_alignment();
+    textBytes.append((char*)&test, sizeof(test));
+
+    auto pad = [](std::string& bytes, const size_t numBytes) {
+        bytes.append(numBytes, asm_nop);
+    };
 
     for (const CodeEntry& codeEntry : codeEntries) {
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
 
-        const uint32_t paddingBytes = alignToSpacing - (textBytes.size() % alignToSpacing);
+        const size_t numPaddingBytes = alignToSpacingBytes - (textBytes.size() % alignToSpacingBytes);
 
-        if (paddingBytes < alignToSpacing)
-            for (uint32_t i = 0; i < paddingBytes; i++)
-                textBytes += asm_nop;
+        if (numPaddingBytes < alignToSpacingBytes)
+            textBytes.append(numPaddingBytes, asm_nop);
 
         textBytes += codeEntry.getData().toStdString();
     }
 
     // Extend to minimal length of section
-    textBytes.append(textLength - textBytes.size(), asm_nop);
+    const int numPaddingBytes = textLength - textBytes.size(); // Be careful of overflow here, using signed int for that reason
+
+    if (numPaddingBytes < 0)
+        textBytes.append(numPaddingBytes, asm_nop);
+
+    pad(textBytes, textLength - textBytes.size());
 
     section textSection;
     //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.
