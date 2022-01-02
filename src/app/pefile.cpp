@@ -10,7 +10,7 @@
 PeFile::PeFile(const QFile &file, QObject *parent) :
     QObject(parent),
     file(file)
-{    
+{
     // Read PE from file.
     read();
 }
@@ -22,7 +22,7 @@ PeFile::~PeFile()
 }
 
 bool PeFile::read()
-{ 
+{
     // Open the file.
     std::ifstream inputStream(file.fileName().toStdString(), std::ios::in | std::ios::binary);
 
@@ -81,7 +81,6 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     rebuild_imports(*image, imports, attachedImportSection, settings); // Rebuild imports.
 
     // Create .text section for custom assembly code.
-    constexpr uint32_t textLength = 1024;
     constexpr uint32_t alignToSpacingBytes = 32;
     std::string textBytes;
 
@@ -102,9 +101,9 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     }
 
     // Extend to minimal length of section
-    const int numPaddingBytes = textLength - textBytes.size(); // Be careful of overflow here, using signed int for that reason
+    const int numPaddingBytes = image->get_section_alignment() - textBytes.size(); // Be careful of overflow here, using signed int for that reason
 
-    if (numPaddingBytes < 0)
+    if (numPaddingBytes > 0)
         textBytes.append(numPaddingBytes, asm_nop);
 
     section textSection;
