@@ -111,9 +111,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }
+                      "03d66fe3a9a683ed6985e49a439764684a9a3f7e0aafddbb19231fabaf801392" }
                 },
                 {
+                    { "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }, // Hash for Retail version 0.1.17.
                     { "9bfb6cf3be83af54a3625df887bf6a3aeacb13dd32a683a282c4fc4f03a4d50f" }, // Hash for Retail version 0.1.16.
                     { "cd14c176f0e86cc5b362e91badf32d882e54be0ecec85057d5200206433c1cff" }, // Hash for Retail version 0.1.14.
                     { "7f0ff9ac6b07c17944df76beb563ad4d9a35cd7832f4f3f2d6aa5da1f482d9b8" }, // Hash for Retail version 0.1.13.
@@ -200,13 +201,15 @@ const QList<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "7af71319ef055fcc2193862ea43cf63dca92a957eb1c19c3956c72faaaf94804" },
+                      "0ddf307814b87828e008008daf78d688fbd263fb838800dce09dcc5c08135c61" },
 
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "5391e8b949ecf8b6506b925814c1d8d77d134d83660fb593645c2ed466c02282" }
+                      "998fa74a2c5ed60033e35ba929fa013effb8b833d557d2a4b57c79b326b7d033" }
                 },
                 {
+                    { "7af71319ef055fcc2193862ea43cf63dca92a957eb1c19c3956c72faaaf94804" }, // Hash for Steam version 0.1.17.
+                    { "5391e8b949ecf8b6506b925814c1d8d77d134d83660fb593645c2ed466c02282" }, // Hash for Uplay version 0.1.17.
                     { "3cb9feaf36ac1c057a3fac56e57f3a60bd0f7749f26d3ad55e9366bdbdd7d696" }, // Hash for Steam version 0.1.16.
                     { "b32d68ad40ad1e7cd7fc22836125b9b6ea25c8c2e4d17801ad8efeda58876ea3" }, // Hash for Uplay version 0.1.16.
                     { "03175df34cde45fccc02fc0c23d4aca40eef49cf228dfdc5932069a941082fa7" }, // Hash for Steam version 0.1.14.
@@ -310,9 +313,10 @@ const QList<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "ed008348873b2f4f9e25ecb144aabb243b005711d9cd59841f65874c90349325" }
+                      "a258da1155c56d3d21e7aa4fd2703931c7af3fc85590d8794b22fa8a3426c565" }
                 },
                 {
+                    { "ed008348873b2f4f9e25ecb144aabb243b005711d9cd59841f65874c90349325" }, // Hash for Retail version 0.1.17.
                     { "26a9f3a1cf1880df79e395006b0fb595767c10b0265283e4e9928353d30f1e79" }, // Hash for Retail version 0.1.16.
                     { "418b8393f912bb6cdede77360914fc32979964aab1950d240f15ceb35ad80da0" }, // Hash for Retail version 0.1.14.
                     { "20a85ddbff6a6a0fc35aa3ddaff9e4d08ce660000b9568731c39b3d94ac38e8d" }, // Hash for Retail version 0.1.13.
@@ -379,13 +383,15 @@ const QList<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "18902ffab0a8227d762d0ea0bbc0ea780e52ac81b25fd6a95f41a926c9e07929" },
+                      "d5a8ea9f8e6b766ff2f5243819dbc210c9501cae41e62a3d24aee8f9984d1e62" },
 
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "97dcbe2f34e21bc68560acacd4febba956abb76d3b136fcae5fdbbac5527b183" }
+                      "df76b536d7748d385065f4e5de7d3be11465ed23854e3de82a8d83397d16134f" }
                 },
                 {
+                    { "18902ffab0a8227d762d0ea0bbc0ea780e52ac81b25fd6a95f41a926c9e07929" }, // Hash for Steam version 0.1.17.
+                    { "97dcbe2f34e21bc68560acacd4febba956abb76d3b136fcae5fdbbac5527b183" }, // Hash for Uplay version 0.1.17.
                     { "db5cfd6e70ea8abe54c221aff028132ec581684755a687e21aad7173cd57856c" }, // Hash for Steam version 0.1.16.
                     { "258d1c9461c751f245d8b8c93894ffa9957e064b2b8a87a9dec9303c21ff595f" }, // Hash for Uplay version 0.1.16.
                     { "b3d4c57e6ad51c6e4615106329a5c33d0121c25f5c5e22da80201c2488f78c5c" }, // Hash for Steam version 0.1.14.

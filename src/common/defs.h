@@ -5,7 +5,8 @@
 #include <QStringList>
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE true
+#define DEBUG_MODE false
+
 // App
 constexpr char app_name[] = "FC2MPPatcher";
 const QString app_organization = app_name;
