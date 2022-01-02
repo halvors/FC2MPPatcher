@@ -84,27 +84,23 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     constexpr uint32_t alignToSpacingBytes = 32;
     std::string textBytes;
 
-    //qDebug() << "File size: " << image->get_file_alignment();
-    uint32_t test = image->get_file_alignment();
-    textBytes.append((char*)&test, sizeof(test));
-
     for (const CodeEntry& codeEntry : codeEntries) {
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
+
+        textBytes += codeEntry.getData().toStdString();
 
         const uint32_t numPaddingBytes = alignToSpacingBytes - (textBytes.size() % alignToSpacingBytes);
 
         if (numPaddingBytes < alignToSpacingBytes)
             textBytes.append(numPaddingBytes, asm_nop);
-
-        textBytes += codeEntry.getData().toStdString();
     }
 
     // Extend to minimal length of section
     const int numPaddingBytes = image->get_section_alignment() - textBytes.size(); // Be careful of overflow here, using signed int for that reason
 
     if (numPaddingBytes > 0)
-        textBytes.append(numPaddingBytes, asm_nop);
+        textBytes.append(numPaddingBytes, 0xFF);
 
     section textSection;
     //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.

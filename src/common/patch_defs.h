@@ -234,14 +234,25 @@ const QList<FileEntry> files = {
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
-                    { 0x10c24829, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+                    //{ 0x10c24829, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
 
-                    // TODO: Add agora root public key here.
+                    // Fix: Patch in our own agora root public key, and use that instead
+                    { patch_agora_root_public_key },
+
+                    // Fix: Call rsa_import() with our agora root public key
+                    { QByteArray("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
+                                 "\x50"                                    // push eax                        ; rsa_key *key
+                                 "\x68\x0E\x02\x00\x00"                    // push 526                        ; unsigned long inlen
+                                 "\x68\x00\xD0\x9E\x11"                    // push dunia.119ED000             ; const unsigned char *in
+                                 "\xE8\x1A\x1A\x28\xFF"                    // call dunia.10C6EC50             ; Calling rsa_import()
+                                 "\xE9\xA6\x6C\x23\xFF", 27) },            // jmp  <dunia.return>
+                    { 0x10c23edc, QByteArray("\xE9\x3F\x93\xDC\x00", 5) }, // jmp  dunia.119ED220              ; Jump to codecave because of space constrains
+                    { 0x10c23ee1, get_asm_nop(15) },
 
                     // Fix: Change function call genOneTimeKey() to instead call external.
-                    { QByteArray("\xFF\x15\x0C\xBA\x9E\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                 "\xE9\x02\x7A\x23\xFF", 11) }, // jmp    dunia.119ED040
-                    { 0x10c24a08, QByteArray("\xE9\xF3\x85\xDC\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xFF\x15\x0C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                 "\xE9\xC2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c24a08, QByteArray("\xE9\x33\x88\xDC\x00", 5) }, // jmp  dunia.119ED240                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -249,39 +260,27 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xDB\x05\xD9\xFE"         // call   dunia.1077D600 ; GetNetFileServerAddress()
-                                 "\x51"                         // push   ecx
-                                 "\x50"                         // push   eax
-                                 "\xE8\x04\x09\xD9\xFE"         // call   dunia.1077D930 ; IsSessionTypeLAN()
-                                 "\x84\xC0"                     // test   al,al
-                                 "\x75\x16"                     // jne    <dunia.lan>
-                                 "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\x10\xBA\x9E\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
-                                 "\x8B\xC8"                     // mov    ecx,eax
-                                 "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xB6\x0E\xD9\xFE"         // jmp    <dunia.return>
-                                 "\x58"                         // pop    eax
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xAF\x0E\xD9\xFE", 45) }, // jmp    <dunia.return>
+                    { QByteArray("\xE8\x9B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
+                                 "\x51"                                    // push ecx
+                                 "\x50"                                    // push eax
+                                 "\xE8\xC4\x06\xD9\xFE"                    // call dunia.1077D930 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                                // test al,al
+                                 "\x75\x16"                                // jne  <dunia.lan>
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\xFF\x15\x10\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\x8B\xC8"                                // mov  ecx,eax
+                                 "\x58"                                    // pop  eax
+                                 "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x76\x0C\xD9\xFE"                    // jmp  <dunia.return>
+                                 "\x58"                                    // pop  eax
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x6F\x0C\xD9\xFE", 45) },            // jmp  <dunia.return>
 
-                    // TODO: Trying to patch in root public key here.
-                    { patch_agora_root_public_key }, // Located at memory address: 0x119ED060
-
-                    // Dunia.dll (Steam) notes
-                    //char* ptr to public key at 0x10C23EE6
-
-                    /*
-                    <$dunia.0C23EDC>
-                      push dword ptr ss:[esp+0x28] ; Length of public key
-                      lea eax, ds:[esi+0x3358]
-                      push dword ptr ss:[esp+0x28] ; Pointer to char array containing public key
-                      push eax
-                      call $$0C244D6 ; Call to agora_rsa_import()
-                    */
-
-                    { 0x1077def7, QByteArray("\xE9\x24\xF1\x26\x01", 5) }, // change function call to instead jump to the .text_p section.
+                    { 0x1077def7, QByteArray("\xE9\x64\xF3\x26\x01", 5) }, // jmp  dunia.119ED260 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
