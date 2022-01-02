@@ -5,7 +5,7 @@ QT += network
 TARGET = mppatch
 TEMPLATE = lib
 CONFIG += \
-    c++17 \
+    c++latest \
     skip_target_version_ext
 
 DEFINES += MPPATCH_LIBRARY
