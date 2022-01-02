@@ -100,7 +100,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
     const int numPaddingBytes = image->get_section_alignment() - textBytes.size(); // Be careful of overflow here, using signed int for that reason
 
     if (numPaddingBytes > 0)
-        textBytes.append(numPaddingBytes, 0xFF);
+        textBytes.append(numPaddingBytes, asm_nop);
 
     section textSection;
     //textSection.get.get_raw_data().resize(1); // We cannot add empty sections, so let it be the initial data size 1.

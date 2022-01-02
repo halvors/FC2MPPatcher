@@ -3,6 +3,8 @@
 
 #include <QByteArray>
 #include <QList>
+
+#include "defs.h"
 #include "entry.h"
 
 const QStringList patch_library_functions = {
@@ -37,7 +39,7 @@ const constexpr uint16_t patch_endpoint_config_port = 3074;
 const QByteArray patch_endpoint_onlineconfig = QByteArray(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0');
 const QByteArray patch_endpoint_stun_host = "stun.farcry2.online";
 
-const QByteArray patch_agora_root_public_key = QByteArray(
+const QByteArray patch_agora_root_public_key(
     "\x30\x82\x02\x0a\x02\x82\x02\x01\x00\xb5\xf6\xe8\x3a\x62\xef\x60"
     "\x1b\x78\x86\x39\x15\xdf\xec\x89\x83\xfe\x63\x8d\x45\xad\xc1\xc9"
     "\x47\xd7\x7b\x12\x0a\xf1\xd8\xd9\x54\xe4\x53\x74\x43\x26\xf5\xe3"
@@ -97,7 +99,7 @@ inline const QByteArray get_asm_nop(const uint16_t numBytes) {
     QByteArray nop;
 
     for (uint16_t i = 0; i < numBytes; i++)
-        nop.append('\x90');
+        nop.append(asm_nop);
 
     return nop;
 }
@@ -145,12 +147,25 @@ const QList<FileEntry> files = {
                     { 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
 
                     // Fix: Hack to avoid verfiying agora certificate with public key from game files.
-                    { 0x10c1354c, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+                    //{ 0x10c1354c, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+
+                    // Fix: Patch in our own agora root public key, and use that instead
+                    { patch_agora_root_public_key },
+
+                    // Fix: Call rsa_import() with our agora root public key
+                    { QByteArray("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
+                                 "\x50"                                    // push eax                         ; rsa_key *key
+                                 "\x68\x0E\x02\x00\x00"                    // push 526                         ; unsigned long inlen
+                                 "\x68\x00\xF0\x92\x11"                    // push dunia.1192F000              ; const unsigned char *in
+                                 "\xE8\x1A\x12\x33\xFF"                    // call dunia.10C60450              ; Calling rsa_import()
+                                 "\xE9\x94\x39\x2E\xFF", 27) },            // jmp  <dunia.return>
+                    { 0x10c12bca, QByteArray("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  dunia.1192F220              ; Jump to codecave because of space constrains
+                    { 0x10c12bcf, get_asm_nop(15) },
 
                     // Fix: Change function call genOneTimeKey() to instead call external.
-                    { QByteArray("\xFF\x15\x08\xD7\x92\x11"     // call   call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                 "\xE9\x25\x47\x2E\xFF", 11) }, // jmp    dunia.119ED040
-                    { 0x10c1372b, QByteArray("\xE9\xD0\xB8\xD1\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xFF\x15\x08\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                 "\xE9\xE5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c1372b, QByteArray("\xE9\x10\xBB\xD1\x00", 5) }, // jmp  dunia.1192f240                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -158,23 +173,26 @@ const QList<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\xAB\x1B\xE4\xFE"         // call   dunia.10770BD0 ; GetNetFileServerAddress()
-                                 "\x51"                         // push   ecx
-                                 "\x50"                         // push   eax
-                                 "\xE8\xA4\x8E\xEB\xFE"         // call   dunia.107E7ED0 ; IsSessionTypeLAN()
-                                 "\x84\xC0"                     // test   al,al
-                                 "\x75\x16"                     // jne    <dunia.lan>
-                                 "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\x0C\xD7\x92\x11"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
-                                 "\x8B\xC8"                     // mov    ecx,eax
-                                 "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xD6\x24\xE4\xFE"         // jmp    <dunia.return>
-                                 "\x58"                         // pop    eax
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xCF\x24\xE4\xFE", 45) }, // jmp    <dunia.return>
-                    { 0x10771517, QByteArray("\xE9\x04\xDB\x1B\x01", 5) }, // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xE8\x6B\x19\xE4\xFE"                    // call dunia.10770BD0 ; GetNetFileServerAddress()
+                                 "\x51"                                    // push ecx
+                                 "\x50"                                    // push eax
+                                 "\xE8\x64\x8C\xEB\xFE"                    // call dunia.107E7ED0 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                                // test al,al
+                                 "\x75\x16"                                // jne  <dunia.lan>
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\xFF\x15\x0C\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\x8B\xC8"                                // mov  ecx,eax
+                                 "\x58"                                    // pop  eax
+                                 "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x96\x22\xE4\xFE"                    // jmp  <dunia.return>
+                                 "\x58"                                    // pop  eax
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x8F\x22\xE4\xFE", 45) },            // jmp  <dunia.return>
+                    { 0x10771517, QByteArray("\xE9\x44\xDD\x1B\x01", 5) }, // jmp  dunia.1192F260 ; Change function call to instead jump to the .text_p section.
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
@@ -241,10 +259,10 @@ const QList<FileEntry> files = {
 
                     // Fix: Call rsa_import() with our agora root public key
                     { QByteArray("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
-                                 "\x50"                                    // push eax                        ; rsa_key *key
-                                 "\x68\x0E\x02\x00\x00"                    // push 526                        ; unsigned long inlen
-                                 "\x68\x00\xD0\x9E\x11"                    // push dunia.119ED000             ; const unsigned char *in
-                                 "\xE8\x1A\x1A\x28\xFF"                    // call dunia.10C6EC50             ; Calling rsa_import()
+                                 "\x50"                                    // push eax                         ; rsa_key *key
+                                 "\x68\x0E\x02\x00\x00"                    // push 526                         ; unsigned long inlen
+                                 "\x68\x00\xD0\x9E\x11"                    // push dunia.119ED000              ; const unsigned char *in
+                                 "\xE8\x1A\x1A\x28\xFF"                    // call dunia.10C6EC50              ; Calling rsa_import()
                                  "\xE9\xA6\x6C\x23\xFF", 27) },            // jmp  <dunia.return>
                     { 0x10c23edc, QByteArray("\xE9\x3F\x93\xDC\x00", 5) }, // jmp  dunia.119ED220              ; Jump to codecave because of space constrains
                     { 0x10c23ee1, get_asm_nop(15) },
@@ -329,24 +347,26 @@ const QList<FileEntry> files = {
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
-
-                    { QByteArray("\xE8\x4B\x4C\x30\xFF"         // call   fc2serverlauncher.AB3C50 ; GetNetFileServerAddress()
-                                 "\x51"                         // push   ecx
-                                 "\x50"                         // push   eax
-                                 "\xE8\x04\x01\x30\xFF"         // call   fc2serverlauncher.AAF110 ; IsSessionTypeLAN()
-                                 "\x84\xC0"                     // test   al,al
-                                 "\x75\x16"                     // jne    <fc2serverlauncher.lan>
-                                 "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\xEC\xDB\x7A\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
-                                 "\x8B\xC8"                     // mov    ecx,eax
-                                 "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\x3F\x91\x30\xFF"         // jmp    <fc2serverlauncher.return>
-                                 "\x58"                         // pop    eax
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\x38\x91\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
-                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xE8\x4B\x4C\x30\xFF"                    // call fc2serverlauncher.AB3C50 ; GetNetFileServerAddress()
+                                 "\x51"                                    // push ecx
+                                 "\x50"                                    // push eax
+                                 "\xE8\x04\x01\x30\xFF"                    // call fc2serverlauncher.AAF110 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                                // test al,al
+                                 "\x75\x16"                                // jne  <fc2serverlauncher.lan>
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\xFF\x15\xE8\xDB\x7A\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\x8B\xC8"                                // mov  ecx,eax
+                                 "\x58"                                    // pop  eax
+                                 "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x3F\x91\x30\xFF"                    // jmp  <fc2serverlauncher.return>
+                                 "\x58"                                    // pop  eax
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\x38\x91\x30\xFF", 45) },            // jmp  <fc2serverlauncher.return>
+                    { 0x00ab8160, QByteArray("\xE9\x9B\x6E\xCF\x00", 5) }, // jmp  fc2serverlauncher.17AF000 ; Change function call to instead jump to the .text_p section.
                     { 0x004ecb38, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
@@ -407,23 +427,26 @@ const QList<FileEntry> files = {
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"         // call   fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
-                                 "\x51"                         // push   ecx
-                                 "\x50"                         // push   eax
-                                 "\xE8\x14\x72\x2F\xFF"         // call   fc2serverlauncher.AA9220 ; IsSessionTypeLAN()
-                                 "\x84\xC0"                     // test   al,al
-                                 "\x75\x16"                     // jne    <fc2serverlauncher.lan>
-                                 "\x90\x90\x90\x90"             // nop    nop nop nop
-                                 "\xFF\x15\xA0\x0D\x7B\x01"     // call   dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
-                                 "\x8B\xC8"                     // mov    ecx,eax
-                                 "\x58"                         // pop    eax
-                                 "\x89\x48\x08"                 // mov    dword ptr ds:[eax+8],ecx
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xDF\x10\x30\xFF"         // jmp    <fc2serverlauncher.return>
-                                 "\x58"                         // pop    eax
-                                 "\x59"                         // pop    ecx
-                                 "\xE9\xD8\x10\x30\xFF", 45) }, // jmp    <fc2serverlauncher.return>
-                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // change function call to instead jump to the .text_p section.
+                    { QByteArray("\xE8\x4B\xCB\x2F\xFF"                    // call fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
+                                 "\x51"                                    // push ecx
+                                 "\x50"                                    // push eax
+                                 "\xE8\x14\x72\x2F\xFF"                    // call fc2serverlauncher.AA9220 ; IsSessionTypeLAN()
+                                 "\x84\xC0"                                // test al,al
+                                 "\x75\x16"                                // jne  <fc2serverlauncher.lan>
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\x90"                                    // nop
+                                 "\xFF\x15\xA0\x0D\x7B\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                 "\x8B\xC8"                                // mov  ecx,eax
+                                 "\x58"                                    // pop  eax
+                                 "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\xDF\x10\x30\xFF"                    // jmp  <fc2serverlauncher.return>
+                                 "\x58"                                    // pop  eax
+                                 "\x59"                                    // pop  ecx
+                                 "\xE9\xD8\x10\x30\xFF", 45) },            // jmp  <fc2serverlauncher.return>
+                    { 0x00ab3100, QByteArray("\xE9\xFB\xEE\xCF\x00", 5) }, // jmp  fc2serverlauncher.17B2000 ; Change function call to instead jump to the .text_p section.
                     { 0x004ec828, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
