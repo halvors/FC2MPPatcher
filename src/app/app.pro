@@ -5,7 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = fc2mppatcher
 TEMPLATE = app
 CONFIG += \
-        c++17
+        c++latest
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -44,8 +44,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 include(../common/common.pri)
 
-# Including 3rd party PeBliss library.
+# Including 3rd party libraries.
+LIBS += -L$$OUT_PWD/../../lib/libpebliss/pe_lib/ -lpebliss
+
 INCLUDEPATH += $$PWD/../../lib/libpebliss/pe_lib
 DEPENDPATH += $$PWD/../../lib/libpebliss/pe_lib
 
-LIBS += -L$$PWD/../../lib/libpebliss -lpebliss
+PRE_TARGETDEPS += $$OUT_PWD/../../lib/libpebliss/pe_lib/libpebliss.a
