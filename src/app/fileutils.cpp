@@ -9,7 +9,7 @@
 #include <qt_windows.h>
 #endif
 
-QByteArray FileUtils::calculateChecksum(QFile file)
+const std::string FileUtils::calculateChecksum(QFile file)
 {
     if (!file.open(QFile::ReadOnly))
         return nullptr;
@@ -18,18 +18,18 @@ QByteArray FileUtils::calculateChecksum(QFile file)
     hash.addData(&file);
     file.close();
 
-    return hash.result().toHex();
+    return hash.result().toHex().toStdString();
 }
 
 bool FileUtils::isValid(const QDir &dir, const FileEntry &file, const TargetEntry &target, bool patched)
 {
-    QByteArray fileChecksum = calculateChecksum(dir.filePath(file.name));
+    std::string fileChecksum = calculateChecksum(dir.filePath(file.name));
 
-    if (fileChecksum.isEmpty())
+    if (fileChecksum.empty())
         return false;
 
     for (const HashEntry &entry : target.hashEntries) {
-        QByteArray targetChecksum = patched ? entry.result : entry.original;
+        std::string targetChecksum = patched ? entry.result : entry.original;
 
         if (fileChecksum == targetChecksum)
             return true;

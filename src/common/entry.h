@@ -1,12 +1,13 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
+#include <string>
+
 #include <QList>
-#include <QByteArray>
 
 struct HashEntry {
-    QByteArray original;
-    QByteArray result;
+    std::string original;
+    std::string result;
 };
 
 class CodeEntry {
@@ -18,12 +19,12 @@ public:
     };
 
     CodeEntry(const uint32_t address, const uint32_t word, const char *section = ".text", Type type = INJECT_SYMBOL) :
-        CodeEntry(address, QByteArray::number(word), section, type) {}
+        CodeEntry(address, std::to_string(word), section, type) {}
 
-    CodeEntry(const QByteArray &data, const char *section = ".text_mp", Type type = NEW_DATA) :
+    CodeEntry(const std::string &data, const char *section = ".text_mp", Type type = NEW_DATA) :
         CodeEntry(0, data, section, type) {}
 
-    CodeEntry(const uint32_t address, const QByteArray &data, const char *section = ".text", Type type = INJECT_DATA) :
+    CodeEntry(const uint32_t address, const std::string &data, const char *section = ".text", Type type = INJECT_DATA) :
         address(address),
         data(data),
         section(section),
@@ -33,7 +34,7 @@ public:
         return address;
     }
 
-    const QByteArray &getData() const {
+    const std::string &getData() const {
         return data;
     }
 
@@ -47,14 +48,14 @@ public:
 
 private:
     uint32_t address = 0;
-    QByteArray data;
+    std::string data;
     const char *section;
     Type type;
 };
 
 struct TargetEntry {
     QList<HashEntry> hashEntries;
-    QList<QByteArray> legacyHashEntries;
+    QList<std::string> legacyHashEntries;
     QList<CodeEntry> codeEntries;
 };
 
