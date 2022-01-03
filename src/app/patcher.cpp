@@ -38,10 +38,10 @@ Patcher::State Patcher::isPatched(const QString &path)
                     }
                 }
 
-                const QByteArray &checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
+                const std::string checksum = FileUtils::calculateChecksum(dir.filePath(QString(file.name)));
 
                 // Check if there are legacy versions installed.
-                for (const QByteArray &legacyHash : target.legacyHashEntries) {
+                for (const std::string& legacyHash : target.legacyHashEntries) {
                     if (checksum == legacyHash) {
                         numLegacyInstalled++;
                         break;
@@ -182,7 +182,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     delete peFile;
 
     if (DEBUG_MODE)
-        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.name, FileUtils::calculateChecksum(dir.filePath(fileEntry.name)).constData()));
+        qDebug().noquote() << QT_TR_NOOP(QString("New checksum for file %1 is \"%2\"").arg(fileEntry.name).arg(FileUtils::calculateChecksum(dir.filePath(fileEntry.name)).data()));
 
     return FileUtils::isValid(dir, fileEntry, target, true);
 }

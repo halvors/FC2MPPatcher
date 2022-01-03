@@ -88,7 +88,7 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
         if (codeEntry.getType() != CodeEntry::NEW_DATA)
             continue;
 
-        textBytes += codeEntry.getData().toStdString();
+        textBytes += codeEntry.getData();
 
         const uint32_t numPaddingBytes = alignToSpacingBytes - (textBytes.size() % alignToSpacingBytes);
 
@@ -190,7 +190,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                 continue;
 
             const uint32_t address = codeEntry.getAddress();
-            const QByteArray &data = codeEntry.getData();
+            const std::string data = codeEntry.getData();
 
             // If address is zero, that means this function is not use for this file.
             if (address == 0)
@@ -203,7 +203,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
             switch (codeEntry.getType()) {
             case CodeEntry::INJECT_SYMBOL:
                 {
-                    int index = data.toInt();
+                    int index = std::stoi(data);
                     uint32_t functionAddress = symbolAddressList[index];
 
                     // Verify to some degree addresses to be patched.
@@ -227,19 +227,19 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                     // Change the value at the address to the gived code.
                     char *bytePtr = reinterpret_cast<char*>(wordPtr);
 
-                    if (data.length() <= 0) {
+                    if (data.size() <= 0) {
                         qDebug().noquote() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));
 
                         return false;
                     }
 
                     qDebug().noquote() << QT_TR_NOOP(QString("Patched data at address 0x%1, changed from \"%2\" to \"%3\", offset from address is %4.").arg(address, 0, 16)
-                                                                                                                                                       .arg(QByteArray(bytePtr, data.length()).toHex().constData(),
-                                                                                                                                                            data.toHex().constData())
+                                                                                                                                                       .arg(QByteArray(bytePtr, data.size()).toHex().constData(),
+                                                                                                                                                            QByteArray::fromStdString(data).toHex().constData())
                                                                                                                                                        .arg(data.length()));
 
                     // Copy data.
-                    std::memcpy(bytePtr, data.constData(), data.length());
+                    std::memcpy(bytePtr, data.data(), data.size());
                 }
                 break;
 

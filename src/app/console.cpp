@@ -6,8 +6,6 @@
 #include "defs.h"
 #include "patcher.h"
 
-#include "patch_defs.h"
-
 Console::Console(const QString &installDir, const QString &interfaceName, QObject *parent) :
     QObject(parent)
 {
@@ -27,8 +25,6 @@ Console::~Console()
 
 bool Console::exec()
 {
-    qDebug() << QString("Public root key hex (%1): %2").arg(patch_agora_root_public_key.size()).arg(patch_agora_root_public_key.toHex().constData());
-
     if (installDir.isEmpty()) {
         qDebug().noquote() << tr("No %1 installation directory specified, attempting auto detection...").arg(game_name);
 
