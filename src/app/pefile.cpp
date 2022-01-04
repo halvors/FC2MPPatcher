@@ -44,7 +44,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
+bool PeFile::apply(const std::string& libraryFile, const std::vector<std::string>& libraryFunctions, const std::vector<CodeEntry>& codeEntries) const
 {
     // Check that image is loaded.
     if (!image)
@@ -55,12 +55,12 @@ bool PeFile::apply(const QString &libraryFile, const QStringList &libraryFunctio
 
     // Create a new library from which we will import functions.
     import_library importLibrary;
-    importLibrary.set_name(libraryFile.toStdString());
+    importLibrary.set_name(libraryFile);
 
     // Add a new import symbols to library.
-    for (const QString &functionName : libraryFunctions) {
+    for (const std::string& functionName : libraryFunctions) {
         imported_function importFunction;
-        importFunction.set_name(functionName.toStdString());
+        importFunction.set_name(functionName);
         importLibrary.add_import(importFunction);
     }
 
@@ -144,14 +144,14 @@ bool PeFile::write() const
     return true;
 }
 
-QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
+QList<uint32_t> PeFile::buildSymbolAddressList(const std::string &libraryFile) const
 {
     QList<uint32_t> symbolAddressList;
 
     // Loop thru all imported libraries.
     for (const import_library &library : get_imported_functions(*image)) {
         // Only build map for the selected target library.
-        if (library.get_name() != libraryFile.toStdString())
+        if (library.get_name() != libraryFile)
             continue;
 
         const import_library::imported_list &functions = library.get_imported_functions();
@@ -172,7 +172,7 @@ QList<uint32_t> PeFile::buildSymbolAddressList(const QString &libraryFile) const
     return symbolAddressList;
 }
 
-bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const
+bool PeFile::patchCode(const std::string& libraryFile, const std::vector<std::string> &libraryFunctions, const std::vector<CodeEntry> &codeEntries) const
 {
     // Get a compiled list of all functiona addreses.
     const QList<uint32_t> &symbolAddressList = buildSymbolAddressList(libraryFile);
@@ -214,7 +214,7 @@ bool PeFile::patchCode(const QString &libraryFile, const QStringList &libraryFun
                     }
 
                     qDebug().noquote() << QT_TR_NOOP(QString("Patched function call at address 0x%1, new function is \"%2\" with address of 0x%3.").arg(address, 0, 16)
-                                                                                                                                                   .arg(libraryFunctions[index])
+                                                                                                                                                   .arg(QString::fromStdString(libraryFunctions[index]))
                                                                                                                                                    .arg(functionAddress, 0, 16));
 
                     // Change the old address to point to new function instead.

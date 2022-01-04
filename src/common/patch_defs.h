@@ -1,13 +1,13 @@
 #ifndef PATCH_DEFS_H
 #define PATCH_DEFS_H
 
-#include <QByteArray>
-#include <QList>
+#include <cstdint>
+#include <string>
 
 #include "defs.h"
 #include "entry.h"
 
-const QStringList patch_library_functions = {
+const std::vector<std::string> patch_library_functions = {
     "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
@@ -36,10 +36,10 @@ const QStringList patch_library_functions = {
  */
 static const std::string patch_endpoint_config_host = "conf.farcry2.online";
 const constexpr uint16_t patch_endpoint_config_port = 3074;
-const std::string patch_endpoint_onlineconfig = QByteArray::fromStdString(patch_endpoint_config_host).append(':').append(QByteArray::number(patch_endpoint_config_port)).append(3, '\0').toStdString();
+const std::string patch_endpoint_onlineconfig = patch_endpoint_config_host + ":" + std::to_string(patch_endpoint_config_port).append(3, 0x00);
 const std::string patch_endpoint_stun_host = "stun.farcry2.online";
 
-// CryptoPP - 4096 key (OK)
+// RSA root public key (4096 bits)
 const std::string patch_agora_root_public_key(
     "\x30\x82\x02\x0a\x02\x82\x02\x01\x00\xd7\x38\xcd\x45\x34\x20\x1f"
     "\x37\x6d\xec\x48\xb9\x45\x50\x8e\xe9\x67\x37\x25\xb6\x01\x3c\x2a"
@@ -75,7 +75,7 @@ const std::string patch_agora_root_public_key(
     "\x3c\x4f\xea\x13\x20\x18\xc9\x81\xbc\xf8\x78\x2c\xc2\x89\x5a\x8c"
     "\x7d\x0c\x53\xa8\x19\xf7\x3e\x9d\x67\x02\x03\x01\x00\x01", 526);
 
-const QList<std::string> agoraIdList = {
+const std::string agoraIdList[] = {
     "2c66b725e7fb0697c0595397a14b0bc8", // Ubi (Retail)
     "5865cbb3ffd54d7eb2ba667044b0cab1", // Ubi (Steam)
     "9cc10a3d6fb2cc872794b475104c204e", // Ubi (Dedicated server)
@@ -92,6 +92,7 @@ const QList<std::string> agoraIdList = {
     "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
     "d75461366f6cabb69e833dbe61fc904a"  // Dev (Dedicated server)
 };
+constexpr uint32_t agoraIdModifier = !DEBUG_MODE ? 0 : 6;
 
 // Reusable assembly constants.
 const std::string asm_jmp("\xEB", 1);
@@ -105,7 +106,7 @@ inline const std::string get_asm_nop(const uint16_t numBytes) {
     return nop;
 }
 
-const QList<FileEntry> files = {
+const std::vector<FileEntry> files = {
     {
         "Dunia.dll",
         {
@@ -146,7 +147,7 @@ const QList<FileEntry> files = {
 
                     /* Client */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x10dba4c4, agoraIdList[3], ".rdata" }, // game_id
+                    { 0x10dba4c4, agoraIdList[3 + agoraIdModifier], ".rdata" }, // game_id
 
                     // Tweak: Patch in our own agora root public key, and use that instead
                     { patch_agora_root_public_key },
@@ -247,7 +248,7 @@ const QList<FileEntry> files = {
 
                     /* Client */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x10e420c0, agoraIdList[4], ".rdata" }, // game_id
+                    { 0x10e420c0, agoraIdList[4 + agoraIdModifier], ".rdata" }, // game_id
 
                     // Tweak: Swap Ubisoft endpoints with our own.
                     { 0x10f3fa7c, patch_endpoint_onlineconfig, ".rdata" },
@@ -341,7 +342,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x01042f50, agoraIdList[5], ".rdata" }, // game_id
+                    { 0x01042f50, agoraIdList[5 + agoraIdModifier], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
@@ -423,7 +424,7 @@ const QList<FileEntry> files = {
 
                     /* Server */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x01045fb0, agoraIdList[5], ".rdata" }, // game_id
+                    { 0x01045fb0, agoraIdList[5 + agoraIdModifier], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
