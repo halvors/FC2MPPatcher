@@ -21,7 +21,7 @@ public:
     explicit PeFile(const QFile &file, QObject *parent = nullptr);
     ~PeFile();
 
-    bool apply(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const;
+    bool apply(const std::string& libraryFile, const std::vector<std::string>& libraryFunctions, const std::vector<CodeEntry> &codeEntries) const;
     bool write() const;
 
 private:
@@ -29,8 +29,8 @@ private:
     pe_base *image = nullptr;
 
     bool read();
-    QList<uint32_t> buildSymbolAddressList(const QString &libraryFile) const;
-    bool patchCode(const QString &libraryFile, const QStringList &libraryFunctions, const QList<CodeEntry> &codeEntries) const;
+    QList<uint32_t> buildSymbolAddressList(const std::string& libraryFile) const;
+    bool patchCode(const std::string& libraryFile, const std::vector<std::string>& libraryFunctions, const std::vector<CodeEntry> &codeEntries) const;
 };
 
 #endif // PEFILE_H

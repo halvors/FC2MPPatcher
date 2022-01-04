@@ -14,8 +14,8 @@ Patcher::State Patcher::isPatched(const QString &path)
         return INVALID;
 
     QDir dir = path;
-    int numInstalled = 0;
-    int numLegacyInstalled = 0;
+    uint32_t numInstalled = 0;
+    uint32_t numLegacyInstalled = 0;
 
     // Should we be looking in executable directory instead?
     if (dir.exists() | dir.cd(game_executable_directory)) {
@@ -61,7 +61,7 @@ Patcher::State Patcher::isPatched(const QString &path)
 
 bool Patcher::patch(const QDir &dir, QWidget *widget)
 {
-    int numPatched = 0;
+    uint32_t numPatched = 0;
 
     // Scanning for valid files to start patching.
     for (const FileEntry &fileEntry : files) {
@@ -130,8 +130,8 @@ void Patcher::undoPatch(const QDir &dir) {
     QFile::remove(dir.filePath(patch_library_file));
 
     // Remove patch runtime dependencies.
-    for (const QString &fileName : patch_library_runtime_dependencies)
-        QFile::remove(dir.filePath(fileName));
+    for (const std::string& fileName : patch_library_runtime_dependencies)
+        QFile::remove(dir.filePath(QString::fromStdString(fileName)));
 
     // Remove network configuration file.
     QFile::remove(dir.filePath(patch_configuration_file));
@@ -153,9 +153,9 @@ bool Patcher::copyFiles(const QDir &dir)
 {
     bool success = true;
 
-    for (const QString &fileName : patch_library_runtime_dependencies) {
-        QFile sourceFile = fileName;
-        QFile destinationFile = dir.filePath(fileName);
+    for (const std::string& fileName : patch_library_runtime_dependencies) {
+        QFile sourceFile = QString::fromStdString(fileName);
+        QFile destinationFile = dir.filePath(QString::fromStdString(fileName));
 
         if (!destinationFile.exists() || destinationFile.remove())
             success &= sourceFile.copy(destinationFile.fileName());
@@ -174,7 +174,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
     PeFile *peFile = new PeFile(file);
 
     // Apply PE and binary patches.
-    peFile->apply(patch_library_file, patch_library_functions, target.codeEntries);
+    peFile->apply(patch_library_file.toStdString(), patch_library_functions, target.codeEntries);
 
     // Write PE to file.
     peFile->write();

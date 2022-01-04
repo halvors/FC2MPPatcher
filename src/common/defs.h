@@ -52,8 +52,8 @@ const QString patch_library_file = QString(patch_library_name).toLower() + ".dll
 const QString patch_configuration_file = QString(patch_library_name).toLower() + ".cfg";
 constexpr char patch_configuration_network[] = "Network";
 constexpr char patch_configuration_network_interface[] = "Interface";
-const QStringList patch_library_runtime_dependencies = {
-    patch_library_file,
+const std::string patch_library_runtime_dependencies[] = {
+    patch_library_file.toStdString(),
     "libgcc_s_dw2-1.dll",
     "libstdc++-6.dll",
     "libwinpthread-1.dll",

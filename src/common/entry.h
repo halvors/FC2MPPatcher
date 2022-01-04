@@ -1,10 +1,8 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
-#include <initializer_list>
+#include <cstdint>
 #include <string>
-
-#include <QList>
 
 #include "defs.h"
 
@@ -52,19 +50,19 @@ public:
 private:
     uint32_t address = 0;
     std::string data;
-    const char *section;
+    const char* section;
     Type type;
 };
 
 struct TargetEntry {
-    QList<HashEntry> hashEntries;
-    QList<std::string> legacyHashEntries;
-    QList<CodeEntry> codeEntries;
+    std::vector<HashEntry> hashEntries;
+    std::vector<std::string> legacyHashEntries;
+    std::vector<CodeEntry> codeEntries;
 };
 
 struct FileEntry {
-    const char *name;
-    QList<TargetEntry> targets;
+    const char* name;
+    std::vector<TargetEntry> targets;
 };
 
 #endif // ENTRY_H
