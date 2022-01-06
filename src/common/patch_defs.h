@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "defs.h"
 #include "entry.h"
@@ -12,8 +13,9 @@ const std::vector<std::string> patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+    "_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_",                       // genCdKeyIdHex()
     "_ZN7MPPatch13genOneTimeKeyEPhPjPcS2_S2_",                    // genOneTimeKey()
-    "_ZN7MPPatch18getPublicIPAddressEv@0"                         // getPublicIpAddress()
+    "_ZN7MPPatch18getPublicIPAddressEv@0",                        // getPublicIpAddress()
 };
 
 /**
@@ -266,37 +268,42 @@ const std::vector<FileEntry> files = {
                     { 0x10c23edc, std::string("\xE9\x3F\x93\xDC\x00", 5) }, // jmp  dunia.119ED220              ; Jump to codecave because of space constrains
                     { 0x10c23ee1, get_asm_nop(15) },
 
+                    // Tweak: Change function call genCdKeyIdHex() to instead call external.
+                    { std::string("\xFF\x15\x34\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::genCdKeyIdHex()
+                                  "\xE9\x76\x77\x23\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
+
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x0C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                 "\xE9\xC2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c24a08, std::string("\xE9\x33\x88\xDC\x00", 5) }, // jmp  dunia.119ED240                                             ; Change function call to instead jump to the .text_p section.
+                    { std::string("\xFF\x15\x38\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                  "\xE9\xA2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED240                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
-                    /* Server */
+                    /* Server */ 
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x9B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
+                    { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\xC4\x06\xD9\xFE"                    // call dunia.1077D930 ; IsSessionTypeLAN()
+                                  "\xE8\xA4\x06\xD9\xFE"                    // call dunia.1077D930 ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
                                   "\x75\x16"                                // jne  <dunia.lan>
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\x10\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\x3C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x76\x0C\xD9\xFE"                    // jmp  <dunia.return>
+                                  "\xE9\x56\x0C\xD9\xFE"                    // jmp  <dunia.return>
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x6F\x0C\xD9\xFE", 45) },            // jmp  <dunia.return>
-                    { 0x1077def7, std::string("\xE9\x64\xF3\x26\x01", 5) }, // jmp  dunia.119ED260 ; Change function call to instead jump to the .text_p section.
+                                  "\xE9\x4F\x0C\xD9\xFE", 45) },            // jmp  <dunia.return>
+                    { 0x1077def7, std::string("\xE9\x8F\x88\xDC\x00", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
