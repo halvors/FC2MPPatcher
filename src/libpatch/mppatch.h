@@ -18,6 +18,7 @@ public:
 
     static MPPATCHSHARED_EXPORT int __cdecl genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password);
     static MPPATCHSHARED_EXPORT uint32_t __stdcall getPublicIPAddress();
+    static MPPATCHSHARED_EXPORT int genCdKeyIdHex();
 
 private:
     static QString address;

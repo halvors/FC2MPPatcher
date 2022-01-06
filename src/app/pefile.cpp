@@ -225,7 +225,7 @@ bool PeFile::patchCode(const std::string& libraryFile, const std::vector<std::st
             case CodeEntry::INJECT_DATA:
                 {
                     // Change the value at the address to the gived code.
-                    char *bytePtr = reinterpret_cast<char*>(wordPtr);
+                    char* bytePtr = reinterpret_cast<char*>(wordPtr);
 
                     if (data.size() <= 0) {
                         qDebug().noquote() << QT_TR_NOOP(QString("Error: Data length is zero, something went wrong! Aborting."));

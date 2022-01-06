@@ -36,7 +36,7 @@ void MPPatch::readSettings()
     delete settings;
 }
 
-int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int namelen)
+int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int namelen)
 {
     sockaddr_in *name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
 
@@ -46,7 +46,7 @@ int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr *name, int nam
     return bind(s, name, namelen);
 }
 
-int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, int flags, const sockaddr *to, int tolen)
+int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
 {
     sockaddr_in *to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
 
@@ -59,7 +59,7 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char *buf, int len, i
     return sendto(s, buf, len, flags, to, tolen);
 }
 
-uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, unsigned long *sizePointer)
+uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
@@ -79,7 +79,7 @@ uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, 
     return result;
 }
 
-hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
+hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 {
     Q_UNUSED(name);
 
@@ -88,7 +88,7 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char *name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-int __cdecl MPPatch::genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password)
+int __cdecl MPPatch::genOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
 {
     QByteArray passwordHash = CryptoUtils::hashPassword(password);
 
@@ -124,4 +124,18 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
     }
 
     return publicAddress;
+}
+
+__cdecl int genCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
+{
+    QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
+    cdKeyHash.addData(serialName, strlen(serialName));
+    cdKeyHash.addData(cdKey, strlen(cdKey));
+
+    QByteArray result = cdKeyHash.result().toHex();
+
+    *outLen = result.size();
+    std::memcpy(out, result.constData(), *outLen);
+
+    return 0;
 }

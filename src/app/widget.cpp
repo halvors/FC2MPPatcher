@@ -16,14 +16,19 @@
 #include "netutils.h"
 #include "patcher.h"
 
+#include <QSysInfo>
+
 Widget::Widget(const QString &installDir, const QString &interfaceName, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
 
+    QByteArray test = QSysInfo::machineUniqueId();
+    qDebug().noquote() << tr("ID: %1").arg(test.constData());
+
     // Set window title.
-    setWindowTitle(QString("%1 %2%3").arg(app_name).arg(APP_VERSION, DEBUG_MODE ? "-dev" : QString()));
+    setWindowTitle(QString("%1 %2%3").arg(app_name).arg(APP_VERSION).arg(DEBUG_MODE ? "-dev" : QString()));
 
     // Set label text.
     ui->label_installation_directory->setText(tr("Select the %1 installation directory:").arg(game_name));
