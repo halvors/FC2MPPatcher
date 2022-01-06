@@ -88,6 +88,26 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
     return gethostbyname(address.toStdString().c_str());
 }
 
+int __cdecl MPPatch::genCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
+{
+    QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
+    //cdKeyHash.addData(serialName, strlen(serialName));
+    //cdKeyHash.addData(cdKey, strlen(cdKey));
+
+    cdKeyHash.addData("FARCRY2PC");
+    cdKeyHash.addData("FC2-D76H-0MB3-81MR-1AFR");
+
+
+    QByteArray result = cdKeyHash.result().toHex();
+
+    *outLen = result.size();
+    std::memcpy(out, result.constData(), *outLen);
+
+    //std::memcpy(out, cdKey, strlen(cdKey));
+
+    return 0;
+}
+
 int __cdecl MPPatch::genOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
 {
     QByteArray passwordHash = CryptoUtils::hashPassword(password);
@@ -124,18 +144,4 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
     }
 
     return publicAddress;
-}
-
-__cdecl int genCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
-{
-    QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
-    cdKeyHash.addData(serialName, strlen(serialName));
-    cdKeyHash.addData(cdKey, strlen(cdKey));
-
-    QByteArray result = cdKeyHash.result().toHex();
-
-    *outLen = result.size();
-    std::memcpy(out, result.constData(), *outLen);
-
-    return 0;
 }

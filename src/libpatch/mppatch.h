@@ -16,9 +16,9 @@ public:
     static MPPATCHSHARED_EXPORT uint64_t __stdcall getAdaptersInfo_patch(IP_ADAPTER_INFO *adapterInfo, unsigned long *sizePointer);
     static MPPATCHSHARED_EXPORT hostent *WSAAPI __stdcall getHostByName_patch(const char *name);
 
+    static MPPATCHSHARED_EXPORT int __cdecl genCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey);
     static MPPATCHSHARED_EXPORT int __cdecl genOneTimeKey(uint8_t *out, uint32_t *outLen, char *challenge, char *username, char *password);
     static MPPATCHSHARED_EXPORT uint32_t __stdcall getPublicIPAddress();
-    static MPPATCHSHARED_EXPORT int genCdKeyIdHex();
 
 private:
     static QString address;
