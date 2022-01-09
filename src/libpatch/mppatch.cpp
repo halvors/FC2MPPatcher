@@ -1,10 +1,12 @@
-#include <QSettings>
-#include <QNetworkInterface>
-#include <QHostAddress>
-#include <QCryptographicHash>
+#include "mppatch.h"
+
 #include <cstring>
 
-#include "mppatch.h"
+#include <QCryptographicHash>
+#include <QHostAddress>
+#include <QNetworkInterface>
+#include <QSettings>
+
 #include "defs.h"
 #include "patch_defs.h"
 #include "netutils.h"
@@ -88,34 +90,38 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-int __cdecl MPPatch::genCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
+int __cdecl MPPatch::genCdKeyIdHex(uint8_t* out, uint32_t* outLen)
 {
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
+    cdKeyHash.addData("FARCRY2PC");
+    cdKeyHash.addData(QSysInfo::machineUniqueId());
+
     //cdKeyHash.addData(serialName, strlen(serialName));
     //cdKeyHash.addData(cdKey, strlen(cdKey));
 
-    cdKeyHash.addData("FARCRY2PC");
-    cdKeyHash.addData("FC2-D76H-0MB3-81MR-1AFR");
-
+    //cdKeyHash.addData("FARCRY2PC");
+    //cdKeyHash.addData("FC2-D76H-0MB3-81MR-1AFR");
 
     QByteArray result = cdKeyHash.result().toHex();
 
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 
-    //std::memcpy(out, cdKey, strlen(cdKey));
+    //char text[] = "FC2-TEST-SERIAL";
+    //*outLen = strlen(text);
+    //std::memcpy(out, text, *outLen);
 
     return 0;
 }
 
 int __cdecl MPPatch::genOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
 {
-    QByteArray passwordHash = CryptoUtils::hashPassword(password);
+    QByteArray passwordHash = CryptoUtils::hashPassword(password).toHex();
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username, strlen(username));
     oneTimeHash.addData(challenge, strlen(challenge));
-    oneTimeHash.addData(passwordHash.toHex());
+    oneTimeHash.addData(passwordHash);
 
     QByteArray result = oneTimeHash.result().toHex();
 
