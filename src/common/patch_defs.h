@@ -13,10 +13,24 @@ const std::vector<std::string> patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_",                       // genCdKeyIdHex()
+    "_ZN7MPPatch13genCdKeyIdHexEPhPj",                            // genCdKeyIdHex()
     "_ZN7MPPatch13genOneTimeKeyEPhPjPcS2_S2_",                    // genOneTimeKey()
     "_ZN7MPPatch18getPublicIPAddressEv@0",                        // getPublicIpAddress()
 };
+
+/*
+10C24999 | 75 DA                    | jne dunia.10C24975                                                      |
+10C2499B | 8B85 80000000            | mov eax,dword ptr ss:[ebp+80]                                           | serial name length?
+10C249A1 | 8B75 5C                  | mov esi,dword ptr ss:[ebp+5C]                                           | serialname "FARCRY2PC"
+10C249A4 | 889C05 84020000          | mov byte ptr ss:[ebp+eax+284],bl                                        | out length
+10C249AB | 8D45 74                  | lea eax,dword ptr ss:[ebp+74]                                           |
+10C249AE | 50                       | push eax                                                                |
+10C249AF | 8D85 04010000            | lea eax,dword ptr ss:[ebp+104]                                          |
+10C249B5 | 50                       | push eax                                                                |
+10C249B6 | 8DBD 84020000            | lea edi,dword ptr ss:[ebp+284]                                          | [ebp+284]:"îþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþî�
+10C249BC | E8 A9FEFFFF              | call dunia.10C2486A                                                     |
+10C249C1 | 3BC3                     | cmp eax,ebx                                                             |
+*/
 
 /**
  * Patch values patch related to community backend.
@@ -269,12 +283,12 @@ const std::vector<FileEntry> files = {
                     { 0x10c23ee1, get_asm_nop(15) },
 
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
-                    { std::string("\xFF\x15\x34\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::genCdKeyIdHex()
+                    { std::string("\xFF\x15\x30\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::genCdKeyIdHex()
                                   "\xE9\x76\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x38\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                    { std::string("\xFF\x15\x34\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\xA2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED240                                             ; Change function call to instead jump to the .text_p section.
 
@@ -294,7 +308,7 @@ const std::vector<FileEntry> files = {
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\x3C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\x38\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
