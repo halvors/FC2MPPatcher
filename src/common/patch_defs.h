@@ -13,24 +13,10 @@ const std::vector<std::string> patch_library_functions = {
     "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch13genCdKeyIdHexEPhPj",                            // genCdKeyIdHex()
-    "_ZN7MPPatch13genOneTimeKeyEPhPjPcS2_S2_",                    // genOneTimeKey()
+    "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
+    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_",               // generateOneTimeKey()
     "_ZN7MPPatch18getPublicIPAddressEv@0",                        // getPublicIpAddress()
 };
-
-/*
-10C24999 | 75 DA                    | jne dunia.10C24975                                                      |
-10C2499B | 8B85 80000000            | mov eax,dword ptr ss:[ebp+80]                                           | serial name length?
-10C249A1 | 8B75 5C                  | mov esi,dword ptr ss:[ebp+5C]                                           | serialname "FARCRY2PC"
-10C249A4 | 889C05 84020000          | mov byte ptr ss:[ebp+eax+284],bl                                        | out length
-10C249AB | 8D45 74                  | lea eax,dword ptr ss:[ebp+74]                                           |
-10C249AE | 50                       | push eax                                                                |
-10C249AF | 8D85 04010000            | lea eax,dword ptr ss:[ebp+104]                                          |
-10C249B5 | 50                       | push eax                                                                |
-10C249B6 | 8DBD 84020000            | lea edi,dword ptr ss:[ebp+284]                                          | [ebp+284]:"îþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþîþî�
-10C249BC | E8 A9FEFFFF              | call dunia.10C2486A                                                     |
-10C249C1 | 3BC3                     | cmp eax,ebx                                                             |
-*/
 
 /**
  * Patch values patch related to community backend.
@@ -129,7 +115,7 @@ const std::vector<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "5c521c30a4be8d479030f30e34331c6de049f8c4ff9b4118a429ec9e5864a21f" }
+                      "" }
                 },
                 {
                     { "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }, // Hash for Retail version 0.1.17.
@@ -178,10 +164,23 @@ const std::vector<FileEntry> files = {
                     { 0x10c12bca, std::string("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  dunia.1192F220              ; Jump to codecave because of space constrains
                     { 0x10c12bcf, get_asm_nop(15) },
 
+                    // Tweak: Change function call genCdKeyIdHex() to instead call external.
+                    { std::string("\x57"                                    // push edi                                                    ; cd key
+                                  "\x56"                                    // push esi                                                    ; serial name
+                                  "\x50"                                    // push eax                                                    ; out length
+                                  "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
+                                  "\x50"                                    // push eax                                                    ; out pointer
+                                  "\xFF\x15\x38\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\x59"                                    // pop ecx                                                     ; clean up cd key
+                                  "\x59"                                    // pop ecx                                                     ; clean up serial name
+                                  "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp <dunia.return>
+                    { 0x10c136d1, get_asm_nop(8) },
+                    { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
+
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x08\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                  "\xE9\xE5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c1372b, std::string("\xE9\x10\xBB\xD1\x00", 5) }, // jmp  dunia.1192f240                                             ; Change function call to instead jump to the .text_p section.
+                    { std::string("\xFF\x15\x3C\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                  "\xE9\xC5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c1372b, std::string("\xE9\x30\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -189,26 +188,26 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x6B\x19\xE4\xFE"                    // call dunia.10770BD0 ; GetNetFileServerAddress()
+                    { std::string("\xE8\x4B\x19\xE4\xFE"                    // call dunia.10770BD0                                        ; GetNetFileServerAddress()
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\x64\x8C\xEB\xFE"                    // call dunia.107E7ED0 ; IsSessionTypeLAN()
+                                  "\xE8\x44\x8C\xEB\xFE"                    // call dunia.107E7ED0                                        ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
                                   "\x75\x16"                                // jne  <dunia.lan>
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\x0C\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\x40\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x96\x22\xE4\xFE"                    // jmp  <dunia.return>
+                                  "\xE9\x76\x22\xE4\xFE"                    // jmp  <dunia.return>
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x8F\x22\xE4\xFE", 45) },            // jmp  <dunia.return>
-                    { 0x10771517, std::string("\xE9\x44\xDD\x1B\x01", 5) }, // jmp  dunia.1192F260 ; Change function call to instead jump to the .text_p section.
+                                  "\xE9\x6F\x22\xE4\xFE", 45) },            // jmp  <dunia.return>
+                    { 0x10771517, std::string("\xE9\x64\xDD\x1B\x01", 5) }, // jmp  dunia.1192F280 ; Change function call to instead jump to the .text_p section.
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
@@ -216,11 +215,11 @@ const std::vector<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "66bed02cb616edd6a6043d8a37aed702da43f54c0824722d2e974d273d5db6fd" },
+                      "" },
 
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "c9dd9a37410a95bfdf6aadb133535ce776686f9c47abababb284451dbafc2474" }
+                      "" }
                 },
                 {
                     { "7af71319ef055fcc2193862ea43cf63dca92a957eb1c19c3956c72faaaf94804" }, // Hash for Steam version 0.1.17.
@@ -283,19 +282,27 @@ const std::vector<FileEntry> files = {
                     { 0x10c23ee1, get_asm_nop(15) },
 
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
-                    { std::string("\xFF\x15\x30\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::genCdKeyIdHex()
-                                  "\xE9\x76\x77\x23\xFF", 11) },            // jmp  <dunia.return>
+                    { std::string("\x57"                                    // push edi                                                    ; cd key
+                                  "\x56"                                    // push esi                                                    ; serial name
+                                  "\x50"                                    // push eax                                                    ; out length
+                                  "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
+                                  "\x50"                                    // push eax                                                    ; out pointer
+                                  "\xFF\x15\x40\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\x59"                                    // pop ecx                                                     ; clean up cd key
+                                  "\x59"                                    // pop ecx                                                     ; clean up serial name
+                                  "\xE9\x6A\x77\x23\xFF", 23) },            // jmp <dunia.return>
+                    { 0x10c249ae, get_asm_nop(8) },
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x34\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                    { std::string("\xFF\x15\x44\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\xA2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED240                                             ; Change function call to instead jump to the .text_p section.
+                    { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
-                    /* Server */ 
+                    /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
                     { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
@@ -308,7 +315,7 @@ const std::vector<FileEntry> files = {
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\x38\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\x48\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
@@ -317,7 +324,7 @@ const std::vector<FileEntry> files = {
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
                                   "\xE9\x4F\x0C\xD9\xFE", 45) },            // jmp  <dunia.return>
-                    { 0x1077def7, std::string("\xE9\x8F\x88\xDC\x00", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
+                    { 0x1077def7, std::string("\xE9\x84\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
@@ -329,7 +336,7 @@ const std::vector<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "5e77788635dd62f4592380be16d52125342fc52541a60ebd08c7757f3960ffaf" }
+                      "" }
                 },
                 {
                     { "ed008348873b2f4f9e25ecb144aabb243b005711d9cd59841f65874c90349325" }, // Hash for Retail version 0.1.17.
@@ -399,11 +406,11 @@ const std::vector<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "db794f13f7162a26f9ee8d410bca2a3f090e99f2c7ae969dc6c41dadb86e9ab1" },
+                      "" },
 
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "366a543ae95924d441cdd07a213d366354b5bd5a6ecd795865e9d6ff8695b725" }
+                      "" }
                 },
                 {
                     { "18902ffab0a8227d762d0ea0bbc0ea780e52ac81b25fd6a95f41a926c9e07929" }, // Hash for Steam version 0.1.17.

@@ -90,41 +90,34 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
     return gethostbyname(address.toStdString().c_str());
 }
 
-int __cdecl MPPatch::genCdKeyIdHex(uint8_t* out, uint32_t* outLen)
+int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
 {
+    Q_UNUSED(cdKey);
+
+    // TODO: Read out hardware unique id?
+    // https://www.codeproject.com/Tips/5263343/How-to-Get-the-BIOS-UUID
+
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
-    cdKeyHash.addData("FARCRY2PC");
+    cdKeyHash.addData(serialName);
     cdKeyHash.addData(QSysInfo::machineUniqueId());
 
-    //cdKeyHash.addData(serialName, strlen(serialName));
-    //cdKeyHash.addData(cdKey, strlen(cdKey));
-
-    //cdKeyHash.addData("FARCRY2PC");
-    //cdKeyHash.addData("FC2-D76H-0MB3-81MR-1AFR");
-
     QByteArray result = cdKeyHash.result().toHex();
-
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
-
-    //char text[] = "FC2-TEST-SERIAL";
-    //*outLen = strlen(text);
-    //std::memcpy(out, text, *outLen);
 
     return 0;
 }
 
-int __cdecl MPPatch::genOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
+int __cdecl MPPatch::generateOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
 {
     QByteArray passwordHash = CryptoUtils::hashPassword(password).toHex();
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
-    oneTimeHash.addData(username, strlen(username));
-    oneTimeHash.addData(challenge, strlen(challenge));
+    oneTimeHash.addData(username);
+    oneTimeHash.addData(challenge);
     oneTimeHash.addData(passwordHash);
 
     QByteArray result = oneTimeHash.result().toHex();
-
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 
@@ -145,7 +138,7 @@ uint32_t __stdcall MPPatch::getPublicIPAddress()
         const http::Response response = request.send("GET");
 
         publicAddress = htonl(QHostAddress(QString::fromStdString(std::string(response.body.begin(), response.body.end()))).toIPv4Address());
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
 
     }
 
