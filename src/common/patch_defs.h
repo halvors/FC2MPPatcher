@@ -384,7 +384,7 @@ const std::vector<FileEntry> files = {
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\xE8\xDB\x7A\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\x20\xDC\x7A\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
@@ -399,7 +399,89 @@ const std::vector<FileEntry> files = {
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
                     { 0x0094c74b, std::string("\xE9\xA9\x00\x00\x00", 5).append(get_asm_nop(1)) }, // change JZ to JMP + NOP, from (0F 84 A8 00 00 00) to (E9 A9 00 00 00 90), bypassing PB checks for ranked matches.
                     { 0x0094c943, asm_jmp }, // change JZ to JMP in order to bypass autoenable of PB on ranked matches.
-                    { 0x00661eac, get_asm_nop(2) } // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
+                    { 0x00661eac, get_asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting after match is started.
+
+                    // Fix: Unintentional line break due to UTF-16 character being printed on client join.
+                    { std::string("\x68\x10\x0F\x04\x01"         // push   fc2serverlauncher.1040f10
+                                  "\x57"                         // push   edi
+                                  "\x50"                         // push   eax
+                                  "\x51"                         // push   ecx
+                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                 // test   cx,cx
+                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x80\xE1\x80"                 // and    cl,80
+                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x84\xED"                     // test   ch,ch
+                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\xB1\x3F"                     // mov    cl,3F
+                                  "\x32\xED"                     // xor    ch,ch
+                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                 // add    eax,2
+                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x59"                         // pop    ecx
+                                  "\x58"                         // pop    eax
+                                  "\xE9\x93\x2B\x55\xFF", 64) }, // jmp <fc2serverlauncher.return_joined>
+                    { 0x00d01c0d, std::string("\xE9\x2E\xD4\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
+
+                    // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
+                    { std::string("\x68\x70\x0F\x04\x01"         // push   fc2serverlauncher.1040F70
+                                  "\x57"                         // push   edi
+                                  "\x50"                         // push   eax
+                                  "\x51"                         // push   ecx
+                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                 // test   cx,cx
+                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x80\xE1\x80"                 // and    cl,80
+                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x84\xED"                     // test   ch,ch
+                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\xB1\x3F"                     // mov    cl,3F
+                                  "\x32\xED"                     // xor    ch,ch
+                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                 // add    eax,2
+                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x90"                         // nop
+                                  "\x59"                         // pop    ecx
+                                  "\x58"                         // pop    eax
+                                  "\xE9\xA3\x2C\x55\xFF", 64) }, // jmp <fc2serverlauncher.return_left>
+                    { 0x00d01d5d, std::string("\xE9\x1E\xD3\xAA\x00", 5).append(get_asm_nop(1)) } // change function call to instead jump to the .text_p section.
                 }
             },
             { // Steam (R2 is identical) and Uplay
@@ -466,7 +548,7 @@ const std::vector<FileEntry> files = {
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
                                   "\x90"                                    // nop
-                                  "\xFF\x15\xA0\x0D\x7B\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\xFF\x15\xD4\x0D\x7B\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
                                   "\x8B\xC8"                                // mov  ecx,eax
                                   "\x58"                                    // pop  eax
                                   "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
@@ -523,7 +605,6 @@ const std::vector<FileEntry> files = {
                                   "\x58"                         // pop    eax
                                   "\xE9\x13\x28\x55\xFF", 64) },
                     { 0x00d0488d, std::string("\xE9\xAE\xD7\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
-
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
                     { std::string("\x68\xD8\x3F\x04\x01"         // push   fc2serverlauncher.1043FD8
