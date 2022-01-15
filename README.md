@@ -11,7 +11,7 @@ In order to play online you have to register for an online account, Ubisoft serv
     * Verify your account by clicking on the link in the received e-mail.
     * NOTE: You do not need to login to your account on the website, only ingame.
 * Add an online profile (or edit existing one) in the ingame multiplayer menu, use exactly the same account details as registered on [farcry2.online](https://farcry2.online) website.
- Create an online profile in the multiplayer menus ingame using the very same account details.
+* Enjoy your multiplayer online experience!
 
 ### Installation
 **NOTE:** As mentioned in our license, we are liable for bricking your game or even computer. 
