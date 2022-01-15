@@ -1,5 +1,34 @@
 # FC2MPPatcher
-An utility for patching your Far Cry 2 installation to support multiplayer agian. 
+An community-made utility for patching Far Cry 2 to yet again support multiplayer online. 
+
+## Howto / Instructions
+By following the these instructions you will be able to play multiplayer online within 2 minutes!
+
+### Account registration
+In order to play online you have to register for an online account, Ubisoft services shutdown on June 1st 2021 ([Source](https://forums.ubisoft.com/showthread.php/1241617-Online-Services-Update-Masterlist-Forums?s=4e28173932bf67c5c4b122e6e2bd10eb)).
+
+* Create an online account by registering at [farcry2.online](https://farcry2.online/register.html).
+    * Verify your account by clicking on the link in the received e-mail.
+    * NOTE: You do not need to login to your account on the website, only ingame.
+* Add an online profile (or edit existing one) in the ingame multiplayer menu, use exactly the same account details as registered on [farcry2.online](https://farcry2.online) website.
+ Create an online profile in the multiplayer menus ingame using the very same account details.
+
+### Installation
+**NOTE:** As mentioned in our license, we are liable for bricking your game or even computer. 
+
+* Download the latest version of the patch [here](https://github.com/halvors/FC2MPPatcher/releases) (make sure to download the .zip file), if you have a previous version installed, select upgrade instead of install.
+* Run the patcher application (fc2mppatcher.exe) and make sure to select the network interface that your internet connection is on (Usually Ethernet or Wifi).
+* Press the patch button and you are good to go!
+
+Currently to play ranked matches you need PunkBuster installed, even though it is not in use by the server itself.
+
+### Requirements
+ * A legal copy of the Far Cry 2 game (We do not ship any game files as they are intellectual property of Ubisoft Montreal). 
+ * Game from one of these sources: Steam, Uplay, GOG or the Retail edition (CD/Disc).
+ * Your game needs to be patched to version 1.03.
+
+### Antivirus
+This patch could trigger a false positive in your antivirus software, that is because it alters Far Cry 2 game files, this is to be expected and can be ignored. This software contains no code, you're welcome to read throught our source code ;-)
 
 ## Features
 This resolves the following issues for the game and dedicated server.
@@ -20,36 +49,21 @@ This resolves the following issues for the game and dedicated server.
 
 If you experience diffculties patching the game, first make sure you got the 1.03 patch installed, if your version of the game isn't supported (only Retail, Steam, Uplay and GOG is tested), please report on the issue tracker, it's a quick fix.
 
-## Requirements
- * The game files itself. (We do not ship any game files as they are copyrighted by Ubisoft). 
- * The newest version of the game from either Steam, Uplay, GOG or the Retail edition (Disc), your game needs to be version 1.03.
+## Hosting a server
+To host a server online you have to make the proper ports is open/forwarded. Usually port TCP/UDP 9000 to 9100 should do, everything else should work out of the box!
 
-## Installation
-<b>NOTE:</b> As mentioned in license, we're not responsible for breaking your game or getting you banned.
+Please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server actually listens to address 0.0.0.0 (any), which makes it reachable on any network adapter.
 
-* Download the latest version of the patcher, if you got an old version installed, uninstall it first.
-* Run the patcher and make sure to select the network interface that your internet connection is on (Usually Ethernet or Wifi).
-* Press the patch button and you are good to go!
-
-To play ranked matches you need PunkBuster installed, even though it is not in use by the server itself.
-
-### Antivirus
-This patch will probably trigger a false positive in your antivirus software because it alters the game files of Far Cry 2, this is normal.  
-The patch contains no malware or virueses, you're also welcome to read throught our code!
-
-### Running a Dedicated Server
-If hosting a server to be used by players thru VPN, you have to select your VPN adapter before patching!
-
-Also please be aware that IP addresses shown in server logs may be misleading, no matter what address is shown the server always listens on 0.0.0.0 (any), which means it's reachable on any network adapter.
+If hosting a server to be used by players on LAN or thru VPN, you have to select the proper network adapter (if VPN select that) before patching!
 
 ## Discord
-### To get support and reach out to other players
-https://discord.link/FC2
+[FC2MPPatcher](https://discord.gg/82G9Fh5)
+[FC2Community](https://discord.link/FC2)
 
 ## Thanks to
 ### Contributors
-<i>zenoy, halvors and FEARIV</i> - for patching the assembly code, creating the patcher application and web development.  
-<i>svinsen, Gabor and Lasercar</i> - for help testing and with community support.
+<i>zenoy, halvors and FEARIV</i> - for patching the assembly code, creating the patcher application, and providing community backend services.  
+<i>svinsen, Gabor and Lasercar</i> - for help testing and community support.
 
 ### Others
 Thanks to original author of PE Bliss library, rukaimi (kaimi.ru)!  
