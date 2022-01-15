@@ -57,7 +57,7 @@ Please be aware that IP addresses shown in server logs may be misleading, no mat
 If hosting a server to be used by players on LAN or thru VPN, you have to select the proper network adapter (if VPN select that) before patching!
 
 ## Discord
-[FC2MPPatcher](https://discord.gg/82G9Fh5) 
+[FC2MPPatcher](https://discord.gg/82G9Fh5)  
 [FC2Community](https://discord.link/FC2)
 
 ## Thanks to
