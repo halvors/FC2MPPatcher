@@ -14,13 +14,13 @@ In order to play online you have to register for an online account, Ubisoft serv
 * Enjoy your multiplayer online experience!
 
 ### Installation
-**NOTE:** As mentioned in our license, we are liable for bricking your game or even computer. 
-
 * Download the latest version of the patch [here](https://github.com/halvors/FC2MPPatcher/releases) (make sure to download the .zip file), if you have a previous version installed, select upgrade instead of install.
 * Run the patcher application (fc2mppatcher.exe) and make sure to select the network interface that your internet connection is on (Usually Ethernet or Wifi).
 * Press the patch button and you are good to go!
 
 Currently to play ranked matches you need PunkBuster installed, even though it is not in use by the server itself.
+
+**NOTE:** As mentioned in our license, we are liable for bricking your game or even computer. 
 
 ### Requirements
  * A legal copy of the Far Cry 2 game (We do not ship any game files as they are intellectual property of Ubisoft Montreal). 
