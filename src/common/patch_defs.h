@@ -305,6 +305,7 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
+
                     { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
@@ -374,25 +375,26 @@ const std::vector<FileEntry> files = {
 
                     // Fix: Custom map download
                     { 0x004ecda5, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x4B\x4C\x30\xFF"                    // call fc2serverlauncher.AB3C50 ; GetNetFileServerAddress()
+                    { std::string("\xE8\x4B\x4C\x30\xFF"                    // call fc2serverlauncher.AB3C50  ; GetNetFileServerAddress()
+                                  "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\x04\x01\x30\xFF"                    // call fc2serverlauncher.AAF110 ; IsSessionTypeLAN()
+                                  "\xE8\x03\x01\x30\xFF"                    // call fc2serverlauncher.AAF110  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
-                                  "\x75\x16"                                // jne  <fc2serverlauncher.lan>
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\xFF\x15\x20\xDC\x7A\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\x75\x1B", 17)                           // jne  <fc2serverlauncher.end>
+                      .append(get_asm_nop(4)).append(
+                                  "\xE8\x07\x42\x6B\xFF"                    // call fc2serverlauncher.E63221  ; Os::Agora::Network::getSingleton()
+                                  "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
+                                  "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
+                                  "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
+                                  "\x36\x8D\x49\x08"                        // lea  ecx,dword ptr ds:[ecx+8]
+                                  "\x51"                                    // push ecx
                                   "\x8B\xC8"                                // mov  ecx,eax
-                                  "\x58"                                    // pop  eax
-                                  "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
-                                  "\x59"                                    // pop  ecx
-                                  "\xE9\x3F\x91\x30\xFF"                    // jmp  <fc2serverlauncher.return>
+                                  "\xFF\xD2"                                // call edx
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x38\x91\x30\xFF", 45) },            // jmp  <fc2serverlauncher.return>
+                                  "\x5A"                                    // pop  edx
+                                  "\xE9\x31\x91\x30\xFF", 31) },            // jmp  <fc2serverlauncher.return>
                     { 0x00ab8160, std::string("\xE9\x9B\x6E\xCF\x00", 5) }, // jmp  fc2serverlauncher.17AF000 ; Change function call to instead jump to the .text_p section.
                     { 0x004ecb38, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
@@ -538,25 +540,26 @@ const std::vector<FileEntry> files = {
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x4B\xCB\x2F\xFF"                    // call fc2serverlauncher.AAEB50 ; GetNetFileServerAddress()
+                    { std::string("\xE8\x4B\xCB\x2F\xFF"                    // call fc2serverlauncher.AAEB50  ; GetNetFileServerAddress()
+                                  "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\x14\x72\x2F\xFF"                    // call fc2serverlauncher.AA9220 ; IsSessionTypeLAN()
+                                  "\xE8\x13\x72\x2F\xFF"                    // call fc2serverlauncher.AA9220  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
-                                  "\x75\x16"                                // jne  <fc2serverlauncher.lan>
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\xFF\x15\xD4\x0D\x7B\x01"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\x75\x1B", 17)                           // jne  <fc2serverlauncher.end>
+                      .append(get_asm_nop(4)).append(
+                                  "\xE8\x7D\x34\x6B\xFF"                    // call fc2serverlauncher.E65497  ; Os::Agora::Network::getSingleton()
+                                  "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
+                                  "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
+                                  "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
+                                  "\x36\x8D\x49\x08"                        // lea  ecx,dword ptr ds:[ecx+8]
+                                  "\x51"                                    // push ecx
                                   "\x8B\xC8"                                // mov  ecx,eax
-                                  "\x58"                                    // pop  eax
-                                  "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
-                                  "\x59"                                    // pop  ecx
-                                  "\xE9\xDF\x10\x30\xFF"                    // jmp  <fc2serverlauncher.return>
+                                  "\xFF\xD2"                                // call edx
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\xD8\x10\x30\xFF", 45) },            // jmp  <fc2serverlauncher.return>
+                                  "\x5A"                                    // pop  edx
+                                  "\xE9\xD1\x10\x30\xFF", 31) },            // jmp  <fc2serverlauncher.return>
                     { 0x00ab3100, std::string("\xE9\xFB\xEE\xCF\x00", 5) }, // jmp  fc2serverlauncher.17B2000 ; Change function call to instead jump to the .text_p section.
                     { 0x004ec828, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 

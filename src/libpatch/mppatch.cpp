@@ -92,16 +92,28 @@ hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 
 int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
 {
+    Q_UNUSED(serialName);
     Q_UNUSED(cdKey);
 
-    // TODO: Read out hardware unique id?
-    // https://www.codeproject.com/Tips/5263343/How-to-Get-the-BIOS-UUID
-
+    /*
+    // CD key
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
     cdKeyHash.addData(serialName);
-    cdKeyHash.addData(QSysInfo::machineUniqueId());
+    cdKeyHash.addData(cdKey);
+    */
 
-    QByteArray result = cdKeyHash.result().toHex();
+    // Machine id
+    QCryptographicHash identifierHash(QCryptographicHash::Algorithm::Sha256);
+    identifierHash.addData(QSysInfo::machineUniqueId());
+
+    /*
+    QByteArray asn1 = QByteArray("\x39\x3e"( // SEQUENCE
+                                 "\x80\x04").append(0x1020003).append( // INTEGER
+                                 "\x81\x14").append(cdKeyHash.result().toHex()).append( // OCTET STRING
+                                 "\x82\x20").append(identifierHash.result().toHex()); // OCTET STRING
+    */
+
+    QByteArray result = identifierHash.result().toHex();
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 
