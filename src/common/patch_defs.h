@@ -14,8 +14,7 @@ const std::vector<std::string> patch_library_functions = {
     "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
     "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
     "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
-    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_",               // generateOneTimeKey()
-    "_ZN7MPPatch18getPublicIPAddressEv@0",                        // getPublicIpAddress()
+    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_"                // generateOneTimeKey()
 };
 
 /**
@@ -36,7 +35,7 @@ const std::vector<std::string> patch_library_functions = {
  * Original: stun.ncsa.ubi.com00
  * New:      stun.farcry2.online
  */
-static const std::string patch_endpoint_config_host = "conf.farcry2.online";
+const std::string patch_endpoint_config_host = "conf.farcry2.online";
 const constexpr uint16_t patch_endpoint_config_port = 3074;
 const std::string patch_endpoint_onlineconfig = patch_endpoint_config_host + ":" + std::to_string(patch_endpoint_config_port).append(3, 0x00);
 const std::string patch_endpoint_stun_host = "stun.farcry2.online";
@@ -168,17 +167,17 @@ const std::vector<FileEntry> files = {
                     { std::string("\x57"                                    // push edi                                                    ; cd key
                                   "\x56"                                    // push esi                                                    ; serial name
                                   "\x50"                                    // push eax                                                    ; out length
-                                  "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
+                                  "\x8D\x85\x04\x01\x00\x00"                // lea  eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                                    ; out pointer
-                                  "\xFF\x15\x38\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
-                                  "\x59"                                    // pop ecx                                                     ; clean up cd key
-                                  "\x59"                                    // pop ecx                                                     ; clean up serial name
-                                  "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp <dunia.return>
+                                  "\xFF\x15\x10\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\x59"                                    // pop  ecx                                                     ; clean up cd key
+                                  "\x59"                                    // pop  ecx                                                     ; clean up serial name
+                                  "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp  <dunia.return>
                     { 0x10c136d1, get_asm_nop(8) },
                     { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x3C\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                    { std::string("\xFF\x15\x14\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\xC5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c1372b, std::string("\xE9\x30\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
 
@@ -188,25 +187,26 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x4B\x19\xE4\xFE"                    // call dunia.10770BD0                                        ; GetNetFileServerAddress()
+                    { std::string("\xE8\x4B\x19\xE4\xFE"                    // call dunia.10770BD0  ; GetNetFileServerAddress()
+                                  "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\x44\x8C\xEB\xFE"                    // call dunia.107E7ED0                                        ; IsSessionTypeLAN()
+                                  "\xE8\x43\x8C\xEB\xFE"                    // call dunia.107E7ED0  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
-                                  "\x75\x16"                                // jne  <dunia.lan>
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\xFF\x15\x40\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\x75\x1B", 17)                           // jne  <dunia.end>
+                      .append(get_asm_nop(4)).append(
+                                  "\xE8\xA1\xBD\x2D\xFF"                    // call dunia.10C0B03B  ; Os::Agora::Network::getSingleton()
+                                  "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
+                                  "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
+                                  "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
+                                  "\x36\x8D\x49\x08"                        // lea  ecx,dword ptr ds:[ecx+8]
+                                  "\x51"                                    // push ecx
                                   "\x8B\xC8"                                // mov  ecx,eax
-                                  "\x58"                                    // pop  eax
-                                  "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
-                                  "\x59"                                    // pop  ecx
-                                  "\xE9\x76\x22\xE4\xFE"                    // jmp  <dunia.return>
+                                  "\xFF\xD2"                                // call edx
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x6F\x22\xE4\xFE", 45) },            // jmp  <dunia.return>
+                                  "\x5A"                                    // pop  edx
+                                  "\xE9\x68\x22\xE4\xFE", 31) },            // jmp  <dunia.return>
                     { 0x10771517, std::string("\xE9\x64\xDD\x1B\x01", 5) }, // jmp  dunia.1192F280 ; Change function call to instead jump to the .text_p section.
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
@@ -287,7 +287,7 @@ const std::vector<FileEntry> files = {
                                   "\x50"                                    // push eax                                                    ; out length
                                   "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                                    ; out pointer
-                                  "\xFF\x15\x40\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\xFF\x15\x18\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
                                   "\x59"                                    // pop ecx                                                     ; clean up cd key
                                   "\x59"                                    // pop ecx                                                     ; clean up serial name
                                   "\xE9\x6A\x77\x23\xFF", 23) },            // jmp <dunia.return>
@@ -295,7 +295,7 @@ const std::vector<FileEntry> files = {
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x44\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                    { std::string("\xFF\x15\x1C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\xA2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
 
@@ -305,26 +305,26 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-
-                    { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600 ; GetNetFileServerAddress()
+                    { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600  ; GetNetFileServerAddress()
+                                  "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\xA4\x06\xD9\xFE"                    // call dunia.1077D930 ; IsSessionTypeLAN()
+                                  "\xE8\xA3\x06\xD9\xFE"                    // call dunia.1077D930  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
-                                  "\x75\x16"                                // jne  <dunia.lan>
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\x90"                                    // nop
-                                  "\xFF\x15\x48\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch18getPublicIPAddressEv@0>] ; MPPatch::getPublicIPAddress()
+                                  "\x75\x1B", 17)                           // jne  <dunia.end>
+                      .append(get_asm_nop(4)).append(
+                                  "\xE8\xB9\xEF\x22\xFF"                    // call dunia.10C1C253  ; Os::Agora::Network::getSingleton()
+                                  "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
+                                  "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
+                                  "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
+                                  "\x36\x8D\x49\x08"                        // lea  ecx,dword ptr ds:[ecx+8]
+                                  "\x51"                                    // push ecx
                                   "\x8B\xC8"                                // mov  ecx,eax
-                                  "\x58"                                    // pop  eax
-                                  "\x89\x48\x08"                            // mov  dword ptr ds:[eax+8],ecx
-                                  "\x59"                                    // pop  ecx
-                                  "\xE9\x56\x0C\xD9\xFE"                    // jmp  <dunia.return>
+                                  "\xFF\xD2"                                // call edx
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
-                                  "\xE9\x4F\x0C\xD9\xFE", 45) },            // jmp  <dunia.return>
+                                  "\x5A"                                    // pop  edx
+                                  "\xE9\x48\x0C\xD9\xFE", 31) },            // jmp  <dunia.return>
                     { 0x1077def7, std::string("\xE9\x84\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
@@ -404,85 +404,59 @@ const std::vector<FileEntry> files = {
                     { 0x00661eac, get_asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting after match is started.
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client join.
-                    { std::string("\x68\x10\x0F\x04\x01"         // push   fc2serverlauncher.1040f10
-                                  "\x57"                         // push   edi
-                                  "\x50"                         // push   eax
-                                  "\x51"                         // push   ecx
-                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
-                                  "\x66\x85\xC9"                 // test   cx,cx
-                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x80\xE1\x80"                 // and    cl,80
-                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x84\xED"                     // test   ch,ch
-                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xB1\x3F"                     // mov    cl,3F
-                                  "\x32\xED"                     // xor    ch,ch
-                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
-                                  "\x83\xC0\x02"                 // add    eax,2
-                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x59"                         // pop    ecx
-                                  "\x58"                         // pop    eax
-                                  "\xE9\x93\x2B\x55\xFF", 64) }, // jmp <fc2serverlauncher.return_joined>
+                    { std::string("\x68\x10\x0F\x04\x01"        // push fc2serverlauncher.1040f10
+                                  "\x57"                        // push edi
+                                  "\x50"                        // push eax
+                                  "\x51"                        // push ecx
+                                  "\x66\x8B\x08"                // mov  cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                // test cx,cx
+                                  "\x74\x29", 16)               // je   <fc2serverlauncher.exit_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x80\xE1\x80"                // and  cl,80
+                                  "\x75\x11", 5)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x84\xED"                    // test ch,ch
+                                  "\x75\x09", 4)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\xEB\x0A", 2)                // jmp  <fc2serverlauncher.continue_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\xB1\x3F"                    // mov  cl,3F
+                                  "\x32\xED"                    // xor  ch,ch
+                                  "\x66\x89\x08"                // mov  word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                // add  eax,2
+                                  "\xEB\xD2", 12)               // jmp  <fc2serverlauncher.loop_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\x59"                        // pop    ecx
+                                  "\x58"                        // pop    eax
+                                  "\xE9\x93\x2B\x55\xFF", 7) }, // jmp <fc2serverlauncher.return_joined>
                     { 0x00d01c0d, std::string("\xE9\x2E\xD4\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
-                    { std::string("\x68\x70\x0F\x04\x01"         // push   fc2serverlauncher.1040F70
-                                  "\x57"                         // push   edi
-                                  "\x50"                         // push   eax
-                                  "\x51"                         // push   ecx
-                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
-                                  "\x66\x85\xC9"                 // test   cx,cx
-                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x80\xE1\x80"                 // and    cl,80
-                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x84\xED"                     // test   ch,ch
-                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xB1\x3F"                     // mov    cl,3F
-                                  "\x32\xED"                     // xor    ch,ch
-                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
-                                  "\x83\xC0\x02"                 // add    eax,2
-                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x59"                         // pop    ecx
-                                  "\x58"                         // pop    eax
-                                  "\xE9\xA3\x2C\x55\xFF", 64) }, // jmp <fc2serverlauncher.return_left>
+                    { std::string("\x68\x70\x0F\x04\x01"        // push fc2serverlauncher.1040F70
+                                  "\x57"                        // push edi
+                                  "\x50"                        // push eax
+                                  "\x51"                        // push ecx
+                                  "\x66\x8B\x08"                // mov  cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                // test cx,cx
+                                  "\x74\x29", 16)               // je   <fc2serverlauncher.exit_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x80\xE1\x80"                // and  cl,80
+                                  "\x75\x11", 5)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x84\xED"                    // test ch,ch
+                                  "\x75\x09", 4)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\xEB\x0A", 2)                // jmp  <fc2serverlauncher.continue_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\xB1\x3F"                    // mov  cl,3F
+                                  "\x32\xED"                    // xor  ch,ch
+                                  "\x66\x89\x08"                // mov  word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                // add  eax,2
+                                  "\xEB\xD2", 12)               // jmp  <fc2serverlauncher.loop_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\x59"                        // pop  ecx
+                                  "\x58"                        // pop  eax
+                                  "\xE9\xA3\x2C\x55\xFF", 7) }, // jmp <fc2serverlauncher.return_left>
                     { 0x00d01d5d, std::string("\xE9\x1E\xD3\xAA\x00", 5).append(get_asm_nop(1)) } // change function call to instead jump to the .text_p section.
                 }
             },
@@ -569,85 +543,59 @@ const std::vector<FileEntry> files = {
                     { 0x0067552c, get_asm_nop(2) }, // change JNZ to NOP in order to prevent PB from starting autostarting after match is started.
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client join.
-                    { std::string("\x68\x78\x3F\x04\x01"         // push   fc2serverlauncher.1043F78
-                                  "\x57"                         // push   edi
-                                  "\x50"                         // push   eax
-                                  "\x51"                         // push   ecx
-                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
-                                  "\x66\x85\xC9"                 // test   cx,cx
-                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x80\xE1\x80"                 // and    cl,80
-                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x84\xED"                     // test   ch,ch
-                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xB1\x3F"                     // mov    cl,3F
-                                  "\x32\xED"                     // xor    ch,ch
-                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
-                                  "\x83\xC0\x02"                 // add    eax,2
-                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x59"                         // pop    ecx
-                                  "\x58"                         // pop    eax
-                                  "\xE9\x13\x28\x55\xFF", 64) },
+                    { std::string("\x68\x78\x3F\x04\x01"        // push fc2serverlauncher.1043F78
+                                  "\x57"                        // push edi
+                                  "\x50"                        // push eax
+                                  "\x51"                        // push ecx
+                                  "\x66\x8B\x08"                // mov  cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                // test cx,cx
+                                  "\x74\x29", 16)               // je   <fc2serverlauncher.exit_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x80\xE1\x80"                // and  cl,80
+                                  "\x75\x11", 5)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x84\xED"                    // test ch,ch
+                                  "\x75\x09", 4)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\xEB\x0A", 2)                // jmp  <fc2serverlauncher.continue_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\xB1\x3F"                    // mov  cl,3F
+                                  "\x32\xED"                    // xor  ch,ch
+                                  "\x66\x89\x08"                // mov  word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                // add  eax,2
+                                  "\xEB\xD2", 12)               // jmp  <fc2serverlauncher.loop_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\x59"                        // pop  ecx
+                                  "\x58"                        // pop  eax
+                                  "\xE9\x13\x28\x55\xFF", 7) }, // jmp <fc2serverlauncher.return_left>
                     { 0x00d0488d, std::string("\xE9\xAE\xD7\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     // Fix: Unintentional line break due to UTF-16 character being printed on client leave.
-                    { std::string("\x68\xD8\x3F\x04\x01"         // push   fc2serverlauncher.1043FD8
-                                  "\x57"                         // push   edi
-                                  "\x50"                         // push   eax
-                                  "\x51"                         // push   ecx
-                                  "\x66\x8B\x08"                 // mov    cx,word ptr ds:[eax]
-                                  "\x66\x85\xC9"                 // test   cx,cx
-                                  "\x74\x29"                     // je     <fc2serverlauncher.exit_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x80\xE1\x80"                 // and    cl,80
-                                  "\x75\x11"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x84\xED"                     // test   ch,ch
-                                  "\x75\x09"                     // jne    <fc2serverlauncher.do_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xEB\x0A"                     // jmp    <fc2serverlauncher.continue_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\xB1\x3F"                     // mov    cl,3F
-                                  "\x32\xED"                     // xor    ch,ch
-                                  "\x66\x89\x08"                 // mov    word ptr ds:[eax],cx
-                                  "\x83\xC0\x02"                 // add    eax,2
-                                  "\xEB\xD2"                     // jmp    <fc2serverlauncher.loop_joined>
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x90"                         // nop
-                                  "\x59"                         // pop    ecx
-                                  "\x58"                         // pop    eax
-                                  "\xE9\x23\x29\x55\xFF", 64) },
+                    { std::string("\x68\xD8\x3F\x04\x01"        // push fc2serverlauncher.1043FD8
+                                  "\x57"                        // push edi
+                                  "\x50"                        // push eax
+                                  "\x51"                        // push ecx
+                                  "\x66\x8B\x08"                // mov  cx,word ptr ds:[eax]
+                                  "\x66\x85\xC9"                // test cx,cx
+                                  "\x74\x29", 16)               // je   <fc2serverlauncher.exit_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x80\xE1\x80"                // and  cl,80
+                                  "\x75\x11", 5)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\x84\xED"                    // test ch,ch
+                                  "\x75\x09", 4)                // jne  <fc2serverlauncher.do_joined>
+                      .append(get_asm_nop(4)).append(
+                                  "\xEB\x0A", 2)                // jmp  <fc2serverlauncher.continue_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\xB1\x3F"                    // mov  cl,3F
+                                  "\x32\xED"                    // xor  ch,ch
+                                  "\x66\x89\x08"                // mov  word ptr ds:[eax],cx
+                                  "\x83\xC0\x02"                // add  eax,2
+                                  "\xEB\xD2", 12)               // jmp  <fc2serverlauncher.loop_joined>
+                      .append(get_asm_nop(3)).append(
+                                  "\x59"                        // pop  ecx
+                                  "\x58"                        // pop  eax
+                                  "\xE9\x23\x29\x55\xFF", 7) }, // jmp <fc2serverlauncher.return_left>
                     { 0x00d049dd, std::string("\xE9\x9E\xD6\xAA\x00", 5).append(get_asm_nop(1)) }, // change function call to instead jump to the .text_p section.
 
                     /* Experimental / WIP */

@@ -8,20 +8,20 @@
 #include <QSettings>
 
 #include "defs.h"
+#include "helper.h"
 #include "patch_defs.h"
 #include "netutils.h"
 #include "cryptoutils.h"
-#include "HTTPRequest.h"
 
 void MPPatch::readSettings()
 {
-    if (!address.isEmpty() && !broadcast.isEmpty())
+    if (!address.empty() && !broadcast.empty())
         return;
 
-    QSettings *settings = new QSettings(patch_configuration_file, QSettings::IniFormat);
+    QSettings settings(patch_configuration_file, QSettings::IniFormat);
 
-    settings->beginGroup(patch_configuration_network);
-        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings->value(patch_configuration_network_interface).toString());
+    settings.beginGroup(patch_configuration_network);
+        QNetworkInterface networkInterface = NetUtils::findValidInterface(settings.value(patch_configuration_network_interface).toString());
 
         // Scan thru addresses for this interface.
         for (const QNetworkAddressEntry &addressEntry : networkInterface.addressEntries()) {
@@ -29,18 +29,16 @@ void MPPatch::readSettings()
 
             // We're only looking for IPv4 addresses.
             if (hostAddress.protocol() == QAbstractSocket::IPv4Protocol) {
-                address = hostAddress.toString();
-                broadcast = addressEntry.broadcast().toString();
+                address = hostAddress.toString().toStdString();
+                broadcast = addressEntry.broadcast().toString().toStdString();
             }
         }
-    settings->endGroup();
-
-    delete settings;
+    settings.endGroup();
 }
 
 int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int namelen)
 {
-    sockaddr_in *name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
+    sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
 
     // Change address to bind to any.
     name_in->sin_addr.s_addr = INADDR_ANY;
@@ -50,13 +48,13 @@ int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int nam
 
 int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
 {
-    sockaddr_in *to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
+    sockaddr_in* to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
 
     readSettings();
 
     // If destination address is 255.255.255.255, use subnet broadcast address instead.
     if (to_in->sin_addr.s_addr == INADDR_BROADCAST)
-        to_in->sin_addr.s_addr = inet_addr(broadcast.toStdString().c_str());
+        to_in->sin_addr.s_addr = inet_addr(broadcast.c_str());
 
     return sendto(s, buf, len, flags, to, tolen);
 }
@@ -68,52 +66,46 @@ uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, 
     if (result == ERROR_BUFFER_OVERFLOW)
         return result;
 
-    IP_ADAPTER_INFO *adapter = adapterInfo;
+    IP_ADAPTER_INFO* adapter = adapterInfo;
 
     readSettings();
 
-    while (strcmp(adapter->IpAddressList.IpAddress.String, address.toStdString().c_str()) != 0)
+    while (strcmp(adapter->IpAddressList.IpAddress.String, address.c_str()) != 0)
         adapter = adapter->Next;
 
     adapter->Next = nullptr;
-    memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
+    std::memcpy(adapterInfo, adapter, sizeof(IP_ADAPTER_INFO));
 
     return result;
 }
 
-hostent *WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
+hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 {
     Q_UNUSED(name);
 
     readSettings();
 
-    return gethostbyname(address.toStdString().c_str());
+    return gethostbyname(address.c_str());
 }
 
 int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
 {
-    Q_UNUSED(serialName);
-    Q_UNUSED(cdKey);
+    uint32_t version = Helper::toInt(APP_VERSION);
 
-    /*
-    // CD key
+    // CD key hex
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
     cdKeyHash.addData(serialName);
     cdKeyHash.addData(cdKey);
-    */
 
     // Machine id
-    QCryptographicHash identifierHash(QCryptographicHash::Algorithm::Sha256);
+    QCryptographicHash identifierHash(QCryptographicHash::Algorithm::Sha1);
     identifierHash.addData(QSysInfo::machineUniqueId());
 
-    /*
-    QByteArray asn1 = QByteArray("\x39\x3e"( // SEQUENCE
-                                 "\x80\x04").append(0x1020003).append( // INTEGER
-                                 "\x81\x14").append(cdKeyHash.result().toHex()).append( // OCTET STRING
-                                 "\x82\x20").append(identifierHash.result().toHex()); // OCTET STRING
-    */
-
-    QByteArray result = identifierHash.result().toHex();
+    // Sending ASN.1 structure inside IA5String, currently 12 bytes of space left in buffer of 128 bytes.
+    QByteArray result = QByteArray("\x30\x32").append( // SEQUENCE
+                                   "\x80\x04").append(reinterpret_cast<const char*>(&version), sizeof(version)).append( // INTEGER
+                                   "\x81\x14").append(cdKeyHash.result()).append( // OCTET STRING
+                                   "\x82\x14").append(identifierHash.result()).toHex(); // OCTET STRING
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 
@@ -134,25 +126,4 @@ int __cdecl MPPatch::generateOneTimeKey(uint8_t* out, uint32_t* outLen, char* ch
     std::memcpy(out, result.constData(), *outLen);
 
     return 0;
-}
-
-uint32_t __stdcall MPPatch::getPublicIPAddress()
-{
-    // Return cached address if it exists.
-    if (publicAddress != 0)
-        return publicAddress;
-
-    try {
-        // you can pass http::InternetProtocol::V6 to Request to make an IPv6 request
-        http::Request request("http://api.ipify.org");
-
-        // send a get request
-        const http::Response response = request.send("GET");
-
-        publicAddress = htonl(QHostAddress(QString::fromStdString(std::string(response.body.begin(), response.body.end()))).toIPv4Address());
-    } catch (const std::exception& e) {
-
-    }
-
-    return publicAddress;
 }
