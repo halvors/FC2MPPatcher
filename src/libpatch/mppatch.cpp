@@ -105,7 +105,7 @@ int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* se
     QByteArray result = QByteArray("\x30\x32").append( // SEQUENCE
                                    "\x80\x04").append(reinterpret_cast<const char*>(&version), sizeof(version)).append( // INTEGER
                                    "\x81\x14").append(cdKeyHash.result()).append( // OCTET STRING
-                                   "\x82\x14").append(identifierHash.result()).toHex(); // OCTET STRING
+                                   "\x82\x14").append(identifierHash.result().toHex()); // OCTET STRING
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 

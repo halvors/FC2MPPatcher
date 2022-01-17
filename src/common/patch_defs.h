@@ -294,9 +294,14 @@ const std::vector<FileEntry> files = {
                     { 0x10c249ae, get_asm_nop(8) },
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
 
+                    // Tweak: Use OCTETSTRING instead of IA5STRING
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
+                                  "\xE9\x90\x78\x23\xFF", 15) },             // jmp dunia.119ED260
+                    { 0x10c24af9, std::string("\xE9\x62\x87\xDC\x00", 5).append(get_asm_nop(1)) },
+
                     // Tweak: Change function call genOneTimeKey() to instead call external.
                     { std::string("\xFF\x15\x1C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                  "\xE9\xA2\x77\x23\xFF", 11) },            // jmp  <dunia.return>
+                                  "\xE9\x82\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
@@ -305,15 +310,15 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cebaf2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x7B\x03\xD9\xFE"                    // call dunia.1077D600  ; GetNetFileServerAddress()
+                    { std::string("\xE8\x5B\x03\xD9\xFE"                    // call dunia.1077D600  ; GetNetFileServerAddress()
                                   "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\xA3\x06\xD9\xFE"                    // call dunia.1077D930  ; IsSessionTypeLAN()
+                                  "\xE8\x83\x06\xD9\xFE"                    // call dunia.1077D930  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
                                   "\x75\x1B", 17)                           // jne  <dunia.end>
                       .append(get_asm_nop(4)).append(
-                                  "\xE8\xB9\xEF\x22\xFF"                    // call dunia.10C1C253  ; Os::Agora::Network::getSingleton()
+                                  "\xE8\x99\xEF\x22\xFF"                    // call dunia.10C1C253  ; Os::Agora::Network::getSingleton()
                                   "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
                                   "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
                                   "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
@@ -324,7 +329,7 @@ const std::vector<FileEntry> files = {
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
-                                  "\xE9\x48\x0C\xD9\xFE", 31) },            // jmp  <dunia.return>
+                                  "\xE9\x28\x0C\xD9\xFE", 31) },            // jmp  <dunia.return>
                     { 0x1077def7, std::string("\xE9\x84\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
