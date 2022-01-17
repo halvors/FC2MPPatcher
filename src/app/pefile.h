@@ -1,11 +1,11 @@
 #ifndef PEFILE_H
 #define PEFILE_H
 
+#include <string>
+#include <vector>
+
 #include <QObject>
 #include <QFile>
-#include <QString>
-#include <QStringList>
-#include <QList>
 
 #include <pe_bliss.h>
 

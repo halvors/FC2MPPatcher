@@ -44,7 +44,7 @@ bool PeFile::read()
     return true;
 }
 
-bool PeFile::apply(const std::string& libraryFile, const std::vector<std::string>& libraryFunctions, const std::vector<CodeEntry>& codeEntries) const
+bool PeFile::apply(const std::string& libraryFile, const std::vector<std::string> &libraryFunctions, const std::vector<CodeEntry>& codeEntries) const
 {
     // Check that image is loaded.
     if (!image)

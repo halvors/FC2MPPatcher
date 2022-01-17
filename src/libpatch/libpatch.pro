@@ -23,12 +23,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 HEADERS += \
     cryptoutils.h \
-    httprequest.h \
+    helper.h \
     mppatch.h \
     mppatch_global.h
 
 SOURCES += mppatch.cpp \
-    cryptoutils.cpp
+    cryptoutils.cpp \
+    helper.cpp
 
 include(../common/common.pri)
 
