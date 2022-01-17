@@ -302,7 +302,7 @@ const std::vector<FileEntry> files = {
                     // Tweak: Change function call genOneTimeKey() to instead call external.
                     { std::string("\xFF\x15\x1C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\x82\x77\x23\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c24a08, std::string("\xE9\x53\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
+                    { 0x10c24a08, std::string("\xE9\x73\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
