@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include <QtEndian>
 #include <QCryptographicHash>
 #include <QHostAddress>
 #include <QNetworkInterface>
@@ -90,7 +91,7 @@ hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
 
 int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
 {
-    uint32_t version = Helper::toInt(APP_VERSION);
+    const uint32_t version = qbswap(Helper::toInt(APP_VERSION));
 
     // CD key hex
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
@@ -101,11 +102,11 @@ int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* se
     QCryptographicHash identifierHash(QCryptographicHash::Algorithm::Sha1);
     identifierHash.addData(QSysInfo::machineUniqueId());
 
-    // Sending ASN.1 structure inside IA5String, currently 12 bytes of space left in buffer of 128 bytes.
+    // Sending ASN.1 structure inside OCTETSTRING
     QByteArray result = QByteArray("\x30\x32").append( // SEQUENCE
-                                   "\x80\x04").append(reinterpret_cast<const char*>(&version), sizeof(version)).append( // INTEGER
-                                   "\x81\x14").append(cdKeyHash.result()).append( // OCTET STRING
-                                   "\x82\x14").append(identifierHash.result()); // OCTET STRING
+                                   "\x02\x04").append(reinterpret_cast<const char*>(&version), sizeof(version)).append( // INTEGER
+                                   "\x04\x14").append(cdKeyHash.result()).append( // OCTETSTRING
+                                   "\x04\x14").append(identifierHash.result()); // OCTETSTRING
     *outLen = result.size();
     std::memcpy(out, result.constData(), *outLen);
 
