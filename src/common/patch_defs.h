@@ -176,10 +176,15 @@ const std::vector<FileEntry> files = {
                     { 0x10c136d1, get_asm_nop(8) },
                     { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
 
+                    // Tweak: Use OCTETSTRING instead of IA5STRING
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
+                                  "\xE9\xB3\x45\x2E\xFF", 15) },             // jmp dunia.119ED260
+                    { 0x10c1381c, std::string("\xE9\x3F\xBA\xD1\x00", 5).append(get_asm_nop(1)) },
+
                     // Tweak: Change function call genOneTimeKey() to instead call external.
                     { std::string("\xFF\x15\x14\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                  "\xE9\xC5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c1372b, std::string("\xE9\x30\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
+                                  "\xE9\xA5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c1372b, std::string("\xE9\x50\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
