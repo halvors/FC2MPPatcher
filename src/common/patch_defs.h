@@ -93,7 +93,7 @@ const std::string agoraIdList[] = {
     "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
     "d75461366f6cabb69e833dbe61fc904a"  // Dev (Dedicated server)
 };
-constexpr uint32_t agoraIdModifier = !DEBUG_MODE ? 0 : 6;
+constexpr uint32_t agoraIdModifier = !BACKEND_DEV_MODE ? 0 : 6;
 
 // Reusable assembly constants.
 const std::string asm_jmp("\xEB", 1);
@@ -114,7 +114,7 @@ const std::vector<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "" }
+                      "7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
                 },
                 {
                     { "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }, // Hash for Retail version 0.1.17.
@@ -220,11 +220,11 @@ const std::vector<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "" },
+                      "31c0784efadfd6b526379eba24be939f79a4c93ac0f1e1e8565243ff38319f4e" },
 
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "" }
+                      "5b03e1da81f19abc7e5b9750daae89b28591087228fb104673b8078f2e29b98c" }
                 },
                 {
                     { "7af71319ef055fcc2193862ea43cf63dca92a957eb1c19c3956c72faaaf94804" }, // Hash for Steam version 0.1.17.
@@ -347,7 +347,7 @@ const std::vector<FileEntry> files = {
             { // Retail (GOG is identical)
                 {
                     { "c175d2a1918d3e6d4120a2f6e6254bd04907a5ec10d3c1dfac28100d6fbf9ace",
-                      "" }
+                      "b671face0db269fd6e269d75db3996f55a5371d839a2aaca121439edc701f277" }
                 },
                 {
                     { "ed008348873b2f4f9e25ecb144aabb243b005711d9cd59841f65874c90349325" }, // Hash for Retail version 0.1.17.
@@ -474,11 +474,11 @@ const std::vector<FileEntry> files = {
                 {
                     // Steam (R2 is identical)
                     { "5cd5d7b6e6e0b1d25843fdee3e9a743ed10030e89ee109b121109f4a146a062e",
-                      "" },
+                      "66273498444f82cc2c0ef01c0fca539034abb397a3fbcefbb595b3df0c135e8c" },
 
                     // Uplay
                     { "948a8626276a6689c0125f2355b6a820c104f20dee36977973b39964a82f2703",
-                      "" }
+                      "19a8f132b6dbfd7173f3e3ea5a2d084a03bbb9aa189ce4237aeb80effea0abe8" }
                 },
                 {
                     { "18902ffab0a8227d762d0ea0bbc0ea780e52ac81b25fd6a95f41a926c9e07929" }, // Hash for Steam version 0.1.17.
