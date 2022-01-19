@@ -5,8 +5,8 @@
 #include <QStringList>
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE false
-#define BACKEND_DEV_MODE false
+#define DEBUG_MODE true
+#define BACKEND_DEV_MODE true
 
 // App
 constexpr char app_name[] = "FC2MPPatcher";
