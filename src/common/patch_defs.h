@@ -626,7 +626,7 @@ const std::vector<FileEntry> files = {
             { // UPatch (Based on Retail)
                 {
                     { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
-                      "" }
+                      "abac7e2db00b9db26d09dcb613e1537832301a096cc9e635186f8fd49072d7b6" }
                       //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
                 },
                 {
@@ -676,8 +676,8 @@ const std::vector<FileEntry> files = {
                                   "\x8D\x85\x04\x01\x00\x00"                // lea  eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                                    ; out pointer
                                   "\xFF\x15\x10\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
-                                  "\x59"                                    // pop  ecx                                                     ; clean up cd key
-                                  "\x59"                                    // pop  ecx                                                     ; clean up serial name
+                                  "\x59"                                    // pop  ecx                                                    ; clean up cd key
+                                  "\x59"                                    // pop  ecx                                                    ; clean up serial name
                                   "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp  <dunia.return>
                     { 0x10c136d1, get_asm_nop(8) },
                     { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
