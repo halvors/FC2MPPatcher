@@ -630,18 +630,19 @@ const std::vector<FileEntry> files = {
                       //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
                 },
                 {
+                    ""
                     // TODO: Add checksum of older versions here when any available.
                 },
                 {
-                    // Common
+                    /* Common */
                     { 0x1001088e, 0 }, // bind()
                     { 0x10213d18, 0 }, // bind()
                     { 0x10c4e97a, 0 }, // bind()
-                    { 0x10cb9a8c, 0 }, // bind()                    // TODO
-                    { 0x10cb9ad4, 0 }, // bind()                    // TODO
-                    { 0x10014053, 1 }, // sendTo()                    // TODO
-                    { 0x10c5bde2, 2 }, // getAdapersInfo()                    // TODO
-                    { 0x1001431c, 3 }, // getHostByName()                    // TODO
+                    { 0x10cb9a8c, 0 }, // bind()
+                    { 0x10cb9ad4, 0 }, // bind()
+                    { 0x10014053, 1 }, // sendTo()
+                    { 0x10c5bde2, 2 }, // getAdapersInfo()
+                    { 0x1001431c, 3 }, // getHostByName()
 
                     // Tweak: Patch Ubisoft endpoints with our own.
                     { 0x10e7cb98, patch_endpoint_config_host, ".rdata" },
@@ -649,14 +650,13 @@ const std::vector<FileEntry> files = {
                     { 0x10e7f414, patch_endpoint_stun_host, ".rdata" },
                     { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
 
-                    // Client
+                    /* Client */
                     // Tweak: Replace game_id with new for community backend.
                     { 0x10dba4c4, agoraIdList[3 + agoraIdModifier], ".rdata" }, // game_id
 
                     // Tweak: Patch in our own agora root public key, and use that instead
                     { patch_agora_root_public_key },
 
-                    // TODO
                     // Tweak: Call rsa_import() with our agora root public key
                     { std::string("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
                                   "\x50"                                    // push eax                         ; rsa_key *key
@@ -667,7 +667,6 @@ const std::vector<FileEntry> files = {
                     { 0x10c12bca, std::string("\xE9\x51\x76\xB8\x00", 5) }, // jmp  <up104.text>                ; Jump to codecave because of space constrains
                     { 0x10c12bcf, get_asm_nop(15) },
 
-                    /*
                     // TODO
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
                     { std::string("\x57"                                    // push edi                                                    ; cd key
@@ -682,6 +681,7 @@ const std::vector<FileEntry> files = {
                     { 0x10c136d1, get_asm_nop(8) },
                     { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
 
+                    /*
                     // TODO
                     // Tweak: Use OCTETSTRING instead of IA5STRING
                     { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
