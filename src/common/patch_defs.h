@@ -162,7 +162,7 @@ const std::vector<FileEntry> files = {
                                   "\x68\x00\xF0\x92\x11"                    // push dunia.1192F000              ; const unsigned char *in
                                   "\xE8\x1A\x12\x33\xFF"                    // call dunia.10C60450              ; Calling rsa_import()
                                   "\xE9\x94\x39\x2E\xFF", 27) },            // jmp  <dunia.return>
-                    { 0x10c12bca, std::string("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  dunia.1192F220              ; Jump to codecave because of space constrains
+                    { 0x10c12bca, std::string("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  <dunia.text>                ; Jump to codecave because of space constrains
                     { 0x10c12bcf, get_asm_nop(15) },
 
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
@@ -172,11 +172,11 @@ const std::vector<FileEntry> files = {
                                   "\x8D\x85\x04\x01\x00\x00"                // lea  eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                                    ; out pointer
                                   "\xFF\x15\x10\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
-                                  "\x59"                                    // pop  ecx                                                     ; clean up cd key
-                                  "\x59"                                    // pop  ecx                                                     ; clean up serial name
+                                  "\x59"                                    // pop  ecx                                                    ; clean up cd key
+                                  "\x59"                                    // pop  ecx                                                    ; clean up serial name
                                   "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp  <dunia.return>
                     { 0x10c136d1, get_asm_nop(8) },
-                    { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
+                    { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp  <dunia.text>                                           ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Use OCTETSTRING instead of IA5STRING
                     { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5 ; Use OCTETSTRING
@@ -186,7 +186,7 @@ const std::vector<FileEntry> files = {
                     // Tweak: Change function call genOneTimeKey() to instead call external.
                     { std::string("\xFF\x15\x14\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\xA5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c1372b, std::string("\xE9\x50\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
+                    { 0x10c1372b, std::string("\xE9\x50\xBB\xD1\x00", 5) }, // jmp  <dunia.text>                                               ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -287,7 +287,7 @@ const std::vector<FileEntry> files = {
                                   "\x68\x00\xD0\x9E\x11"                    // push dunia.119ED000              ; const unsigned char *in
                                   "\xE8\x1A\x1A\x28\xFF"                    // call dunia.10C6EC50              ; Calling rsa_import()
                                   "\xE9\xA6\x6C\x23\xFF", 27) },            // jmp  <dunia.return>
-                    { 0x10c23edc, std::string("\xE9\x3F\x93\xDC\x00", 5) }, // jmp  dunia.119ED220              ; Jump to codecave because of space constrains
+                    { 0x10c23edc, std::string("\xE9\x3F\x93\xDC\x00", 5) }, // jmp  <dunia.text>                ; Jump to codecave because of space constrains
                     { 0x10c23ee1, get_asm_nop(15) },
 
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
@@ -301,7 +301,7 @@ const std::vector<FileEntry> files = {
                                   "\x59"                                    // pop ecx                                                     ; clean up serial name
                                   "\xE9\x6A\x77\x23\xFF", 23) },            // jmp <dunia.return>
                     { 0x10c249ae, get_asm_nop(8) },
-                    { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
+                    { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp <dunia.text>                                            ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Use OCTETSTRING instead of IA5STRING
                     { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5 ; Use OCTETSTRING
@@ -311,7 +311,7 @@ const std::vector<FileEntry> files = {
                     // Tweak: Change function call genOneTimeKey() to instead call external.
                     { std::string("\xFF\x15\x1C\xBA\x9E\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
                                   "\xE9\x82\x77\x23\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c24a08, std::string("\xE9\x73\x88\xDC\x00", 5) }, // jmp  dunia.119ED260                                             ; Change function call to instead jump to the .text_p section.
+                    { 0x10c24a08, std::string("\xE9\x73\x88\xDC\x00", 5) }, // jmp  <dunia.text>                                               ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
@@ -339,7 +339,7 @@ const std::vector<FileEntry> files = {
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
                                   "\xE9\x28\x0C\xD9\xFE", 31) },            // jmp  <dunia.return>
-                    { 0x1077def7, std::string("\xE9\xA4\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
+                    { 0x1077def7, std::string("\xE9\xA4\xF3\x26\x01", 5) }, // jmp  <dunia.text>    ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
