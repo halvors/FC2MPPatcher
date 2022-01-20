@@ -113,9 +113,8 @@ const std::vector<FileEntry> files = {
         {
             { // Retail (GOG is identical)
                 {
-                    { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
-                      "" }
-                      //"cf77f414a045e98d769c0193402b2f4c2a5e52bf6eb964efb901ce3b266f8bc1" }
+                    { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
+                       "cf77f414a045e98d769c0193402b2f4c2a5e52bf6eb964efb901ce3b266f8bc1" }
                 },
                 {
                     { "7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }, // Hash for Retail version 0.2.0.
@@ -628,12 +627,10 @@ const std::vector<FileEntry> files = {
             { // UPatch (Based on Retail)
                 {
                     { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
-                      "abac7e2db00b9db26d09dcb613e1537832301a096cc9e635186f8fd49072d7b6" }
-                      //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
+                      "d5ad60dfbb1a855716841661d6f9bd663d574ff19506c439e2eea65a18ff7152" }
                 },
                 {
-                    ""
-                    // TODO: Add checksum of older versions here when any available.
+                    "" // TODO: Add checksum of older versions here when any available.
                 },
                 {
                     /* Common */
@@ -696,19 +693,17 @@ const std::vector<FileEntry> files = {
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
                     /* Server */
-                    /*
-                    // TODO
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x4B\x19\xE4\xFE"                     // call dunia.10770BD0  ; GetNetFileServerAddress()
+                    { std::string("\xE8\x2B\x69\xFD\xFE"                     // call up104.10770BD0  ; GetNetFileServerAddress()
                                   "\x52"                                     // push edx
                                   "\x51"                                     // push ecx
                                   "\x50"                                     // push eax
-                                  "\xE8\x43\x8C\xEB\xFE"                     // call dunia.107E7ED0  ; IsSessionTypeLAN()
+                                  "\xE8\x23\xDC\x04\xFF"                     // call up104.107E7ED0  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                 // test al,al
                                   "\x75\x1B", 17)                            // jne  <up104.end>
                       .append(get_asm_nop(4)).append(
-                                  "\xE8\xA1\xBD\x2D\xFF"                     // call dunia.10C0B03B  ; Os::Agora::Network::getSingleton()
+                                  "\xE8\x81\x0D\x47\xFF"                     // call up104.10C0B03B  ; Os::Agora::Network::getSingleton()
                                   "\x8B\x10"                                 // mov  edx,dword ptr ds:[eax]
                                   "\x8B\x52\x14"                             // mov  edx,dword ptr ds:[edx+14]
                                   "\x3E\x8B\x0C\x24"                         // mov  ecx,dword ptr ds:[esp]
@@ -719,10 +714,9 @@ const std::vector<FileEntry> files = {
                                   "\x58"                                     // pop  eax
                                   "\x59"                                     // pop  ecx
                                   "\x5A"                                     // pop  edx
-                                  "\xE9\x68\x22\xE4\xFE", 31) },             // jmp  <up104.return>
-                    { 0x10771517, std::string("\xE9\x64\xDD\x1B\x01", 5) },  // jmp  <up104.text> ; Change function call to instead jump to the .text_p section.
+                                  "\xE9\x48\x72\xFD\xFE", 31) },             // jmp  <up104.return>
+                    { 0x10771517, std::string("\xE9\x84\x8D\x02\x01", 5) },  // jmp  <up104.text>    ; Change function call to instead jump to the .text_p section.
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
-                    */
                 }
             }
         }
