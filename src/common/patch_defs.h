@@ -113,12 +113,12 @@ const std::vector<FileEntry> files = {
         {
             { // Retail (GOG is identical)
                 {
-                    //{ "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
                     { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
                       "" }
-                      //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
+                      //"cf77f414a045e98d769c0193402b2f4c2a5e52bf6eb964efb901ce3b266f8bc1" }
                 },
                 {
+                    { "7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }, // Hash for Retail version 0.2.0.
                     { "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }, // Hash for Retail version 0.1.17.
                     { "9bfb6cf3be83af54a3625df887bf6a3aeacb13dd32a683a282c4fc4f03a4d50f" }, // Hash for Retail version 0.1.16.
                     { "cd14c176f0e86cc5b362e91badf32d882e54be0ecec85057d5200206433c1cff" }, // Hash for Retail version 0.1.14.
@@ -194,15 +194,15 @@ const std::vector<FileEntry> files = {
                     /* Server */
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
-                    { std::string("\xE8\x4B\x19\xE4\xFE"                    // call dunia.10770BD0  ; GetNetFileServerAddress()
+                    { std::string("\xE8\x2B\x19\xE4\xFE"                    // call dunia.10770BD0  ; GetNetFileServerAddress()
                                   "\x52"                                    // push edx
                                   "\x51"                                    // push ecx
                                   "\x50"                                    // push eax
-                                  "\xE8\x43\x8C\xEB\xFE"                    // call dunia.107E7ED0  ; IsSessionTypeLAN()
+                                  "\xE8\x23\x8C\xEB\xFE"                    // call dunia.107E7ED0  ; IsSessionTypeLAN()
                                   "\x84\xC0"                                // test al,al
                                   "\x75\x1B", 17)                           // jne  <dunia.end>
                       .append(get_asm_nop(4)).append(
-                                  "\xE8\xA1\xBD\x2D\xFF"                    // call dunia.10C0B03B  ; Os::Agora::Network::getSingleton()
+                                  "\xE8\x81\xBD\x2D\xFF"                    // call dunia.10C0B03B  ; Os::Agora::Network::getSingleton()
                                   "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
                                   "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
                                   "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
@@ -213,8 +213,8 @@ const std::vector<FileEntry> files = {
                                   "\x58"                                    // pop  eax
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
-                                  "\xE9\x68\x22\xE4\xFE", 31) },            // jmp  <dunia.return>
-                    { 0x10771517, std::string("\xE9\x64\xDD\x1B\x01", 5) }, // jmp  dunia.1192F280 ; Change function call to instead jump to the .text_p section.
+                                  "\xE9\x48\x22\xE4\xFE", 31) },            // jmp  <dunia.return>
+                    { 0x10771517, std::string("\xE9\x84\xDD\x1B\x01", 5) }, // jmp  <dunia.text>    ; Change function call to instead jump to the .text_p section.
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
@@ -222,13 +222,15 @@ const std::vector<FileEntry> files = {
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
-                      "31c0784efadfd6b526379eba24be939f79a4c93ac0f1e1e8565243ff38319f4e" },
+                      "bc5122bb07248861677c1a35fef25cff4912a51714126c5f02505b52d4351383" },
 
                     // Uplay
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
-                      "5b03e1da81f19abc7e5b9750daae89b28591087228fb104673b8078f2e29b98c" }
+                      "24f52200e9e42a4c8428aabd205b8ad791fa59171848b30d0a59a842cfe0ab9e" }
                 },
                 {
+                    { "31c0784efadfd6b526379eba24be939f79a4c93ac0f1e1e8565243ff38319f4e" }, // Hash for Steam version 0.2.0.
+                    { "5b03e1da81f19abc7e5b9750daae89b28591087228fb104673b8078f2e29b98c" }, // Hash for Uplay version 0.2.0.
                     { "7af71319ef055fcc2193862ea43cf63dca92a957eb1c19c3956c72faaaf94804" }, // Hash for Steam version 0.1.17.
                     { "5391e8b949ecf8b6506b925814c1d8d77d134d83660fb593645c2ed466c02282" }, // Hash for Uplay version 0.1.17.
                     { "3cb9feaf36ac1c057a3fac56e57f3a60bd0f7749f26d3ad55e9366bdbdd7d696" }, // Hash for Steam version 0.1.16.
@@ -337,7 +339,7 @@ const std::vector<FileEntry> files = {
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
                                   "\xE9\x28\x0C\xD9\xFE", 31) },            // jmp  <dunia.return>
-                    { 0x1077def7, std::string("\xE9\x84\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
+                    { 0x1077def7, std::string("\xE9\xA4\xF3\x26\x01", 5) }, // jmp  dunia.119ED280 ; Change function call to instead jump to the .text_p section.
                     { 0x10ceb6c8, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             }
@@ -407,7 +409,7 @@ const std::vector<FileEntry> files = {
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
                                   "\xE9\x31\x91\x30\xFF", 31) },            // jmp  <fc2serverlauncher.return>
-                    { 0x00ab8160, std::string("\xE9\x9B\x6E\xCF\x00", 5) }, // jmp  fc2serverlauncher.17AF000 ; Change function call to instead jump to the .text_p section.
+                    { 0x00ab8160, std::string("\xE9\x9B\x6E\xCF\x00", 5) }, // jmp  <fc2serverlauncher.text> ; Change function call to instead jump to the .text_p section.
                     { 0x004ecb38, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
@@ -546,7 +548,7 @@ const std::vector<FileEntry> files = {
                                   "\x59"                                    // pop  ecx
                                   "\x5A"                                    // pop  edx
                                   "\xE9\xD1\x10\x30\xFF", 31) },            // jmp  <fc2serverlauncher.return>
-                    { 0x00ab3100, std::string("\xE9\xFB\xEE\xCF\x00", 5) }, // jmp  fc2serverlauncher.17B2000 ; Change function call to instead jump to the .text_p section.
+                    { 0x00ab3100, std::string("\xE9\xFB\xEE\xCF\x00", 5) }, // jmp  <fc2serverlauncher.text> ; Change function call to instead jump to the .text_p section.
                     { 0x004ec828, get_asm_nop(6) }, // bypassing the rate limiting of map downloads by NOP out rate limit jump.
 
                     // Fix: Possibility to disable PunkBuster also for ranked matches.
