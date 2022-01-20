@@ -653,10 +653,6 @@ const std::vector<FileEntry> files = {
                     // Tweak: Replace game_id with new for community backend.
                     { 0x10dba4c4, agoraIdList[3 + agoraIdModifier], ".rdata" }, // game_id
 
-                    // TEMP FOR UPATCH
-                    //{ 0x10c1354c, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
-
-                    /*
                     // Tweak: Patch in our own agora root public key, and use that instead
                     { patch_agora_root_public_key },
 
@@ -665,12 +661,13 @@ const std::vector<FileEntry> files = {
                     { std::string("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
                                   "\x50"                                    // push eax                         ; rsa_key *key
                                   "\x68\x0E\x02\x00\x00"                    // push 526                         ; unsigned long inlen
-                                  "\x68\x00\xF0\x92\x11"                    // push dunia.1192F000              ; const unsigned char *in
-                                  "\xE8\x1A\x12\x33\xFF"                    // call dunia.10C60450              ; Calling rsa_import()
-                                  "\xE9\x94\x39\x2E\xFF", 27) },            // jmp  <dunia.return>
-                    { 0x10c12bca, std::string("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  dunia.1192F220              ; Jump to codecave because of space constrains
+                                  "\x68\x00\xA0\x79\x11"                    // push up104.1179A000              ; const unsigned char *in
+                                  "\xE8\x1A\x62\x4C\xFF"                    // call up104.10C60450              ; Calling rsa_import()
+                                  "\xE9\x94\x89\x47\xFF", 27) },            // jmp  <up104.return>
+                    { 0x10c12bca, std::string("\xE9\x51\x76\xB8\x00", 5) }, // jmp  <up104.text>                ; Jump to codecave because of space constrains
                     { 0x10c12bcf, get_asm_nop(15) },
 
+                    /*
                     // TODO
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
                     { std::string("\x57"                                    // push edi                                                    ; cd key
