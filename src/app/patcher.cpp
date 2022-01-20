@@ -190,7 +190,7 @@ bool Patcher::patchFile(const QDir &dir, const FileEntry &fileEntry, const Targe
 void Patcher::log(const QString &msg, QWidget *widget)
 {
     if (widget)
-        QMessageBox::warning(widget, QT_TR_NOOP(QString("Warning")), msg);
+        QMessageBox::warning(widget, QT_TR_NOOP("Warning"), msg);
     else
         qDebug().noquote() << msg;
 }

@@ -113,8 +113,10 @@ const std::vector<FileEntry> files = {
         {
             { // Retail (GOG is identical)
                 {
-                    { "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
-                      "7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
+                    //{ "7b82f20088e5c046a99fcaed65dc8bbb8202fd622a69737be83e00686b172d53",
+                    { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
+                      "" }
+                      //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
                 },
                 {
                     { "ada22369c47a00b4279a70e9bf90355877e4e500410c23ff8c1e5852e4158ff6" }, // Hash for Retail version 0.1.17.
@@ -614,6 +616,117 @@ const std::vector<FileEntry> files = {
                     //{ 0x0052c8d3, asm_nop(2) }, // MinPlayers?... 75 03 // works somehow..?
                     //{ 0x00b046ff, asm_nop(2) }, // MinPlayers?... 75 03 // takes care of persist thru refresh??
                     //{ 0x0094df05, asm_nop(2) } // MinPlayers?... 74 0f // bypass join in progress check?
+                }
+            }
+        }
+    },
+    {
+        "up104.dll",
+        {
+            { // UPatch (Based on Retail)
+                {
+                    { "b7de1aa15c90c52d8263298a80d53b6367621ccc5bbd4c1a63869ec401bf0713",
+                      "" }
+                      //"7d71c70809b7153b8e30628a981b096eb6837d024c48eaefbadb64bb21dbdf60" }
+                },
+                {
+                    // TODO: Add checksum of older versions here when any available.
+                },
+                {
+                    // Common
+                    { 0x1001088e, 0 }, // bind()
+                    { 0x10213d18, 0 }, // bind()
+                    { 0x10c4e97a, 0 }, // bind()
+                    { 0x10cb9a8c, 0 }, // bind()                    // TODO
+                    { 0x10cb9ad4, 0 }, // bind()                    // TODO
+                    { 0x10014053, 1 }, // sendTo()                    // TODO
+                    { 0x10c5bde2, 2 }, // getAdapersInfo()                    // TODO
+                    { 0x1001431c, 3 }, // getHostByName()                    // TODO
+
+                    // Tweak: Patch Ubisoft endpoints with our own.
+                    { 0x10e7cb98, patch_endpoint_config_host, ".rdata" },
+                    { 0x10e7f400, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f414, patch_endpoint_stun_host, ".rdata" },
+                    { 0x10e7f428, patch_endpoint_stun_host, ".rdata" },
+
+                    // Client
+                    // Tweak: Replace game_id with new for community backend.
+                    { 0x10dba4c4, agoraIdList[3 + agoraIdModifier], ".rdata" }, // game_id
+
+                    // TEMP FOR UPATCH
+                    //{ 0x10c1354c, get_asm_nop(2) }, // Just importing key no matter if sig verification was success or not :-)
+
+                    /*
+                    // Tweak: Patch in our own agora root public key, and use that instead
+                    { patch_agora_root_public_key },
+
+                    // TODO
+                    // Tweak: Call rsa_import() with our agora root public key
+                    { std::string("\x8D\x86\x58\x33\x00\x00"                // lea  eax,dword ptr ds:[esi+3358] ; Get address of rsa_key *key
+                                  "\x50"                                    // push eax                         ; rsa_key *key
+                                  "\x68\x0E\x02\x00\x00"                    // push 526                         ; unsigned long inlen
+                                  "\x68\x00\xF0\x92\x11"                    // push dunia.1192F000              ; const unsigned char *in
+                                  "\xE8\x1A\x12\x33\xFF"                    // call dunia.10C60450              ; Calling rsa_import()
+                                  "\xE9\x94\x39\x2E\xFF", 27) },            // jmp  <dunia.return>
+                    { 0x10c12bca, std::string("\xE9\x51\xC6\xD1\x00", 5) }, // jmp  dunia.1192F220              ; Jump to codecave because of space constrains
+                    { 0x10c12bcf, get_asm_nop(15) },
+
+                    // TODO
+                    // Tweak: Change function call genCdKeyIdHex() to instead call external.
+                    { std::string("\x57"                                    // push edi                                                    ; cd key
+                                  "\x56"                                    // push esi                                                    ; serial name
+                                  "\x50"                                    // push eax                                                    ; out length
+                                  "\x8D\x85\x04\x01\x00\x00"                // lea  eax,dword ptr ss:[ebp+104]
+                                  "\x50"                                    // push eax                                                    ; out pointer
+                                  "\xFF\x15\x10\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\x59"                                    // pop  ecx                                                     ; clean up cd key
+                                  "\x59"                                    // pop  ecx                                                     ; clean up serial name
+                                  "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp  <dunia.return>
+                    { 0x10c136d1, get_asm_nop(8) },
+                    { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
+
+                    // TODO
+                    // Tweak: Use OCTETSTRING instead of IA5STRING
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
+                                  "\xE9\xB3\x45\x2E\xFF", 15) },             // jmp dunia.119ED260
+                    { 0x10c1381c, std::string("\xE9\x3F\xBA\xD1\x00", 5).append(get_asm_nop(1)) },
+
+                    // TODO
+                    // Tweak: Change function call genOneTimeKey() to instead call external.
+                    { std::string("\xFF\x15\x14\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                  "\xE9\xA5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
+                    { 0x10c1372b, std::string("\xE9\x50\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
+
+                    // Tweak: Remove mouse clamp
+                    { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
+
+                    // Server
+                    // TODO
+                    // Fix: Custom map download
+                    { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
+                    { std::string("\xE8\x4B\x19\xE4\xFE"                    // call dunia.10770BD0  ; GetNetFileServerAddress()
+                                  "\x52"                                    // push edx
+                                  "\x51"                                    // push ecx
+                                  "\x50"                                    // push eax
+                                  "\xE8\x43\x8C\xEB\xFE"                    // call dunia.107E7ED0  ; IsSessionTypeLAN()
+                                  "\x84\xC0"                                // test al,al
+                                  "\x75\x1B", 17)                           // jne  <dunia.end>
+                      .append(get_asm_nop(4)).append(
+                                  "\xE8\xA1\xBD\x2D\xFF"                    // call dunia.10C0B03B  ; Os::Agora::Network::getSingleton()
+                                  "\x8B\x10"                                // mov  edx,dword ptr ds:[eax]
+                                  "\x8B\x52\x14"                            // mov  edx,dword ptr ds:[edx+14]
+                                  "\x3E\x8B\x0C\x24"                        // mov  ecx,dword ptr ds:[esp]
+                                  "\x36\x8D\x49\x08"                        // lea  ecx,dword ptr ds:[ecx+8]
+                                  "\x51"                                    // push ecx
+                                  "\x8B\xC8"                                // mov  ecx,eax
+                                  "\xFF\xD2"                                // call edx
+                                  "\x58"                                    // pop  eax
+                                  "\x59"                                    // pop  ecx
+                                  "\x5A"                                    // pop  edx
+                                  "\xE9\x68\x22\xE4\xFE", 31) },            // jmp  <dunia.return>
+                    { 0x10771517, std::string("\xE9\x64\xDD\x1B\x01", 5) }, // jmp  dunia.1192F280 ; Change function call to instead jump to the .text_p section.
+                    { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
+                    */
                 }
             }
         }
