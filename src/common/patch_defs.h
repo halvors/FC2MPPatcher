@@ -179,7 +179,7 @@ const std::vector<FileEntry> files = {
                     { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Use OCTETSTRING instead of IA5STRING
-                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5 ; Use OCTETSTRING
                                   "\xE9\xB3\x45\x2E\xFF", 15) },             // jmp dunia.119ED260
                     { 0x10c1381c, std::string("\xE9\x3F\xBA\xD1\x00", 5).append(get_asm_nop(1)) },
 
@@ -302,7 +302,7 @@ const std::vector<FileEntry> files = {
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp dunia.119ED240                                          ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Use OCTETSTRING instead of IA5STRING
-                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5 ; Use OCTETSTRING
                                   "\xE9\x90\x78\x23\xFF", 15) },             // jmp dunia.119ED260
                     { 0x10c24af9, std::string("\xE9\x62\x87\xDC\x00", 5).append(get_asm_nop(1)) },
 
@@ -667,37 +667,34 @@ const std::vector<FileEntry> files = {
                     { 0x10c12bca, std::string("\xE9\x51\x76\xB8\x00", 5) }, // jmp  <up104.text>                ; Jump to codecave because of space constrains
                     { 0x10c12bcf, get_asm_nop(15) },
 
-                    // TODO
                     // Tweak: Change function call genCdKeyIdHex() to instead call external.
                     { std::string("\x57"                                    // push edi                                                    ; cd key
                                   "\x56"                                    // push esi                                                    ; serial name
                                   "\x50"                                    // push eax                                                    ; out length
                                   "\x8D\x85\x04\x01\x00\x00"                // lea  eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                                    ; out pointer
-                                  "\xFF\x15\x10\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
+                                  "\xFF\x15\x10\x87\x79\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
                                   "\x59"                                    // pop  ecx                                                    ; clean up cd key
                                   "\x59"                                    // pop  ecx                                                    ; clean up serial name
-                                  "\xE9\x8D\x44\x2E\xFF", 23) },            // jmp  <dunia.return>
+                                  "\xE9\x8D\x94\x47\xFF", 23) },            // jmp  <up104.return>
                     { 0x10c136d1, get_asm_nop(8) },
-                    { 0x10c136df, std::string("\xE9\x5C\xBB\xD1\x00", 5) }, // jmp dunia.1192F240                                          ; Change function call to instead jump to the .text_p section.
+                    { 0x10c136df, std::string("\xE9\x5C\x6B\xB8\x00", 5) }, // jmp  <up104.text>                                           ; Change function call to instead jump to the .text_p section.
 
-                    /*
-                    // TODO
                     // Tweak: Use OCTETSTRING instead of IA5STRING
-                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5
-                                  "\xE9\xB3\x45\x2E\xFF", 15) },             // jmp dunia.119ED260
-                    { 0x10c1381c, std::string("\xE9\x3F\xBA\xD1\x00", 5).append(get_asm_nop(1)) },
+                    { std::string("\xC7\x85\x74\xFF\xFF\xFF\x05\x00\x00\x00" // mov dword ptr ss:[ebp-8C],5 ; Use OCTETSTRING
+                                  "\xE9\xB3\x95\x47\xFF", 15) },             // jmp <up104.return>
+                    { 0x10c1381c, std::string("\xE9\x3F\x6A\xB8\x00", 5).append(get_asm_nop(1)) },
 
-                    // TODO
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x14\xD7\x92\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
-                                  "\xE9\xA5\x44\x2E\xFF", 11) },            // jmp  <dunia.return>
-                    { 0x10c1372b, std::string("\xE9\x50\xBB\xD1\x00", 5) }, // jmp  dunia.1192f260                                             ; Change function call to instead jump to the .text_p section.
+                    { std::string("\xFF\x15\x14\x87\x79\x11"                // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
+                                  "\xE9\xA5\x94\x47\xFF", 11) },            // jmp  <up104.return>
+                    { 0x10c1372b, std::string("\xE9\x50\x6B\xB8\x00", 5) }, // jmp  <up104.text>                                               ; Change function call to instead jump to the .text_p section.
 
                     // Tweak: Remove mouse clamp
                     { 0x105f2338, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
 
-                    // Server
+                    /* Server */
+                    /*
                     // TODO
                     // Fix: Custom map download
                     { 0x10cb29e2, asm_jmp }, // change JZ (74) to JMP (EB)
