@@ -12,7 +12,7 @@
 const std::string FileUtils::calculateChecksum(QFile file)
 {
     if (!file.open(QFile::ReadOnly))
-        return nullptr;
+        return std::string();
 
     QCryptographicHash hash(QCryptographicHash::Sha256);
     hash.addData(&file);
