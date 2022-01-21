@@ -727,7 +727,7 @@ const std::vector<FileEntry> files = {
             { // UPatch (Based on R2)
                 {
                     { "28de59859b08de8b07642be1b99879134ba8cd9b2ea16b0d18c9da8b39483ea1",
-                      "" }
+                      "ae730dbd6b3ce13b55b22cb41cf8a2443a5b6725b5dee7bb49094b9c74ed04a9" }
                 },
                 {
                     // TODO: Add checksum of older versions here when any available.
