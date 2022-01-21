@@ -5,7 +5,7 @@
 #include <QStringList>
 
 // Set true for debugging mode without checksum verification.
-#define DEBUG_MODE false
+#define DEBUG_MODE true
 #define BACKEND_DEV_MODE false
 
 // App
