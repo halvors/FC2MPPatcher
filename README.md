@@ -1,5 +1,5 @@
 # FC2MPPatcher
-An community-made utility for patching Far Cry 2 to yet again support multiplayer online. 
+A community-made utility for patching Far Cry 2 to yet again support multiplayer online. 
 
 ## Howto / Instructions
 By following the these instructions you will be able to play multiplayer online within 2 minutes!
