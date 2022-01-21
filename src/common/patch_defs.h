@@ -93,7 +93,7 @@ const std::string agoraIdList[] = {
     "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
     "d75461366f6cabb69e833dbe61fc904a"  // Dev (Dedicated server)
 };
-constexpr uint32_t agoraIdModifier = !BACKEND_DEV_MODE ? 0 : 6;
+constexpr uint32_t agoraIdModifier = !USE_DEV_BACKEND ? 0 : 6;
 
 // Reusable assembly constants.
 const std::string asm_jmp("\xEB", 1);
