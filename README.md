@@ -24,7 +24,7 @@ Currently to play ranked matches you need PunkBuster installed, even though it i
 
 ### Requirements
  * A legal copy of the Far Cry 2 game (We do not ship any game files as they are intellectual property of Ubisoft Montreal). 
- * Game from one of these sources: Steam, Uplay, GOG or the Retail edition (CD/Disc).
+ * Game from one of these sources: Steam, Uplay, Epic Games, GOG or the Retail edition (CD/Disc).
  * Your game needs to be patched to version 1.03.
 
 ### Antivirus
