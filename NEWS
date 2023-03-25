@@ -1,0 +1,67 @@
+Release 0.2.1
+* Fixed game crashes to desktop if hosting match in-game with custom map.
+
+Release 0.2
+* Increased security for in-game login services.
+* Stability improvements for community backend.
+* Stability improvements for custom map downloads.
+* Fix for unrenderable player names in Dedicated Server console.
+
+Release 0.1.17
+* Switching over to unofficial Far Cry 2 community backend.
+
+Release 0.1.16
+* Improved password security for upcoming community backend.
+
+Release 0.1.15
+* Added a new and secure login solution for use with community backend.
+
+Release 0.1.14
+* Fixed broken custom map download in LAN mode.
+* Fixed crash bug related to custom map download in server.
+
+Release 0.1.13
+* Preparations for possible future community backend and online services if it turns out Ubisoft really shutdown theirs.
+
+Release 0.1.12
+* Fixes custom map download speed being very slow, now not rate limited anymore.
+* Enable possibility of starting ranked servers without PunkBuster.
+
+Release 0.1.11
+* Fixed custom map download for Retail edition as well, also fixed this when hosting matches from the game itself.
+
+Release 0.1.10
+* Fixed custom map download directly from game host for Steam and Uplay editions of the dedicated server, also includes R2 release.
+
+Release 0.1.9
+* Fixed login problem for Steam and Uplay editions.
+
+Release 0.1.8
+* Fixed a crash bug in the patcher itself when no installation detected.
+* Added support for Far Cry 2 installation from Uplay.
+
+Release 0.1.7
+* Fixed an issue where we wrongly detected write protected files, even if they was not.
+* Fixed patching fails if game is running , you still have to restart game after patching for it to take effect.
+
+Release 0.1.6
+* Fixes some issues with LAN play introduced in last version.
+* Added warning if target files is not writable.
+* Included version number in patch library file.
+
+Release 0.1.5
+* No need to select network interface for online multiplayer, only for LAN play. (This enables VPN lan play and online at the same time).
+
+Release 0.1.4
+* Fixes issues related to custom server launchers.
+
+Release 0.1.3
+* Fixes issues related to IP address change on network interface, configuration now persists that.
+
+Release 0.1.2
+* Fixes Dedicated server not being able to connect to Ubisoft's master server.
+* Renamed configuration file from network.cfg to mppatch.cfg.
+* Reverting redux mod support because of incompatibility with multiplayer.
+
+Release 0.1
+* First release of our patch to the public, enjoy!

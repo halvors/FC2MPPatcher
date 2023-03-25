@@ -1,5 +1,5 @@
 # FC2MPPatcher
-An community-made utility for patching Far Cry 2 to yet again support multiplayer online. 
+A community-made utility for patching Far Cry 2 to yet again support multiplayer online. 
 
 ## Howto / Instructions
 By following the these instructions you will be able to play multiplayer online within 2 minutes!
@@ -24,7 +24,7 @@ Currently to play ranked matches you need PunkBuster installed, even though it i
 
 ### Requirements
  * A legal copy of the Far Cry 2 game (We do not ship any game files as they are intellectual property of Ubisoft Montreal). 
- * Game from one of these sources: Steam, Uplay, GOG or the Retail edition (CD/Disc).
+ * Game from one of these sources: Steam, Uplay, Epic Games, GOG or the Retail edition (CD/Disc).
  * Your game needs to be patched to version 1.03.
 
 ### Antivirus
@@ -58,7 +58,8 @@ If hosting a server to be used by players on LAN or thru VPN, you have to select
 
 ## Discord
 [FC2MPPatcher](https://discord.gg/82G9Fh5)  
-[FC2Community](https://discord.link/FC2)
+[Far Cry 2 Community](https://discord.link/FC2)  
+[Far Cry 2 Multiplayer](https://discord.com/invite/YRQhc39)  
 
 ## Thanks to
 ### Contributors

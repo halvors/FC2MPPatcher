@@ -93,7 +93,7 @@ const std::string agoraIdList[] = {
     "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
     "d75461366f6cabb69e833dbe61fc904a"  // Dev (Dedicated server)
 };
-constexpr uint32_t agoraIdModifier = !BACKEND_DEV_MODE ? 0 : 6;
+constexpr uint32_t agoraIdModifier = !USE_DEV_BACKEND ? 0 : 6;
 
 // Reusable assembly constants.
 const std::string asm_jmp("\xEB", 1);
@@ -217,13 +217,13 @@ const std::vector<FileEntry> files = {
                     { 0x10cb2588, get_asm_nop(6) } // bypassing the rate limiting of map downloads by NOP out rate limit jump.
                 }
             },
-            { // Steam and Uplay
+            { // Steam, Uplay and Epic Games
                 {
                     // Steam
                     { "6353936a54aa841350bb30ff005727859cdef1aa10c209209b220b399e862765",
                       "bc5122bb07248861677c1a35fef25cff4912a51714126c5f02505b52d4351383" },
 
-                    // Uplay
+                    // Uplay and Epic Games
                     { "b7219dcd53317b958c8a31c9241f6855cab660a122ce69a0d88cf4c356944e92",
                       "24f52200e9e42a4c8428aabd205b8ad791fa59171848b30d0a59a842cfe0ab9e" }
                 },
