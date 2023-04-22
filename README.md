@@ -20,7 +20,7 @@ In order to play online you have to register for an online account, Ubisoft serv
 
 Currently to play ranked matches you need PunkBuster installed, even though it is not in use by the server itself.
 
-**NOTE:** As mentioned in our license, we are liable for bricking your game or even computer. 
+**NOTE:** As mentioned in our license, we are not liable for any damage to your game or computer. 
 
 ### Requirements
  * A legal copy of the Far Cry 2 game (We do not ship any game files as they are intellectual property of Ubisoft Montreal). 
