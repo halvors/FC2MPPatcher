@@ -9,12 +9,18 @@
 #include "entry.h"
 
 const std::vector<std::string> patch_library_functions = {
-    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
-    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-    "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
-    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_"                // generateOneTimeKey()
+//    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
+//    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
+//    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
+//    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
+//    "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
+//    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_"                // generateOneTimeKey()
+    "patch_bind",              // bind()
+    "patch_sendto",            // sendTo()
+    "patch_get_adapters_info", // getAdapersInfo()
+    "patch_get_host_by_name",  // getHostByName()
+    "generate_cd_key_id_hex",  // generateCdKeyIdHex()
+    "generate_one_time_key"    // generateOneTimeKey()
 };
 
 /**
