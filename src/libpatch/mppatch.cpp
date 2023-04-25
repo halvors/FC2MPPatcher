@@ -89,7 +89,7 @@ hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
     return gethostbyname(address.c_str());
 }
 
-int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
+int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, const char* serialName, char* cdKey)
 {
     const uint32_t version = qbswap(Helper::toInt(APP_VERSION));
 

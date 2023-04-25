@@ -91,7 +91,10 @@ const std::string agoraIdList[] = {
 
     "787292792231d5d89f9015576217b5a4", // Dev (Retail)
     "68cf276e2f1b31dfade9df215744b6dd", // Dev (Steam)
-    "d75461366f6cabb69e833dbe61fc904a"  // Dev (Dedicated server)
+    "d75461366f6cabb69e833dbe61fc904a", // Dev (Dedicated server)
+
+    "c837ecfa7455ebd19325b9d765d8d29c", // UPatch (Retail)
+    "384990478cd35434beaae48eca1e8874", // UPatch (Dedicated server)
 };
 constexpr uint32_t agoraIdModifier = !USE_DEV_BACKEND ? 0 : 6;
 
@@ -651,7 +654,7 @@ const std::vector<FileEntry> files = {
 
                     /* Client */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x10dba4c4, agoraIdList[3 + agoraIdModifier], ".rdata" }, // game_id
+                    { 0x10dba4c4, agoraIdList[12], ".rdata" }, // game_id
 
                     // Tweak: Patch in our own agora root public key, and use that instead
                     { patch_agora_root_public_key },
@@ -751,7 +754,7 @@ const std::vector<FileEntry> files = {
 
                     /* Server */
                     // Tweak: Replace game_id with new for community backend.
-                    { 0x01045fb0, agoraIdList[5 + agoraIdModifier], ".rdata" }, // game_id
+                    { 0x01045fb0, agoraIdList[13], ".rdata" }, // game_id
 
                     // Fix: Custom map download
                     { 0x004eca95, asm_jmp }, // change JZ (74) to JMP (EB)
