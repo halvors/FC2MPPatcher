@@ -15,12 +15,12 @@ const std::vector<std::string> patch_library_functions = {
 //    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
 //    "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
 //    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_"                // generateOneTimeKey()
-    "patch_bind",              // bind()
-    "patch_sendto",            // sendTo()
-    "patch_get_adapters_info", // getAdapersInfo()
-    "patch_get_host_by_name",  // getHostByName()
-    "generate_cd_key_id_hex",  // generateCdKeyIdHex()
-    "generate_one_time_key"    // generateOneTimeKey()
+    "_patch_bind@12",             // bind()
+    "_patch_get_host_by_name@4",  // gethostbyname()
+    "_patch_sendto@24",           // sendto()
+    "_patch_get_adapters_info@8", // getadaptersinfo()
+    "generate_cd_key_id_hex",     // generate_cd_key_id_hex()
+    "generate_one_time_key"       // generate_one_time_key()
 };
 
 /**
