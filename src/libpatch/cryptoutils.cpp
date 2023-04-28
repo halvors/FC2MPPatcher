@@ -2,9 +2,9 @@
 
 #include <argon2.h>
 
-const char CryptoUtils::salt[] = "Yq1cKxqzHN3skC9l";
+const char salt[] = "Yq1cKxqzHN3skC9l";
 
-QByteArray CryptoUtils::hashPassword(const QByteArray &password)
+QByteArray hashPassword(const QByteArray &password)
 {
     if (!password.isEmpty()) {
         QByteArray hash(HASH_LENGTH, 0);

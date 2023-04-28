@@ -4,10 +4,6 @@
 #include <cstdint>
 #include <string>
 
-class Helper
-{
-public:
-    static uint32_t toInt(const std::string& version);
-};
+uint32_t toInt(const std::string& version);
 
 #endif // HELPER_H

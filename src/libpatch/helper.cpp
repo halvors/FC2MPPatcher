@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-uint32_t Helper::toInt(const std::string& version)
+uint32_t toInt(const std::string& version)
 {
     std::istringstream stream(version);
     std::string s;

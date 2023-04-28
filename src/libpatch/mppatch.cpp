@@ -14,7 +14,7 @@
 #include "netutils.h"
 #include "cryptoutils.h"
 
-void MPPatch::readSettings()
+void read_settings()
 {
     if (!address.empty() && !broadcast.empty())
         return;
@@ -37,7 +37,7 @@ void MPPatch::readSettings()
     settings.endGroup();
 }
 
-int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int namelen)
+int WSAAPI __stdcall patch_bind(SOCKET s, const sockaddr* name, int namelen)
 {
     sockaddr_in* name_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(name));
 
@@ -47,11 +47,11 @@ int WSAAPI __stdcall MPPatch::bind_patch(SOCKET s, const sockaddr* name, int nam
     return bind(s, name, namelen);
 }
 
-int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
+int WSAAPI __stdcall patch_sendto(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen)
 {
     sockaddr_in* to_in = reinterpret_cast<sockaddr_in*>(const_cast<sockaddr*>(to));
 
-    readSettings();
+    read_settings();
 
     // If destination address is 255.255.255.255, use subnet broadcast address instead.
     if (to_in->sin_addr.s_addr == INADDR_BROADCAST)
@@ -60,7 +60,16 @@ int WSAAPI __stdcall MPPatch::sendTo_patch(SOCKET s, const char* buf, int len, i
     return sendto(s, buf, len, flags, to, tolen);
 }
 
-uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
+hostent* WSAAPI __stdcall patch_get_host_by_name(const char* name)
+{
+    Q_UNUSED(name);
+
+    read_settings();
+
+    return gethostbyname(address.c_str());
+}
+
+uint64_t __stdcall patch_get_adapters_info(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer)
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
@@ -69,7 +78,7 @@ uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, 
 
     IP_ADAPTER_INFO* adapter = adapterInfo;
 
-    readSettings();
+    read_settings();
 
     while (strcmp(adapter->IpAddressList.IpAddress.String, address.c_str()) != 0)
         adapter = adapter->Next;
@@ -80,18 +89,9 @@ uint64_t __stdcall MPPatch::getAdaptersInfo_patch(IP_ADAPTER_INFO* adapterInfo, 
     return result;
 }
 
-hostent* WSAAPI __stdcall MPPatch::getHostByName_patch(const char* name)
+int __cdecl generate_cd_key_id_hex(uint8_t* out, uint32_t* outLen, const char* serialName, const char* cdKey)
 {
-    Q_UNUSED(name);
-
-    readSettings();
-
-    return gethostbyname(address.c_str());
-}
-
-int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* serialName, char* cdKey)
-{
-    const uint32_t version = qbswap(Helper::toInt(APP_VERSION));
+    const uint32_t version = qbswap(toInt(APP_VERSION));
 
     // CD key hex
     QCryptographicHash cdKeyHash(QCryptographicHash::Algorithm::Sha1);
@@ -113,9 +113,9 @@ int __cdecl MPPatch::generateCdKeyIdHex(uint8_t* out, uint32_t* outLen, char* se
     return 0;
 }
 
-int __cdecl MPPatch::generateOneTimeKey(uint8_t* out, uint32_t* outLen, char* challenge, char* username, char* password)
+int __cdecl generate_one_time_key(uint8_t* out, uint32_t* outLen, const char* challenge, const char* username, const char* password)
 {
-    QByteArray passwordHash = CryptoUtils::hashPassword(password).toHex();
+    QByteArray passwordHash = hashPassword(password).toHex();
 
     QCryptographicHash oneTimeHash(QCryptographicHash::Algorithm::Sha1);
     oneTimeHash.addData(username);
