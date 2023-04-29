@@ -12,7 +12,7 @@
 void read_settings();
 
 extern "C" {
-    int WSAAPI _stdcall patch_bind(SOCKET s, const sockaddr *name, int namelen);
+    MPPATCHSHARED_EXPORT int WSAAPI __stdcall patch_bind(SOCKET s, const sockaddr *name, int namelen);
     MPPATCHSHARED_EXPORT int WSAAPI __stdcall patch_sendto(SOCKET s, const char* buf, int len, int flags, const sockaddr* to, int tolen);
     MPPATCHSHARED_EXPORT uint64_t __stdcall patch_get_adapters_info(IP_ADAPTER_INFO* adapterInfo, unsigned long* sizePointer);
     MPPATCHSHARED_EXPORT hostent* WSAAPI __stdcall patch_get_host_by_name(const char* name);

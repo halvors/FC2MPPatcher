@@ -9,18 +9,12 @@
 #include "entry.h"
 
 const std::vector<std::string> patch_library_functions = {
-//    "_ZN7MPPatch10bind_patchEjPK8sockaddri@12",                   // bind()
-//    "_ZN7MPPatch12sendTo_patchEjPKciiPK8sockaddri@24",            // sendTo()
-//    "_ZN7MPPatch21getAdaptersInfo_patchEP16_IP_ADAPTER_INFOPm@8", // getAdapersInfo()
-//    "_ZN7MPPatch19getHostByName_patchEPKc@4",                     // getHostByName()
-//    "_ZN7MPPatch18generateCdKeyIdHexEPhPjPcS2_",                  // generateCdKeyIdHex()
-//    "_ZN7MPPatch18generateOneTimeKeyEPhPjPcS2_S2_"                // generateOneTimeKey()
-    "_patch_bind@12",             // bind()
-    "_patch_get_host_by_name@4",  // gethostbyname()
-    "_patch_sendto@24",           // sendto()
-    "_patch_get_adapters_info@8", // getadaptersinfo()
-    "generate_cd_key_id_hex",     // generate_cd_key_id_hex()
-    "generate_one_time_key"       // generate_one_time_key()
+    "patch_bind@12",             // bind()
+    "patch_sendto@24",           // sendto()
+    "patch_get_adapters_info@8", // getadaptersinfo()
+    "patch_get_host_by_name@4",  // gethostbyname()
+    "generate_cd_key_id_hex",    // generate_cd_key_id_hex()
+    "generate_one_time_key"      // generate_one_time_key()
 };
 
 /**
@@ -301,12 +295,10 @@ const std::vector<FileEntry> files = {
                                   "\x50"                                    // push eax                                      ; out length
                                   "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                      ; out pointer
-                                  "\xFF\x15\x7C\xB9\x9E\x11"                // call dword ptr ds:[<&generate_cd_key_id_hex>] ; generate_cd_key_id_hex()
+                                  "\xFF\x15\x84\xB9\x9E\x11"                // call dword ptr ds:[<&generate_cd_key_id_hex>] ; generate_cd_key_id_hex()
                                   "\x59"                                    // pop ecx                                       ; clean up cd key
                                   "\x59"                                    // pop ecx                                       ; clean up serial name
                                   "\xE9\x6A\x77\x23\xFF", 23) },            // jmp <dunia.return>
-
-                    // "\xFF\x15\x18\xBA\x9E\x11" // call dword ptr ds:[<&_ZN7MPPatch13genCdKeyIdHexEPhPjPcS2_>] ; MPPatch::generateCdKeyIdHex()
 
                     { 0x10c249ae, get_asm_nop(8) },
                     { 0x10c249bc, std::string("\xE9\x7F\x88\xDC\x00", 5) }, // jmp <dunia.text>                             ; Change function call to instead jump to the .text_p section.
@@ -317,11 +309,9 @@ const std::vector<FileEntry> files = {
                     { 0x10c24af9, std::string("\xE9\x62\x87\xDC\x00", 5).append(get_asm_nop(1)) },
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x80\xB9\x9E\x11"                // call dword ptr ds:[<&generate_one_time_key>] ; generate_one_time_key()
+                    { std::string("\xFF\x15\x88\xB9\x9E\x11"                // call dword ptr ds:[<&generate_one_time_key>] ; generate_one_time_key()
                                   "\xE9\x82\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c24a08, std::string("\xE9\x73\x88\xDC\x00", 5) }, // jmp  <dunia.text>                            ; Change function call to instead jump to the .text_p section.
-
-                    // "\xFF\x15\x1C\xBA\x9E\x11" // call dword ptr ds:[<&_ZN7MPPatch13genOneTimeKeyEPcPyS0_S0_S0_>] ; MPPatch::genOneTimeKey()
 
                     // Tweak: Remove mouse clamp
                     { 0x105ffc78, get_asm_nop(8) }, // Replace byte 0x105ffc78 to 0x105ffc7f with "nop" instruction.
