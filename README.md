@@ -58,8 +58,8 @@ If hosting a server to be used by players on LAN or thru VPN, you have to select
 
 ## Discord
 [FC2MPPatcher](https://discord.gg/82G9Fh5)  
-[Far Cry 2 Community](https://discord.link/FC2)  
-[Far Cry 2 Multiplayer](https://discord.com/invite/YRQhc39)  
+[Far Cry 2 Community](https://discord.com/invite/2XgQzhd)  
+[Far Cry 2 Other community](https://discord.com/invite/YRQhc39)  
 
 ## Thanks to
 ### Contributors
