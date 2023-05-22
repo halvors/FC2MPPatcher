@@ -64,7 +64,7 @@ If hosting a server to be used by players on LAN or thru VPN, you have to select
 ## Thanks to
 ### Contributors
 <i>zenoy and halvors</i> - for patching the assembly code, creating the patcher application, and providing community backend services.  
-<i>FEARIV and claypigeon - for helping developing our web services
+<i>FEARIV and claypigeon - for helping developing our web services.  
 <i>svinsen, Gabor and Lasercar</i> - for help testing and community support.
 
 ### Others
