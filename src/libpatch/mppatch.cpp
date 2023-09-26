@@ -69,7 +69,7 @@ hostent* WSAAPI __stdcall patch_get_host_by_name(const char* name)
     return gethostbyname(address.c_str());
 }
 
-ULONG __stdcall patch_get_adapters_info(PIP_ADAPTER_INFO adapterInfo, PULONG sizePointer)
+ULONG __stdcall patch_get_adapters_info(IP_ADAPTER_INFO* adapterInfo, ULONG* sizePointer)
 {
     unsigned long result = GetAdaptersInfo(adapterInfo, sizePointer);
 
