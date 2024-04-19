@@ -57,7 +57,6 @@ Please be aware that IP addresses shown in server logs may be misleading, no mat
 If hosting a server to be used by players on LAN or thru VPN, you have to select the proper network adapter (if VPN select that) before patching!
 
 ## Discord
-[FC2MPPatcher](https://discord.gg/82G9Fh5)  
 [Far Cry 2 Community](https://discord.com/invite/2XgQzhd)  
 [Far Cry 2 Other community](https://discord.com/invite/YRQhc39)  
 
