@@ -28,7 +28,7 @@ Currently to play ranked matches you need PunkBuster installed, even though it i
  * Your game needs to be patched to version 1.03.
 
 ### Antivirus
-This patch could trigger a false positive in your antivirus software, that is because it alters Far Cry 2 game files, this is to be expected and can be ignored. This software contains no code, you're welcome to read throught our source code ;-)
+This patch could trigger a false positive in your antivirus software, that is because it alters Far Cry 2 game files, this is to be expected and can be ignored. This software is not malware, you're welcome to read throught our source code ;-)
 
 ## Features
 This resolves the following issues for the game and dedicated server.
