@@ -295,7 +295,7 @@ const std::vector<FileEntry> files = {
                                   "\x50"                                    // push eax                                      ; out length
                                   "\x8D\x85\x04\x01\x00\x00"                // lea eax,dword ptr ss:[ebp+104]
                                   "\x50"                                    // push eax                                      ; out pointer
-                                  "\xFF\x15\x84\xB9\x9E\x11"                // call dword ptr ds:[<&generate_cd_key_id_hex>] ; generate_cd_key_id_hex()
+                                  "\xFF\x15\x80\xB9\x9E\x11"                // call dword ptr ds:[<&generate_cd_key_id_hex>] ; generate_cd_key_id_hex()
                                   "\x59"                                    // pop ecx                                       ; clean up cd key
                                   "\x59"                                    // pop ecx                                       ; clean up serial name
                                   "\xE9\x6A\x77\x23\xFF", 23) },            // jmp <dunia.return>
@@ -309,7 +309,7 @@ const std::vector<FileEntry> files = {
                     { 0x10c24af9, std::string("\xE9\x62\x87\xDC\x00", 5).append(get_asm_nop(1)) },
 
                     // Tweak: Change function call genOneTimeKey() to instead call external.
-                    { std::string("\xFF\x15\x88\xB9\x9E\x11"                // call dword ptr ds:[<&generate_one_time_key>] ; generate_one_time_key()
+                    { std::string("\xFF\x15\x84\xB9\x9E\x11"                // call dword ptr ds:[<&generate_one_time_key>] ; generate_one_time_key()
                                   "\xE9\x82\x77\x23\xFF", 11) },            // jmp  <dunia.return>
                     { 0x10c24a08, std::string("\xE9\x73\x88\xDC\x00", 5) }, // jmp  <dunia.text>                            ; Change function call to instead jump to the .text_p section.
 
