@@ -7,10 +7,10 @@ By following the these instructions you will be able to play multiplayer online 
 ### Account registration
 In order to play online you have to register for an online account, Ubisoft services shutdown on June 1st 2021 ([Source](https://forums.ubisoft.com/showthread.php/1241617-Online-Services-Update-Masterlist-Forums?s=4e28173932bf67c5c4b122e6e2bd10eb)).
 
-* Create an online account by registering at [farcry2.online](https://farcry2.online/register.html).
+* Create an online account by registering at [longweep.net](https://longweep.net/register.html).
     * Verify your account by clicking on the link in the received e-mail.
     * NOTE: You do not need to login to your account on the website, only ingame.
-* Add an online profile (or edit existing one) in the ingame multiplayer menu, use exactly the same account details as registered on [farcry2.online](https://farcry2.online) website.
+* Add an online profile (or edit existing one) in the ingame multiplayer menu, use exactly the same account details as registered on [longweep.net](https://longweep.net) website.
 * Enjoy your multiplayer online experience!
 
 ### Installation
