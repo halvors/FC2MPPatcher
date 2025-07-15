@@ -56,6 +56,11 @@ Please be aware that IP addresses shown in server logs may be misleading, no mat
 
 If hosting a server to be used by players on LAN or thru VPN, you have to select the proper network adapter (if VPN select that) before patching!
 
+## Disclaimer
+We do not own any part of the Far Cry 2 intellectual property, nor are we affiliated with Ubisoft Entertainment in any way.  
+FAR CRY is a trademark of Ubisoft Entertainment.  
+This project exists solely for legacy support purposes and does not distribute or modify any Ubisoft-owned software, code, or assets.  
+
 ## Discord
 [Far Cry 2 Community](https://discord.com/invite/2XgQzhd)  
 [Far Cry 2 Other community](https://discord.com/invite/YRQhc39)  
